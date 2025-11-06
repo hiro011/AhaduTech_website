@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About - ahadutech</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+
+</head>
+
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo">ahadutech</a>
+      <div class="nav-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="index.html">Products</a>
+        <a href="services.html">Services</a>
+        <a href="about.html" class="active">About</a>
+        <a href="dashboard.html" id="cart-link">Cart (0)</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- About Section -->
+    <section class="about-section">
+      <h1>About ahadutech</h1>
+      <p>
+        <span class="highlight">ahadutech</span> is a simple, fast, and fully
+        client-side electronics store built for learning and fun.
+      </p>
+      <p>
+        <strong>How it works:</strong>
+      </p>
+      <p>
+        You can <strong>browse products</strong> on the
+        <a href="index.html" style="color: #00d4ff">Products page</a>, check
+        real-time <strong>stock availability</strong>, and add items to your
+        cart with one click.
+      </p>
+      <p>
+        Your cart is saved locally in your browser using
+        <code>localStorage</code> — no login, no server, no data shared.
+      </p>
+      <p>
+        Visit the
+        <a href="dashboard.html" style="color: #00d4ff">Dashboard</a> to
+        <strong>view your cart</strong>, see total items and price, and
+        <strong>remove items</strong> as needed.
+      </p>
+      <p>
+        <strong>Important:</strong> All cart data is
+        <strong>saved only on this device and browser</strong>. Clear your
+        cache or use another device — your cart will be gone.
+      </p>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section">
+      <div class="contact-info">
+        <div>
+          <h2>Get in Touch</h2>
+          <p>
+            We'd love to hear from you! Reach out for inquiries, support, or
+            feedback.
+          </p>
+
+          <div class="contact-item">
+            <div>
+              <strong>
+                <img src="images/phone-alt.svg" alt="Phone" width="15" height="15">
+                Phone</strong><br />
+              <a href="tel:+251941057332">+251-94-105-7332</a>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <div>
+              <strong>
+                <img src="images/envelope.svg" alt="Email" width="15" height="15">
+                Email</strong><br />
+              <a href="mailto:support@ahadutech.com">support@ahadutech.com</a>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <div class="telegram-list">
+              <strong>
+                <img src="images/telegram.svg" alt="Telegram" width="15" height="15">
+                Telegram</strong><br />
+              <a href="https://t.me/AhaduTech" target="_blank">@AhaduTech</a>
+              <a href="https://t.me/trust_payment_proof" target="_blank">@trust_payment_proof</a>
+              <a href="https://t.me/NatnaelBizuneh" target="_blank">@NatnaelBizuneh</a>
+            </div>
+          </div>
+
+          <div class="contact-item">
+            <div>
+              <strong>
+                <img src="images/map-marker-alt.svg" alt="Location" width="15" height="15">
+                Address</strong><br />
+              Bole, Addis Ababa, Ethiopia
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Footer -->
+  <footer>&copy; 2025 ahadutech. All rights reserved.</footer>
+
+  <!-- Cart Count Script -->
+  <script>
+    const cartLink = document.getElementById("cart-link");
+
+    // Load cart from localStorage
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    // Update cart count
+    function updateCartCount() {
+      if (!cartLink) return;
+      const totalItems = cart.reduce(
+        (sum, item) => sum + (item.quantity || 0),
+        0
+      );
+      cartLink.textContent = `Cart (${totalItems})`;
+    }
+
+    // Run on page load
+    document.addEventListener("DOMContentLoaded", updateCartCount);
+  </script>
+</body>
+
+</html>
