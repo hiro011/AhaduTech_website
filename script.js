@@ -2,7 +2,7 @@ const products = [
   { id: 1, name: "Redmi Earpod", price: 2700, stock: 1, img: "images/redmi-earpod.jpg" },
   { id: 2, name: "Hair Trimmer Golden", price: 1100, stock: 1, img: "images/hair-trimmer gold.jpg" },
   { id: 3, name: "Hair Trimmer Black", price: 1100, stock: 1, img: "images/hair-trimmer black.jpg" },
-  { id: 4, name: "USB-C Charger", price: 29.99, stock: 45, img: "images/Charger.jpg" },
+  { id: 4, name: "USB-C Charger", price: 29.99, stock: 45, img: "images/image.png" },
   { id: 5, name: "Wireless Mouse Adjustable DPI", price: 1200 , stock: 1, img: "images/mouse-black.jpg" },
   { id: 6, name: "Slim Wireless Mouse White", price: 1200, stock: 0, img: "images/mouse-white.jpg" },
   { id: 7, name: "Hair Clipper", price: 2000, stock: 0, img: "images/Hair Clipper.jpg" },
