@@ -4,47 +4,245 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>AhaduTech</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image" href="images/image.png">
   <link rel="stylesheet" href="style.css">
-</head>
+  
+  <style>
+    .container { max-width:1200px; margin:3rem auto; padding:0 5%; text-align:center; }
 
+    h1 { font-size:2.8rem; color:#1a1a2e; margin-bottom:1rem; }
+    .subtitle { font-size:1.2rem; color:#666; margin-bottom:3rem; }
+
+    /* Package Grid */
+    .packages-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 4rem;
+    }
+
+    .package {
+      background:#fff; border-radius:16px; overflow:hidden;
+      box-shadow:0 8px 25px rgba(0,0,0,0.1); transition:transform .3s;
+    }
+    .package:hover { transform:translateY(-10px); }
+
+    .pkg-header {
+      padding:1rem; color:white; font-weight:700; font-size:1.1rem;
+    }
+    .pkg1 { background:linear-gradient(135deg, #9b59b6, #8e44ad); }
+    .pkg2 { background:linear-gradient(135deg, #95a5a6, #7f8c8d); }
+    .pkg3 { background:linear-gradient(135deg, #3498db, #2980b9); }
+    .pkg4 { background:linear-gradient(135deg, #1abc9c, #16a085); }
+    .pkg5 { background:linear-gradient(135deg, #2ecc71, #27ae60); }
+    .pkg6 { background:linear-gradient(135deg, #8e44ad, #9b59b6); }
+
+    .pkg-price {
+      font-size:3rem; font-weight:800; padding:1.5rem 0; background:#f8f9fa;
+      color:#2c3e50;
+    }
+    .pkg-features { padding:1.5rem; text-align:left; background:white; }
+    .pkg-features ul { list-style:none; }
+    .pkg-features li {
+      padding:0.6rem 0; font-size:1.05rem; border-bottom:1px solid #eee;
+    }
+    .pkg-features li:last-child { border:none; }
+
+    .pkg-duration {
+      background:#2c3e50; color:white; padding:1rem; font-weight:700; font-size:1.1rem;
+    }
+
+    /* Telegram Stars Section */
+    .stars-section {
+      background:linear-gradient(135deg, #0088cc, #0055aa);
+      color:white; padding:3rem; border-radius:16px; margin:4rem 0;
+    }
+    .stars-section h2 { font-size:2.3rem; margin-bottom:1.5rem; }
+    .stars-grid {
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:1.5rem; margin-top:2rem;
+    }
+    .star-card {
+      background:rgba(255,255,255,0.15); backdrop-filter:blur(10px);
+      padding:1.5rem; border-radius:12px; text-align:center; transition:0.3s;
+    }
+    .star-card:hover { transform:scale(1.05); background:rgba(255,255,255,0.25); }
+    .star-amount { font-size:2.2rem; font-weight:800; margin:0.5rem 0; }
+    .star-price { font-size:1.4rem; }
+
+    footer { text-align:center; padding:2.5rem; background:#1a1a2e; color:#fff; font-size:0.9rem; }
+
+    @media (max-width: 768px) {
+      h1 { font-size:2.3rem; }
+      .nav-container { flex-direction:column; gap:1rem; }
+      .nav-links { gap:1rem; flex-wrap:wrap; justify-content:center; }
+      .pkg-price { font-size:2.4rem; }
+    }
+  </style>
+</head>
 <body>
-  <!-- Navigation Bar -->
+
+  <!-- Navbar -->
   <nav class="navbar">
     <div class="nav-container">
-      <a href="#" class="logo">AhaduTech</a>
+      <a href="index.html" class="logo">ElectroHub</a>
       <div class="nav-links">
-        <a href="dashboard.html">Dashboard</a>
-        <a href="index.html">Products</a>
+        <a href="index.html">Home</a>
+        <a href="products.html">Products</a>
         <a href="services.html" class="active">Services</a>
+        <a href="cart.html" id="cart-link">Cart (0)</a>
         <a href="about.html">About</a>
-        <a href="#" id="cart-link">Cart (0)</a>
       </div>
     </div>
   </nav>
 
-  <!-- Main Content -->
   <div class="container">
-    <div class="hero">
-      <h1>Featured Services</h1>
+    <h1>Our Services</h1>
+    <p class="subtitle">Boost your social media presence with real engagement or get Telegram Stars instantly!</p>
+
+    <!-- Social Media Boost Packages -->
+    <div class="packages-grid">
+      <div class="package">
+        <div class="pkg-header pkg1">PACKAGE 1</div>
+        <div class="pkg-price">1900 Birr</div>
+        <div class="pkg-features">
+          <ul>
+            <li>40k views</li>
+            <li>95+ likes</li>
+            <li>30+ follows</li>
+          </ul>
+        </div>
+        <div class="pkg-duration">3 DAYS</div>
+      </div>
+
+      <div class="package">
+        <div class="pkg-header pkg2">PACKAGE 2</div>
+        <div class="pkg-price">2500 Birr</div>
+        <div class="pkg-features">
+          <ul>
+            <li>75k views</li>
+            <li>120+ likes</li>
+            <li>40+ follows</li>
+            <li>20+ shares</li>
+          </ul>
+        </div>
+        <div class="pkg-duration">4 DAYS</div>
+      </div>
+
+      <div class="package">
+        <div class="pkg-header pkg3">PACKAGE 3</div>
+        <div class="pkg-price">4300 Birr</div>
+        <div class="pkg-features">
+          <ul>
+            <li>100k views</li>
+            <li>230+ likes</li>
+            <li>70+ follows</li>
+            <li>40+ shares</li>
+            <li>30+ save</li>
+          </ul>
+        </div>
+        <div class="pkg-duration">7 DAYS</div>
+      </div>
+
+      <div class="package">
+        <div class="pkg-header pkg4">PACKAGE 4</div>
+        <div class="pkg-price">5400 Birr</div>
+        <div class="pkg-features">
+          <ul>
+            <li>120k views</li>
+            <li>312+ likes</li>
+            <li>90+ follows</li>
+            <li>45+ shares</li>
+            <li>35+ save</li>
+            <li>450+ interactions</li>
+          </ul>
+        </div>
+        <div class="pkg-duration">7 DAYS</div>
+      </div>
+
+      <div class="package">
+        <div class="pkg-header pkg5">PACKAGE 5</div>
+        <div class="pkg-price">10,500 Birr</div>
+        <div class="pkg-features">
+          <ul>
+            <li>150k views</li>
+            <li>350+ likes</li>
+            <li>120+ follows</li>
+            <li>60+ shares</li>
+            <li>45+ save</li>
+            <li>350+ link clicks</li>
+          </ul>
+        </div>
+        <div class="pkg-duration">5 DAYS</div>
+      </div>
+
+      <div class="package">
+        <div class="pkg-header pkg6">PACKAGE 6</div>
+        <div class="pkg-price">13,500 Birr</div>
+        <div class="pkg-features">
+          <ul>
+            <li>250k views</li>
+            <li>600+ likes</li>
+            <li>200+ follows</li>
+            <li>100+ shares</li>
+            <li>75+ save</li>
+            <li>5750+ profile visits</li>
+          </ul>
+        </div>
+        <div class="pkg-duration">6 DAYS</div>
+      </div>
     </div>
-    <!-- Light‑box markup -->
-    <div id="lightbox">
-      <span class="close" onclick="closeLightbox()">X</span>
-      <img id="lightbox-img" src="" alt="Enlarged product">
-    </div>
-    <!-- Product Grid -->
-    <div class="products" id="product-list">
-      <!-- Products injected via JS -->
+
+    <!-- Telegram Stars Section -->
+    <div class="stars-section">
+      <h2>Telegram Stars Available</h2>
+      <p style="font-size:1.2rem; margin-bottom:1rem;">Buy Telegram Stars instantly at the best rates!</p>
+      <div class="stars-grid">
+        <div class="star-card">
+          <div class="star-amount">50 Stars</div>
+          <div class="star-price">200 Birr</div>
+        </div>
+        <div class="star-card">
+          <div class="star-amount">100 Stars</div>
+          <div class="star-price">400 Birr</div>
+        </div>
+        <div class="star-card">
+          <div class="star-amount">250 Stars</div>
+          <div class="star-price">800 Birr</div>
+        </div>
+        <div class="star-card">
+          <div class="star-amount">500 Stars</div>
+          <div class="star-price">1500 Birr</div>
+        </div>
+        <div class="star-card">
+          <div class="star-amount">1000 Stars</div>
+          <div class="star-price">2500 Birr</div>
+        </div>
+      </div>
+      <p style="margin-top:2rem; font-size:1rem;">
+        Contact us on <a href="https://t.me/NatnaelBizuneh" target="_blank" style="color:#fff; text-decoration:underline;">Telegram @NatnaelBizuneh</a> to order!
+      </p>
     </div>
   </div>
 
-  <!-- Footer -->
-  <footer>
-    &copy; 2025 AhaduTech. All rights reserved.
+ <footer>
+    &copy; 2025 AhaduTech • Your #1 Digital Store in Ethiopia<br>
+    <a href="https://t.me/AhaduTechSupport" target="_blank" style="color:#00d4ff; text-decoration:none;">Contact us on
+      Telegram @AhaduTechSupport</a>
   </footer>
+  
+  <!-- Cart Count Script -->
+  <script>
+    const cartLink = document.getElementById("cart-link");
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-  <script src="script.js"></script>
+    function updateCartCount() {
+      if (!cartLink) return;
+      const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
+      cartLink.textContent = `Cart (${totalItems})`;
+    }
 
+    document.addEventListener("DOMContentLoaded", updateCartCount);
+  </script>
 </body>
 </html>

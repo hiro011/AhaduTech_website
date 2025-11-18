@@ -7,62 +7,9 @@
   <title>Dashboard - AhaduTech</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="icon" type="image" href="images/image.png">
+  <link rel="stylesheet" href="style.css">
   
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
-
-    body {
-      background: #f4f4f9;
-      color: #333;
-    }
-
-    /* Navbar */
-    .navbar {
-      background: #1a1a2e;
-      padding: 1rem 5%;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, .1);
-    }
-
-    .nav-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1200px;
-      margin: auto;
-    }
-
-    .logo {
-      color: #00d4ff;
-      font-size: 1.8rem;
-      font-weight: 600;
-      text-decoration: none;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 2rem;
-    }
-
-    .nav-links a {
-      color: #fff;
-      text-decoration: none;
-      font-weight: 500;
-      transition: color .3s;
-    }
-
-    .nav-links a:hover,
-    .nav-links a.active {
-      color: #00d4ff;
-    }
-
     /* Main */
     .container {
       max-width: 1200px;
@@ -297,11 +244,11 @@
     <div class="nav-container">
       <a href="index.html" class="logo">AhaduTech</a>
       <div class="nav-links">
-        <a href="dashboard.html" class="active">Dashboard</a>
-        <a href="index.html">Products</a>
+        <a href="index.html">Home</a>
+        <a href="products.html">Products</a>
         <a href="services.html">Services</a>
+        <a href="cart.html" id="cart-link" class="active">Cart (0)</a>
         <a href="about.html">About</a>
-        <a href="#" id="cart-link">Cart (0)</a>
       </div>
     </div>
   </nav>
@@ -338,8 +285,12 @@
 
   </div>
 
-  <footer>&copy; 2025 AhaduTech. All rights reserved.</footer>
-
+  <footer>
+    &copy; 2025 AhaduTech • Your #1 Digital Store in Ethiopia<br>
+    <a href="https://t.me/AhaduTechSupport" target="_blank" style="color:#00d4ff; text-decoration:none;">Contact us on
+      Telegram @AhaduTechSupport</a>
+  </footer>
+  
   <script>
     // Load cart
     let cart = JSON.parse(localStorage.getItem('cart')) || [];

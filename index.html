@@ -3,50 +3,170 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AhaduTech</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <title>Welcome - AhaduTech</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image" href="images/image.png">
+  <link rel="stylesheet" href="style.css">
+  
+  <style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+        min-height: 100vh;
+    }
 
+    /* Hero Section */
+    .hero {
+      text-align:center; padding:3rem 5% 6rem; max-width:1000px; margin:auto;
+    }
+    .hero h1 {
+      font-size:4.5rem; font-weight:800; margin-bottom:1rem; line-height:1.1;
+      background:linear-gradient(90deg, #00d4ff, #ff6b6b);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    .hero p {
+      font-size:1.4rem; margin:1.5rem 0; opacity:0.9; line-height:1.7;
+    }
+    .cta-btn {
+      display:inline-block; background:#00d4ff; color:#1a1a2e; padding:1rem 2.5rem;
+      font-size:1.2rem; font-weight:700; border-radius:50px; margin:1rem; text-decoration:none;
+      box-shadow:0 10px 30px rgba(0,212,255,0.4); transition:all .3s;
+    }
+    .cta-btn:hover { transform:translateY(-5px); box-shadow:0 15px 40px rgba(0,212,255,0.6); }
+
+    /* Features Grid */
+    .features {
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(300px,1fr)); gap:2rem;
+      max-width:1200px; margin:4rem auto; padding:0 5%;
+    }
+    .feature-card {
+      background:rgba(255,255,255,0.1); backdrop-filter:blur(10px);
+      padding:2rem; border-radius:20px; text-align:center; transition:0.4s;
+      border:1px solid rgba(255,255,255,0.1);
+    }
+    .feature-card:hover { transform:translateY(-15px); background:rgba(255,255,255,0.2); }
+    .feature-card i { font-size:3.5rem; margin-bottom:1rem; color:#00d4ff; }
+    .feature-card h3 { font-size:1.6rem; margin:1rem 0; }
+    .feature-card p { opacity:0.9; line-height:1.6; }
+
+    /* Services Preview */
+    .services-preview {
+      background:rgba(0,0,0,0.3); padding:4rem 5%; text-align:center;
+    }
+    .services-preview h2 { font-size:2.8rem; margin-bottom:2rem; }
+    .preview-grid {
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(250px,1fr)); gap:2rem; max-width:1200px; margin:auto;
+    }
+    .preview-item {
+      background:rgba(255,255,255,0.15); padding:2rem; border-radius:16px; backdrop-filter:blur(10px);
+    }
+    .preview-item h4 { font-size:1.5rem; margin-bottom:1rem; }
+
+    footer { text-align:center; padding:3rem; background:rgba(0,0,0,0.4); font-size:0.9rem; }
+
+    @media (max-width: 768px) {
+      .hero h1 { font-size:3rem; }
+      .hero p { font-size:1.2rem; }
+      .nav-container { flex-direction:column; gap:1rem; }
+      .nav-links { flex-wrap:wrap; justify-content:center; }
+    }
+  </style>
 </head>
-
 <body>
-  <!-- Navigation Bar -->
+
+  <!-- Navbar -->
   <nav class="navbar">
     <div class="nav-container">
-      <a href="#" class="logo">AhaduTech</a>
+      <a href="index.html" class="logo">AhaduTech</a>
       <div class="nav-links">
-        <a href="dashboard.html">Dashboard</a>
-        <a href="index.html" class="active">Products</a>
+        <a href="index.html" class="active">Home</a>
+        <a href="products.html">Products</a>
         <a href="services.html">Services</a>
+        <a href="cart.html" id="cart-link">Cart (0)</a>
         <a href="about.html">About</a>
-        <a href="#" id="cart-link">Cart (0)</a>
       </div>
     </div>
   </nav>
 
-  <!-- Main Content -->
-  <div class="container">
-    <div class="hero">
-      <h1>Featured Electronics</h1>
+  <!-- Hero Welcome -->
+  <section class="hero">
+    <h1>Welcome to AhaduTech</h1>
+    <p>Your trusted source for premium electronics, social media growth packages, and instant Telegram Stars — all in one place!</p>
+    <div>
+      <a href="index.html" class="cta-btn">Shop Electronics</a>
+      <a href="services.html" class="cta-btn" style="background:#ff6b6b;">View Services</a>
     </div>
-    <!-- Light‑box markup -->
-    <div id="lightbox">
-      <span class="close" onclick="closeLightbox()">X</span>
-      <img id="lightbox-img" src="" alt="Enlarged product">
-    </div>
-    <!-- Product Grid -->
-    <div class="products" id="product-list">
-      <!-- Products injected via JS -->
-    </div>
-  </div>
+  </section>
 
-  <!-- Footer -->
+  <!-- Features -->
+  <section class="features">
+    <div class="feature-card">
+      <i class="fas fa-mobile-alt"></i>
+      <h3>Latest Gadgets</h3>
+      <p>Browse and add cutting-edge electronics to your cart with real-time stock tracking.</p>
+    </div>
+    <div class="feature-card">
+      <i class="fas fa-chart-line"></i>
+      <h3>Social Media Boost</h3>
+      <p>Get real views, likes, follows & shares with our powerful promotion packages.</p>
+    </div>
+    <div class="feature-card">
+      <i class="fab fa-telegram-plane"></i>
+      <h3>Telegram Stars</h3>
+      <p>Buy Telegram Stars instantly at the best rates in Ethiopia — from 50 to 1000 Stars!</p>
+    </div>
+    <div class="feature-card">
+      <i class="fas fa-shield-alt"></i>
+      <h3>Fast & Secure</h3>
+      <p>100% safe delivery · Local payment · Instant support via Telegram.</p>
+    </div>
+  </section>
+
+  <!-- Services Preview -->
+  <section class="services-preview">
+    <h2>Explore Our Services</h2>
+    <div class="preview-grid">
+      <div class="preview-item">
+        <h4>Electronics Store</h4>
+        <p>Headphones, smartwatches, chargers & more</p>
+        <a href="index.html" style="color:#00d4ff; font-weight:600;">Shop Now →</a>
+      </div>
+      <div class="preview-item">
+        <h4>Social Media Packages</h4>
+        <p>40k–250k views · Real engagement</p>
+        <a href="services.html" style="color:#00d4ff; font-weight:600;">See Packages →</a>
+      </div>
+      <div class="preview-item">
+        <h4>Telegram Stars</h4>
+        <p>50 Stars = 200 Birr · Up to 1000 Stars</p>
+        <a href="services.html#telegram" style="color:#00d4ff; font-weight:600;">Buy Now →</a>
+      </div>
+      <div class="preview-item">
+        <h4>Need Help?</h4>
+        <p>Contact us anytime on Telegram</p>
+        <a href="https://t.me/AhaduTechSupport" target="_blank" style="color:#00d4ff; font-weight:600;">@AhaduTechSupport →</a>
+      </div>
+    </div>
+  </section>
+
   <footer>
-    &copy; 2025 AhaduTech. All rights reserved.
+    &copy; 2025 AhaduTech • Your #1 Digital Store in Ethiopia<br>
+    <a href="https://t.me/AhaduTechSupport" target="_blank" style="color:#00d4ff; text-decoration:none;">Contact us on Telegram @AhaduTechSupport</a>
   </footer>
 
-  <script src="script.js"></script>
+  <!-- Cart Count Script -->
+  <script>
+    const cartLink = document.getElementById("cart-link");
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
+    function updateCartCount() {
+      if (!cartLink) return;
+      const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
+      cartLink.textContent = `Cart (${totalItems})`;
+      cartLink.href = "index.html"; // or create cart.html later
+    }
+
+    document.addEventListener("DOMContentLoaded", updateCartCount);
+  </script>
 </body>
 </html>
