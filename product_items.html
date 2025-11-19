@@ -441,7 +441,7 @@
             return user ? JSON.parse(user) : null;
         }
 
-        let currentUser2 = getCurrentUser();
+        let currentUser = getCurrentUser();
 
         // Format date
         function formatDate(dateString) {
@@ -504,7 +504,7 @@
 
                     const deleteBtn = isOwner
                         ? `<div class="delete-btn" onclick="deleteComment(${c.id})"
-                     style="position:absolute; top:12px; right:12px; width:36px; height:36px;
+                     style="position:absolute; top:8px; right:12px; width:25px; height:25px;
                             background:#dc3545; color:white; border-radius:50%;
                             display:flex; align-items:center; justify-content:center;
                             font-weight:bold; font-size:17px; cursor:pointer;
@@ -518,7 +518,7 @@
                     div.innerHTML = `
                 ${deleteBtn}
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <strong style="color:#1e293b; font-size:1.15rem;">${c.name || 'Anonymous'} c: ${commentUserId} u: ${currentUserId}</strong>
+                    <strong style="color:#1e293b; font-size:1.15rem;">${c.name || 'Anonymous'}</strong>
                     <div style="color:#f59e0b; font-size:1.5rem;">${'★'.repeat(c.rating)}${'☆'.repeat(5 - c.rating)}</div>
                 </div>
                 <div style="color:#64748b; font-size:0.95rem; margin-bottom:12px;">
@@ -547,7 +547,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         comment_id: commentId,
-                        user_id: currentUser2.id
+                        user_id: currentUser.id
                     })
                 });
 
@@ -570,7 +570,7 @@
                 const res = await fetch('/api/product-comments', {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ comment_id: commentId, user_id: currentUser2.id })
+                    body: JSON.stringify({ comment_id: commentId, user_id: currentUser.id })
                 });
 
                 if (!res.ok) throw new Error('Failed to delete');
@@ -584,9 +584,9 @@
 
         // Submit review
         document.getElementById('submit-comment')?.addEventListener('click', async () => {
-            currentUser2 = getCurrentUser();
+            currentUser = getCurrentUser();
 
-            if (!currentUser2) {
+            if (!currentUser) {
                 alert('Please login to leave a review!');
                 openPopup(); // This opens your login popup
                 return;
@@ -609,7 +609,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        user_id: currentUser2.id,
+                        user_id: currentUser.id,
                         product_id: productId,
                         comment: text,
                         rating: parseInt(rating.value)
@@ -641,19 +641,19 @@
 
             // Update logged-in message
             const msg = document.getElementById('logged-in-message');
-            if (currentUser2 && msg) {
-                msg.textContent = `Logged in as ${currentUser2.name} — you can write a review!`;
+            if (currentUser && msg) {
+                msg.textContent = `Logged in as ${currentUser.name} — you can write a review!`;
             }
 
             loadComments();
 
             // Refresh when user logs in (if you dispatch an event from login)
             window.addEventListener('storage', (e) => {
-                if (e.key === 'currentUser2') {
-                    currentUser2 = getCurrentUser();
+                if (e.key === 'currentUser') {
+                    currentUser = getCurrentUser();
                     loadComments();
-                    if (currentUser2 && msg) {
-                        msg.textContent = `Logged in as ${currentUser2.name} — you can write a review!`;
+                    if (currentUser && msg) {
+                        msg.textContent = `Logged in as ${currentUser.name} — you can write a review!`;
                     }
                 }
             });
