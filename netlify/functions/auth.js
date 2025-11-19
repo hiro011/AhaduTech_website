@@ -1,23 +1,22 @@
-// netlify/functions/auth.js
+// netlify/functions/auth.js  ← EXACT PATH
 import { neon } from '@netlify/neon';
-import { hash, verify } from 'https://cdn.jsdelivr.net/npm/argon2-browser@1.18.0/+esm';
+import { hash, verify } from 'https://cdn.jsdelivr.net/npm/argon2-browser@1.18.0/dist/argon2-bundled.min.js';
 
 export default async (req) => {
   const sql = neon();
 
   try {
-    const { action, name, email, password } = await req.json();
+    const body = await req.json();
+    const { action, name, email, password } = body;
 
-    // ====================== REGISTER ======================
+    // REGISTER
     if (action === 'register') {
-      if (!name || !email || !password) {
-        return new Response(JSON.stringify({ error: 'All fields required' }), { status: 400 });
-      }
-      if (password.length < 6) {
-        return new Response(JSON.stringify({ error: 'Password too short' }), { status: 400 });
+      if (!name || !email || !password || password.length < 6) {
+        return new Response(JSON.stringify({ error: 'Invalid data' }), { status: 400 });
       }
 
-      const password_hash = await hash({ pass: password, salt: crypto.getRandomValues(new Uint8Array(16)) });
+      const hashResult = await hash({ pass: password, salt: crypto.getRandomValues(new Uint8Array(16)), type: 2 });
+      const password_hash = hashResult.hashHex;
 
       const result = await sql`
         INSERT INTO users (name, email, password_hash)
@@ -26,35 +25,22 @@ export default async (req) => {
         RETURNING id, name, email
       `;
 
-      if (result.length === 0) {
-        return new Response(JSON.stringify({ error: 'Email already registered' }), { status: 409 });
-      }
+      if (!result.length) return new Response(JSON.stringify({ error: 'Email already exists' }), { status: 409 });
 
       return new Response(JSON.stringify({ success: true, user: result[0] }));
     }
 
-    // ====================== LOGIN ======================
+    // LOGIN
     if (action === 'login') {
-      if (!email || !password) {
-        return new Response(JSON.stringify({ error: 'Email and password required' }), { status: 400 });
-      }
-
       const users = await sql`SELECT id, name, email, password_hash FROM users WHERE email = ${email}`;
-
-      if (users.length === 0) {
-        return new Response(JSON.stringify({ error: 'Invalid email or password' }), { status: 401 });
-      }
+      if (!users.length) return new Response(JSON.stringify({ error: 'Invalid credentials' }), { status: 401 });
 
       const user = users[0];
       const valid = await verify({ pass: password, hash: user.password_hash });
 
-      if (!valid) {
-        return new Response(JSON.stringify({ error: 'Invalid email or password' }), { status: 401 });
-      }
+      if (!valid) return new Response(JSON.stringify({ error: 'Invalid credentials' }), { status: 401 });
 
-      // Remove password from response
       delete user.password_hash;
-
       return new Response(JSON.stringify({ success: true, user }));
     }
 
