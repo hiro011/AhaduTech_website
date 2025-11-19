@@ -24,6 +24,36 @@ function getCurrentUser() {
   }
 }
 
+// Run when page loads + when another tab updates login state
+function initAuth() {
+  currentUser = getCurrentUser();
+  renderAuthButton();
+}
+
+// First load
+document.addEventListener('DOMContentLoaded', initAuth);
+
+// Listen for login/logout from other tabs
+window.addEventListener('storage', (e) => {
+  if (e.key === SESSION_KEY) {
+    initAuth();
+    closePopup();
+  }
+});
+
+// Also re-render if user logs in/out on same page
+const originalSet = setCurrentUser;
+setCurrentUser = function (user) {
+  originalSet(user);
+  loadComments?.(); // if on product page
+};
+
+const originalLogout = logout;
+logout = function () {
+  originalLogout();
+  loadComments?.();
+};
+
 function setCurrentUser(user) {
   currentUser = user;
   const sessionData = {
