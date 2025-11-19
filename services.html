@@ -1,18 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AhaduTech</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" type="image" href="images/image.png">
   <link rel="stylesheet" href="style.css">
-  
-  <style>
-    .container { max-width:1200px; margin:3rem auto; padding:0 5%; text-align:center; }
 
-    h1 { font-size:2.8rem; color:#1a1a2e; margin-bottom:1rem; }
-    .subtitle { font-size:1.2rem; color:#666; margin-bottom:3rem; }
+  <style>
+    .container {
+      max-width: 1200px;
+      margin: 3rem auto;
+      padding: 0 5%;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      color: #1a1a2e;
+      margin-bottom: 1rem;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      color: #666;
+      margin-bottom: 3rem;
+    }
 
     /* Package Grid */
     .packages-grid {
@@ -23,63 +38,160 @@
     }
 
     .package {
-      background:#e1e4e3; border-radius:16px; overflow:hidden;
-      box-shadow:0 8px 25px rgba(0,0,0,0.1); transition:transform .3s;
+      background: #e1e4e3;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      transition: transform .3s;
     }
-    .package:hover { transform:translateY(-10px); }
+
+    .package:hover {
+      transform: translateY(-10px);
+    }
 
     .pkg-header {
-      padding:1rem; color:white; font-weight:700; font-size:1.1rem;
+      padding: 1rem;
+      color: white;
+      font-weight: 700;
+      font-size: 1.1rem;
     }
-    .pkg1 { background:linear-gradient(135deg, #9b59b6, #8e44ad); }
-    .pkg2 { background:linear-gradient(135deg, #95a5a6, #7f8c8d); }
-    .pkg3 { background:linear-gradient(135deg, #3498db, #2980b9); }
-    .pkg4 { background:linear-gradient(135deg, #1abc9c, #16a085); }
-    .pkg5 { background:linear-gradient(135deg, #2ecc71, #27ae60); }
-    .pkg6 { background:linear-gradient(135deg, #8e44ad, #9b59b6); }
+
+    .pkg1 {
+      background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    }
+
+    .pkg2 {
+      background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+    }
+
+    .pkg3 {
+      background: linear-gradient(135deg, #3498db, #2980b9);
+    }
+
+    .pkg4 {
+      background: linear-gradient(135deg, #1abc9c, #16a085);
+    }
+
+    .pkg5 {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+    }
+
+    .pkg6 {
+      background: linear-gradient(135deg, #8e44ad, #9b59b6);
+    }
 
     .pkg-price {
-      font-size:3rem; font-weight:800; padding:1.5rem 0; background:#e2e2e2;
-      color:#2c3e50;
+      font-size: 3rem;
+      font-weight: 800;
+      padding: 1.5rem 0;
+      background: #e2e2e2;
+      color: #2c3e50;
     }
-    .pkg-features { padding:1.5rem; text-align:left; background:#e2e2e2; }
-    .pkg-features ul { list-style:none; }
+
+    .pkg-features {
+      padding: 1.5rem;
+      text-align: left;
+      background: #e2e2e2;
+    }
+
+    .pkg-features ul {
+      list-style: none;
+    }
+
     .pkg-features li {
-      padding:0.6rem 0; font-size:1.05rem; border-bottom:1px solid #eee;
+      padding: 0.6rem 0;
+      font-size: 1.05rem;
+      border-bottom: 1px solid #eee;
     }
-    .pkg-features li:last-child { border:none; }
+
+    .pkg-features li:last-child {
+      border: none;
+    }
 
     .pkg-duration {
-      background:#2c3e50; color:white; padding:1rem; font-weight:700; font-size:1.1rem;
+      background: #2c3e50;
+      color: white;
+      padding: 1rem;
+      font-weight: 700;
+      font-size: 1.1rem;
     }
 
     /* Telegram Stars Section */
     .stars-section {
-      background:linear-gradient(135deg, #0088cc, #0055aa);
-      color:white; padding:3rem; border-radius:16px; margin:4rem 0;
+      background: linear-gradient(135deg, #0088cc, #0055aa);
+      color: white;
+      padding: 3rem;
+      border-radius: 16px;
+      margin: 4rem 0;
     }
-    .stars-section h2 { font-size:2.3rem; margin-bottom:1.5rem; }
-    .stars-grid {
-      display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:1.5rem; margin-top:2rem;
-    }
-    .star-card {
-      background:rgba(255,255,255,0.15); backdrop-filter:blur(10px);
-      padding:1.5rem; border-radius:12px; text-align:center; transition:0.3s;
-    }
-    .star-card:hover { transform:scale(1.05); background:rgba(255,255,255,0.25); }
-    .star-amount { font-size:2.2rem; font-weight:800; margin:0.5rem 0; }
-    .star-price { font-size:1.4rem; }
 
-    footer { text-align:center; padding:2.5rem; background:#1a1a2e; color:#fff; font-size:0.9rem; }
+    .stars-section h2 {
+      font-size: 2.3rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .star-card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      padding: 1.5rem;
+      border-radius: 12px;
+      text-align: center;
+      transition: 0.3s;
+    }
+
+    .star-card:hover {
+      transform: scale(1.05);
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .star-amount {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin: 0.5rem 0;
+    }
+
+    .star-price {
+      font-size: 1.4rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2.5rem;
+      background: #1a1a2e;
+      color: #fff;
+      font-size: 0.9rem;
+    }
 
     @media (max-width: 768px) {
-      h1 { font-size:2.3rem; }
-      .nav-container { flex-direction:column; gap:1rem; }
-      .nav-links { gap:1rem; flex-wrap:wrap; justify-content:center; }
-      .pkg-price { font-size:2.4rem; }
+      h1 {
+        font-size: 2.3rem;
+      }
+
+      .nav-container {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .nav-links {
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .pkg-price {
+        font-size: 2.4rem;
+      }
     }
   </style>
 </head>
+
 <body>
 
   <!-- Navbar -->
@@ -194,7 +306,7 @@
     </div>
 
     <!-- Telegram Stars Section -->
-    <div class="stars-section">
+    <div class="stars-section" id="telegram">
       <h2>Telegram Stars Available</h2>
       <p style="font-size:1.2rem; margin-bottom:1rem;">Buy Telegram Stars instantly at the best rates!</p>
       <div class="stars-grid">
@@ -220,17 +332,19 @@
         </div>
       </div>
       <p style="margin-top:2rem; font-size:1rem;">
-        Contact us on <a href="https://t.me/NatnaelBizuneh" target="_blank" style="color:#fff; text-decoration:underline;">Telegram @NatnaelBizuneh</a> to order!
+        Contact us on <a href="https://t.me/NatnaelBizuneh" target="_blank"
+          style="color:#fff; text-decoration:underline;">Telegram @NatnaelBizuneh</a> to order!
       </p>
     </div>
   </div>
 
- <footer>
+  <footer>
     &copy; 2025 AhaduTech • Your #1 Digital Store in Ethiopia<br>
-    <a href="https://t.me/AhaduTechSupport" target="_blank" style="color:#00d4ff; text-decoration:none;">Contact us on
-      Telegram @AhaduTechSupport</a>
+    <a href="https://t.me/NatnaelBizuneh" target="_blank" style="color:#00d4ff; text-decoration:none;">Contact us on
+      Telegram @NatnaelBizuneh</a>
   </footer>
-  
+
+
   <!-- Cart Count Script -->
   <script>
     const cartLink = document.getElementById("cart-link");
@@ -245,4 +359,5 @@
     document.addEventListener("DOMContentLoaded", updateCartCount);
   </script>
 </body>
+
 </html>
