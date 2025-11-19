@@ -441,7 +441,7 @@
             return user ? JSON.parse(user) : null;
         }
 
-        let currentUser = getCurrentUser();
+        let currentUser2 = getCurrentUser();
 
         // Format date
         function formatDate(dateString) {
@@ -481,7 +481,7 @@
 
                 // FORCE GET LATEST USER FROM AUTH SYSTEM
                 if (typeof getCurrentUser === 'function') {
-                    currentUser = getCurrentUser();  // This pulls from localStorage
+                    currentUser2 = getCurrentUser();  // This pulls from localStorage
                 }
 
                 commentsList.innerHTML = '';
@@ -498,7 +498,7 @@
                     div.style.cssText = 'position:relative; background:#f9f9f9; padding:1.4rem; margin:1rem 0; border-radius:14px; border-left:5px solid #007bff; box-shadow:0 4px 12px rgba(0,0,0,0.08);';
 
                     const commentUserId = c.user_id != null ? String(c.user_id) : null;
-                    const currentUserId = currentUser ? String(currentUser.id) : null;
+                    const currentUserId = currentUser2 ? String(currentUser2.id) : null;
 
                     const isOwner = currentUserId && (commentUserId === currentUserId || currentUserId === "0");
 
@@ -547,7 +547,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         comment_id: commentId,
-                        user_id: currentUser.id
+                        user_id: currentUser2.id
                     })
                 });
 
@@ -570,7 +570,7 @@
                 const res = await fetch('/api/product-comments', {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ comment_id: commentId, user_id: currentUser.id })
+                    body: JSON.stringify({ comment_id: commentId, user_id: currentUser2.id })
                 });
 
                 if (!res.ok) throw new Error('Failed to delete');
@@ -584,9 +584,9 @@
 
         // Submit review
         document.getElementById('submit-comment')?.addEventListener('click', async () => {
-            currentUser = getCurrentUser();
+            currentUser2 = getCurrentUser();
 
-            if (!currentUser) {
+            if (!currentUser2) {
                 alert('Please login to leave a review!');
                 openPopup(); // This opens your login popup
                 return;
@@ -609,7 +609,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        user_id: currentUser.id,
+                        user_id: currentUser2.id,
                         product_id: productId,
                         comment: text,
                         rating: parseInt(rating.value)
@@ -641,19 +641,19 @@
 
             // Update logged-in message
             const msg = document.getElementById('logged-in-message');
-            if (currentUser && msg) {
-                msg.textContent = `Logged in as ${currentUser.name} — you can write a review!`;
+            if (currentUser2 && msg) {
+                msg.textContent = `Logged in as ${currentUser2.name} — you can write a review!`;
             }
 
             loadComments();
 
             // Refresh when user logs in (if you dispatch an event from login)
             window.addEventListener('storage', (e) => {
-                if (e.key === 'currentUser') {
-                    currentUser = getCurrentUser();
+                if (e.key === 'currentUser2') {
+                    currentUser2 = getCurrentUser();
                     loadComments();
-                    if (currentUser && msg) {
-                        msg.textContent = `Logged in as ${currentUser.name} — you can write a review!`;
+                    if (currentUser2 && msg) {
+                        msg.textContent = `Logged in as ${currentUser2.name} — you can write a review!`;
                     }
                 }
             });
