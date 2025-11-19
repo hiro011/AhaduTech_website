@@ -72,10 +72,12 @@ function closePopup() {
   document.getElementById('auth-message').innerHTML = '';
 }
 function showRegister() {
+  openPopup();
   document.getElementById('login-form').style.display = 'none';
   document.getElementById('register-form').style.display = 'block';
 }
 function showLogin() {
+  openPopup();
   document.getElementById('register-form').style.display = 'none';
   document.getElementById('login-form').style.display = 'block';
 }

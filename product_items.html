@@ -391,20 +391,19 @@
 
     <!-- Comment Form Section -->
     <div class="container2 comment-form-section" id="review-form-container" style="display:none;">
-        <h2>Write a Review</h2>
-
         <!-- This message appears only when logged in -->
         <p id="logged-in-message" style="color:#007bff; font-weight:600; margin-bottom:15px;"></p>
+        <h2>Write a Review</h2>
 
         <div class="comment-form">
             <div class="star-rating-input">
                 <span>Rate this product:</span>
                 <div class="stars-input" id="stars-input">
-                    <input type="radio" name="rating" id="star5" value="5"><label for="star5">Star</label>
-                    <input type="radio" name="rating" id="star4" value="4"><label for="star4">Star</label>
-                    <input type="radio" name="rating" id="star3" value="3"><label for="star3">Star</label>
-                    <input type="radio" name="rating" id="star2" value="2"><label for="star2">Star</label>
-                    <input type="radio" name="rating" id="star1" value="1"><label for="star1">Star</label>
+                    <input type="radio" name="rating" id="star5" value="5"><label for="star5">★</label>
+                    <input type="radio" name="rating" id="star4" value="4"><label for="star4">★</label>
+                    <input type="radio" name="rating" id="star3" value="3"><label for="star3">★</label>
+                    <input type="radio" name="rating" id="star2" value="2"><label for="star2">★</label>
+                    <input type="radio" name="rating" id="star1" value="1"><label for="star1">★</label>
                 </div>
             </div>
 
@@ -429,8 +428,8 @@
             Telegram @NatnaelBizuneh</a>
     </footer>
 
-
     <script src="script.js"></script>
+
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const productId = parseInt(urlParams.get('id')) || 1;
@@ -491,13 +490,13 @@
                     const div = document.createElement('div');
                     div.className = 'comment';
                     div.innerHTML = `
-        <div class="comment-header">
-          <div class="comment-author">${c.name || 'Anonymous'}</div>
-          <div class="comment-rating">${'★'.repeat(c.rating)}${'☆'.repeat(5 - c.rating)}</div>
-        </div>
-        <div class="comment-date">${formatDate(c.date)}</div>
-        <p>${c.comment.replace(/\n/g, '<br>')}</p>
-      `;
+                        <div class="comment-header">
+                        <div class="comment-author">${c.name || 'Anonymous'}</div>
+                        <div class="comment-rating">${'★'.repeat(c.rating)}${'☆'.repeat(5 - c.rating)}</div>
+                        </div>
+                        <div class="comment-date">${formatDate(c.date)}</div>
+                        <p>${c.comment.replace(/\n/g, '<br>')}</p>
+                    `;
                     commentsList.appendChild(div);
                 });
 
