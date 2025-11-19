@@ -237,6 +237,31 @@
       }
     }
   </style>
+
+  <style>
+    .qty-btn {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: #333;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .qty-btn:hover {
+      background: #555;
+    }
+
+    .qty-number {
+      margin: 0 10px;
+      font-weight: bold;
+      min-width: 24px;
+      display: inline-block;
+      text-align: center;
+    }
+  </style>
 </head>
 
 <body>
@@ -448,7 +473,7 @@
         <div class="cart-info">
           <div class="cart-title">${item.name}</div>
           <div class="cart-price">$${item.price.toFixed(2)}</div>
-          <div class="cart-quantity">
+          <div class="cart-quantity">Qty: 
             <button class="qty-btn minus" data-id="${item.id}">-</button>
             <span class="qty-number">${item.quantity}</span>
             <button class="qty-btn plus" data-id="${item.id}">+</button>
