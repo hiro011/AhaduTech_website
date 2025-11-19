@@ -1,87 +1,78 @@
 // https://bcrypt-generator.com/
-
-// netlify/functions/admin-login.js — FIXED FOR 502
 import { neon } from '@netlify/neon';
+import { pbkdf2Sync } from 'crypto';
 
 export default async (req) => {
   const sql = neon();
 
-  // Helper: Hash (for future use) — but we use pre-hashed for now
-  const hashPassword = (password, salt) => {
-    return new Promise((resolve, reject) => {
-      const key = crypto.pbkdf2Sync(password, salt, 600000, 32, 'sha256');
-      resolve(key.toString('hex'));
-    });
-  };
-
-  // Helper: Verify password (matches your DB hash format)
-  const verifyPassword = (password, storedHash) => {
-    try {
-      // For your pre-hashed format: assume storedHash is the full PBKDF2 string
-      // Parse: pbkdf2:sha256:600000$salt$hash
-      const parts = storedHash.split('$');
-      if (parts.length !== 4) return false;
-      const [, iterations, saltB64, hashB64] = parts;
-      const salt = Buffer.from(atob(saltB64), 'base64');
-      const key = crypto.pbkdf2Sync(password, salt, parseInt(iterations), 32, 'sha256');
-      const derived = key.toString('hex');
-      const expected = Buffer.from(atob(hashB64), 'base64').toString('hex');
-      return derived === expected;
-    } catch {
-      return false;
-    }
-  };
-
   try {
     if (req.method !== 'POST') {
-      return new Response('Method not allowed', { status: 405 });
+      return new Response('Method Not Allowed', { status: 405 });
     }
 
-    const { email, password } = await req.json();
+    const body = await req.json();
+    const { email, password } = body;
 
     if (!email || !password) {
-      return new Response(JSON.stringify({ error: 'Email and password required' }), { 
-        status: 400, 
-        headers: { 'Content-Type': 'application/json' } 
+      return new Response(JSON.stringify({ error: 'Email and password required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    const admins = await sql`SELECT * FROM admin_users WHERE email = ${email.trim().toLowerCase()}`;
-    
-    if (admins.length === 0) {
-      return new Response(JSON.stringify({ error: 'Invalid credentials' }), { 
-        status: 401, 
-        headers: { 'Content-Type': 'application/json' } 
+    // Find admin
+    const result = await sql`
+      SELECT id, name, email, password_hash 
+      FROM admin_users 
+      WHERE email = ${email.trim().toLowerCase()}
+    `;
+
+    if (result.length === 0) {
+      return new Response(JSON.stringify({ error: 'Invalid credentials' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    const admin = admins[0];
-    const valid = verifyPassword(password, admin.password_hash);
+    const admin = result[0];
 
-    if (!valid) {
-      return new Response(JSON.stringify({ error: 'Invalid credentials' }), { 
-        status: 401, 
-        headers: { 'Content-Type': 'application/json' } 
+    const parts = admin.password_hash.split('$');
+    if (parts.length !== 4 || parts[0] !== 'pbkdf2:sha256:600000') {
+      return new Response(JSON.stringify({ error: 'Invalid hash format' }), { status: 500 });
+    }
+
+    const salt = Buffer.from(parts[2], 'base64');
+    const storedHash = parts[3];
+
+    // Generate hash from input password
+    const key = pbkdf2Sync(password, salt, 600000, 32, 'sha256');
+    const inputHash = key.toString('base64');
+
+    if (inputHash !== storedHash) {
+      return new Response(JSON.stringify({ error: 'Invalid credentials' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
       });
     }
 
-    // Safe response (no password)
+    // SUCCESS — remove password
     const { password_hash, ...safeAdmin } = admin;
-    return new Response(JSON.stringify({ success: true, admin: safeAdmin }), { 
-      status: 200, 
-      headers: { 'Content-Type': 'application/json' } 
+
+    return new Response(JSON.stringify({
+      success: true,
+      admin: safeAdmin
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
     });
 
   } catch (error) {
-    console.error('Admin login error:', error);  // Logs to Netlify dashboard
-    return new Response(JSON.stringify({ error: 'Server error: ' + error.message }), { 
-      status: 500, 
-      headers: { 'Content-Type': 'application/json' } 
+    console.error('Admin login error:', error);
+    return new Response(JSON.stringify({ error: 'Server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
     });
   }
 };
 
-// Handle CORS for POST
-export const config = { 
-  path: '/api/admin/login' 
-};
+export const config = { path: '/api/admin/login' };
