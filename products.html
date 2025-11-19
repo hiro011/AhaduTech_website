@@ -219,6 +219,9 @@
       <img id="lightbox-img" src="" alt="Enlarged product">
     </div>
     <!-- Product Grid -->
+    <div class="products" id="product-list">
+      <!-- Products injected via JS -->
+    </div>
     <div class="products" id="product-list2">
       <!-- Products injected via JS -->
     </div>
@@ -327,7 +330,7 @@
       updateCartCount();
 
       const isDetailPage = window.location.pathname.includes('product_items.html');
-      const isListPage = !!document.getElementById('product-list');
+      const isListPage = !!document.getElementById('product-list2');
 
       // PRODUCT DETAIL PAGE
       if (isDetailPage) {
@@ -366,7 +369,7 @@
         const res = await fetch('/api/products');
         const products = await res.json();
 
-        const container = document.getElementById('product-list');
+        const container = document.getElementById('product-list2');
         container.innerHTML = '';
 
         products.forEach(p => {
