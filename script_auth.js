@@ -111,6 +111,11 @@ async function login() {
   const email = document.getElementById('login-email').value.trim();
   const pass = document.getElementById('login-password').value;
 
+  if (!email || !pass) {
+    showMsg('Please enter email and password', 'red');
+    return;
+  }
+
   const res = await fetch('/api/auth', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -120,10 +125,16 @@ async function login() {
 
   if (data.success) {
     setCurrentUser(data.user);
-    showMsg('Welcome back!', 'green');
-    setTimeout(closePopup, 800);
+    showMsg('Login successful!', 'green');
+
+    // Close popup after 800ms
+    setTimeout(() => {
+      closePopup();           // ← This was missing/broken before
+      document.getElementById('login-email').value = '';
+      document.getElementById('login-password').value = '';
+    }, 800);
   } else {
-    showMsg(data.error || 'Login failed', 'red');
+    showMsg(data.error || 'Invalid email or password', 'red');
   }
 }
 

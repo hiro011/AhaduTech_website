@@ -39,7 +39,13 @@ export default async (req) => {
     // REGISTER
     if (action === 'register') {
       if (!name?.trim() || !email?.trim() || !password || password.length < 6) {
-        return new Response(JSON.stringify({ error: 'All fields required. Password min 6 chars.' }), { status: 400 });
+        return new Response(JSON.stringify({ error: 'Fill all fields. Password min 6 chars.' }), { status: 400 });
+      }
+
+      // First check if email already exists
+      const existing = await sql`SELECT id FROM users WHERE email = ${email.trim().toLowerCase()}`;
+      if (existing.length > 0) {
+        return new Response(JSON.stringify({ error: 'This email is already registered!' }), { status: 409 });
       }
 
       const password_hash = await hashPassword(password);
@@ -47,13 +53,8 @@ export default async (req) => {
       const result = await sql`
         INSERT INTO users (name, email, password_hash)
         VALUES (${name.trim()}, ${email.trim().toLowerCase()}, ${password_hash})
-        ON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name
         RETURNING id, name, email
       `;
-
-      if (result.length === 0) {
-        return new Response(JSON.stringify({ error: 'Email already exists' }), { status: 409 });
-      }
 
       return new Response(JSON.stringify({ success: true, user: result[0] }));
     }
