@@ -1,16 +1,16 @@
 // ====================== SHARED PRODUCT DATA ======================
 const products = [
-  { id: 1, name: "Redmi Earpod", price: 2700, stock: 1, img: "images/redmi-earpod.jpg", desc: "High-quality wireless earbuds with deep bass and long battery life.", phone: "+251941057332" },
-  { id: 2, name: "Hair Trimmer Golden", price: 1100, stock: 1, img: "images/hair-trimmer gold.jpg", desc: "Professional golden hair trimmer with sharp blades.", phone: "+251941057332" },
-  { id: 3, name: "Hair Trimmer Black", price: 1100, stock: 1, img: "images/hair-trimmer black.jpg", desc: "Sleek black hair trimmer for precise cutting.", phone: "+251941057332" },
-  { id: 4, name: "USB-C Charger", price: 750, stock: 45, img: "images/image.png", desc: "Fast charging USB-C adapter with 65W power delivery.", phone: "+251941057332" },
-  { id: 5, name: "Wireless Mouse Adjustable DPI", price: 1200, stock: 1, img: "images/mouse-black.jpg", desc: "Ergonomic wireless mouse with adjustable DPI settings.", phone: "+251941057332" },
-  { id: 6, name: "Slim Wireless Mouse White", price: 1200, stock: 0, img: "images/mouse-white.jpg", desc: "Ultra-slim and lightweight wireless mouse in white.", phone: "+251941057332" },
-  { id: 7, name: "Hair Clipper", price: 2000, stock: 0, img: "images/Hair Clipper.jpg", desc: "Professional cordless hair clipper with multiple guards.", phone: "+251941057332" },
-  { id: 8, name: "Lenovo Thinkplus LivePods", price: 2999, stock: 0, img: "images/Lenovo LivePods.jpg", desc: "Premium TWS earbuds with active noise cancellation.", phone: "+251941057332" },
-  { id: 9, name: "USB Bluetooth 5.3/5.1/5.0 Adapter", price: 1000, stock: 0, img: "images/USB Bluetooth.jpg", desc: "Add Bluetooth to any PC or laptop instantly.", phone: "+251941057332" },
-  { id: 10, name: "WiFi 6 USB 3.0 Adapter", price: 2500, stock: 0, img: "images/WiFi-adapter.jpg", desc: "Upgrade your PC to ultra-fast WiFi 6 speeds.", phone: "+251941057332" },
-  { id: 11, name: "Air Pro 6 TWS Headset", price: 1500, stock: 0, img: "images/tws earpod.jpg", desc: "Best-selling wireless earbuds with touch control and mic.", phone: "+251941057332" }
+  { id: 1, name: "Redmi Earpod", price: 2700, stock: 1, img: "images/redmi-earpod.jpg", description: "High-quality wireless earbuds with deep bass and long battery life.", phone: "+251941057332" },
+  { id: 2, name: "Hair Trimmer Golden", price: 1100, stock: 1, img: "images/hair-trimmer gold.jpg", description: "Professional golden hair trimmer with sharp blades.", phone: "+251941057332" },
+  { id: 3, name: "Hair Trimmer Black", price: 1100, stock: 1, img: "images/hair-trimmer black.jpg", description: "Sleek black hair trimmer for precise cutting.", phone: "+251941057332" },
+  { id: 4, name: "USB-C Charger", price: 750, stock: 45, img: "images/image.png", description: "Fast charging USB-C adapter with 65W power delivery.", phone: "+251941057332" },
+  { id: 5, name: "Wireless Mouse Adjustable DPI", price: 1200, stock: 1, img: "images/mouse-black.jpg", description: "Ergonomic wireless mouse with adjustable DPI settings.", phone: "+251941057332" },
+  { id: 6, name: "Slim Wireless Mouse White", price: 1200, stock: 0, img: "images/mouse-white.jpg", description: "Ultra-slim and lightweight wireless mouse in white.", phone: "+251941057332" },
+  { id: 7, name: "Hair Clipper", price: 2000, stock: 0, img: "images/Hair Clipper.jpg", description: "Professional cordless hair clipper with multiple guards.", phone: "+251941057332" },
+  { id: 8, name: "Lenovo Thinkplus LivePods", price: 2999, stock: 0, img: "images/Lenovo LivePods.jpg", description: "Premium TWS earbuds with active noise cancellation.", phone: "+251941057332" },
+  { id: 9, name: "USB Bluetooth 5.3/5.1/5.0 Adapter", price: 1000, stock: 0, img: "images/USB Bluetooth.jpg", description: "Add Bluetooth to any PC or laptop instantly.", phone: "+251941057332" },
+  { id: 10, name: "WiFi 6 USB 3.0 Adapter", price: 2500, stock: 0, img: "images/WiFi-adapter.jpg", description: "Upgrade your PC to ultra-fast WiFi 6 speeds.", phone: "+251941057332" },
+  { id: 11, name: "Air Pro 6 TWS Headset", price: 1500, stock: 0, img: "images/tws earpod.jpg", description: "Best-selling wireless earbuds with touch control and mic.", phone: "+251941057332" }
 ];
 
 // ====================== CART SYSTEM ======================
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('product-stock').textContent = `Available: ${product.stock} unit${product.stock !== 1 ? 's' : ''}`;
     document.getElementById('product-phone').innerHTML = `Phone: <a href="tel:${product.phone}">${product.phone}</a>`;
     document.getElementById('product-img').src = product.img;
-    document.getElementById('product-desc').textContent = product.desc;
+    document.getElementById('product-desc').textContent = product.description;
 
     const btn = document.getElementById('add-to-cart');
     if (product.stock <= 0) {
