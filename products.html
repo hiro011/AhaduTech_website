@@ -222,6 +222,9 @@
     <div class="products" id="product-list">
       <!-- Products injected via JS -->
     </div>
+      <div class="products" id="product-list2">
+      <!-- Products injected via JS -->
+    </div>
   </div>
 
 
@@ -232,6 +235,95 @@
   </footer>
 
   <script src="script.js"></script>
+
+  <script>
+    // ====================== BLOCK 1: ONLY LOAD PRODUCTS FROM DB ======================
+    document.addEventListener('DOMContentLoaded', async () => {
+      const isDetailPage = window.location.pathname.includes('product_items.html');
+      const isListPage = !!document.getElementById('product-list2');
+
+      // === 1. PRODUCT DETAIL PAGE (product_items.html?id=5) ===
+      if (isDetailPage) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = parseInt(urlParams.get('id')) || 1;
+
+        try {
+          const res = await fetch(`/api/products?id=${productId}`);
+          const products = await res.json();
+          const product = products[0];
+
+          if (!product) {
+            document.body.innerHTML = `<h1 style="text-align:center;margin:100px;color:red;">Product Not Found</h1>`;
+            return;
+          }
+
+          // Fill the page with real DB data
+          document.title = product.name + " - AhaduTech";
+          document.getElementById('product-name').textContent = product.name;
+          document.getElementById('product-price').textContent = product.price + " Birr";
+          document.getElementById('product-stock').textContent = "Stock: " + product.stock;
+          document.getElementById('product-phone').innerHTML = `Call: <a href="tel:${product.phone}">${product.phone}</a>`;
+          document.getElementById('product-img').src = product.image || "images/placeholder.jpg";
+          document.getElementById('product-desc').textContent = product.description || "No description.";
+
+          // Disable button if out of stock
+          const btn = document.getElementById('add-to-cart');
+          if (product.stock <= 0) {
+            btn.textContent = "Sold Out";
+            btn.disabled = true;
+            btn.style.background = "#95a5a6";
+          }
+
+          console.log("Product loaded from DB:", product);
+        } catch (err) {
+          console.error("Failed to load product:", err);
+          document.body.innerHTML = `<h1 style="color:red;text-align:center;">Error loading product</h1>`;
+        }
+      }
+
+      // === 2. PRODUCT LIST PAGE (products.html or index.html) ===
+      if (isListPage) {
+        try {
+          const res = await fetch('/api/products');
+          const products = await res.json();
+
+          const container = document.getElementById('product-list2');
+          container.innerHTML = '<p>Loading products...</p>';
+
+          if (products.length === 0) {
+            container.innerHTML = '<p>No products found.</p>';
+            return;
+          }
+
+          container.innerHTML = ''; // Clear loading
+
+          products.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+            <img src="${p.image || 'images/placeholder.jpg'}" alt="${p.name}" class="product-img">
+            <div class="product-info">
+              <div class="product-title">
+                <a href="product_items.html?id=${p.id}">${p.name}</a>
+              </div>
+              <div class="product-price">${p.price} Birr</div>
+              <div class="product-stock">Stock: ${p.stock}</div>
+              <button class="add-to-cart" ${p.stock <= 0 ? 'disabled style="background:#95a5a6"' : ''}>
+                ${p.stock > 0 ? 'Add to Cart' : 'Sold Out'}
+              </button>
+            </div>
+          `;
+            container.appendChild(card);
+          });
+
+          console.log("All products loaded:", products);
+        } catch (err) {
+          console.error("Failed to load products list:", err);
+          document.getElementById('product-list2').innerHTML = '<p style="color:red">Failed to load products</p>';
+        }
+      }
+    });
+  </script>
 
 </body>
 
