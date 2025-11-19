@@ -388,24 +388,27 @@
     </div>
 
     <!-- Comment Form Section -->
-    <div class="container2 comment-form-section">
+    <div class="container2 comment-form-section" id="review-form-container" style="display:none;">
         <h2>Write a Review</h2>
-        <div class="comment-form">
-            <input type="text" id="comment-name" placeholder="Your Name (optional)" maxlength="50">
 
+        <!-- This message appears only when logged in -->
+        <p id="logged-in-message" style="color:#007bff; font-weight:600; margin-bottom:15px;"></p>
+
+        <div class="comment-form">
             <div class="star-rating-input">
                 <span>Rate this product:</span>
                 <div class="stars-input" id="stars-input">
-                    <input type="radio" name="rating" id="star5" value="5"><label for="star5">★</label>
-                    <input type="radio" name="rating" id="star4" value="4"><label for="star4">★</label>
-                    <input type="radio" name="rating" id="star3" value="3"><label for="star3">★</label>
-                    <input type="radio" name="rating" id="star2" value="2"><label for="star2">★</label>
-                    <input type="radio" name="rating" id="star1" value="1"><label for="star1">★</label>
+                    <input type="radio" name="rating" id="star5" value="5"><label for="star5">Star</label>
+                    <input type="radio" name="rating" id="star4" value="4"><label for="star4">Star</label>
+                    <input type="radio" name="rating" id="star3" value="3"><label for="star3">Star</label>
+                    <input type="radio" name="rating" id="star2" value="2"><label for="star2">Star</label>
+                    <input type="radio" name="rating" id="star1" value="1"><label for="star1">Star</label>
                 </div>
             </div>
 
             <textarea id="comment-text" placeholder="Share your experience..." rows="4" maxlength="500"
                 required></textarea>
+
             <button id="submit-comment">Submit Review</button>
         </div>
     </div>
@@ -427,19 +430,49 @@
 
     <script src="script.js"></script>
     <script>
-        // === Product ID from URL (e.g., ?id=2) ===
         const urlParams = new URLSearchParams(window.location.search);
         const productId = parseInt(urlParams.get('id')) || 1;
 
-        // === Load comments from Neon DB (filtered by product) ===
+        // Global logged-in user (set after login)
+        let currentUser = null;
+
+        // Check if user is logged in (you can store in memory or sessionStorage)
+        function getCurrentUser() {
+            const user = sessionStorage.getItem('currentUser');
+            return user ? JSON.parse(user) : null;
+        }
+
+        // Save login state
+        function setCurrentUser(user) {
+            currentUser = user;
+            sessionStorage.setItem('currentUser', JSON.stringify(user));
+            updateLoginUI();
+        }
+
+        // Update login button & review form
+        function updateLoginUI() {
+            const loginBtn = document.querySelector('.open-auth-btn');
+            const formContainer = document.getElementById('review-form-container');
+            const loggedInMsg = document.getElementById('logged-in-message');
+
+            if (currentUser) {
+                if (loginBtn) loginBtn.textContent = `Hi, ${currentUser.name.split(' ')[0]}`;
+                if (formContainer) formContainer.style.display = 'block';
+                if (loggedInMsg) loggedInMsg.textContent = `Logged in as ${currentUser.name} — you can now review!`;
+            } else {
+                if (loginBtn) loginBtn.textContent = 'Login / Register';
+                if (formContainer) formContainer.style.display = 'none';
+                if (loggedInMsg) loggedInMsg.textContent = '';
+            }
+        }
+
+        // Load comments
         async function loadComments() {
             const commentsList = document.getElementById('comments-list');
             commentsList.innerHTML = '<p>Loading reviews...</p>';
 
             try {
                 const res = await fetch(`/api/product-comments?id=${productId}`);
-                if (!res.ok) throw new Error('Failed to load reviews');
-
                 const comments = await res.json();
 
                 commentsList.innerHTML = '';
@@ -450,116 +483,99 @@
                     return;
                 }
 
-                // Sort newest first
                 comments.sort((a, b) => new Date(b.date) - new Date(a.date));
 
                 comments.forEach(c => {
                     const div = document.createElement('div');
                     div.className = 'comment';
                     div.innerHTML = `
-                <div class="comment-header">
-                    <div class="comment-author">${c.name || 'Anonymous'}</div>
-                    <div class="comment-rating">${'★'.repeat(c.rating)}${'☆'.repeat(5 - c.rating)}</div>
-                </div>
-                <div class="comment-date">${formatDate(c.date)}</div>
-                <p>${c.comment.replace(/\n/g, '<br>')}</p>
-            `;
+        <div class="comment-header">
+          <div class="comment-author">${c.name || 'Anonymous'}</div>
+          <div class="comment-rating">${'★'.repeat(c.rating)}${'☆'.repeat(5 - c.rating)}</div>
+        </div>
+        <div class="comment-date">${formatDate(c.date)}</div>
+        <p>${c.comment.replace(/\n/g, '<br>')}</p>
+      `;
                     commentsList.appendChild(div);
                 });
 
                 updateAverageRating(comments);
 
             } catch (err) {
-                console.error('Load comments error:', err);
-                commentsList.innerHTML = `<p style="color:red;">Error loading reviews: ${err.message}</p>`;
+                commentsList.innerHTML = `<p style="color:red;">Error loading reviews</p>`;
             }
         }
 
-        // === Average Rating (same as before) ===
-        function updateAverageRating(comments) {
-            if (comments.length === 0) {
-                document.getElementById('avg-stars').textContent = '☆☆☆☆☆';
-                document.getElementById('avg-rating-text').textContent = 'No reviews yet';
-                return;
-            }
-
-            const avg = comments.reduce((sum, c) => sum + c.rating, 0) / comments.length;
-            const fullStars = Math.floor(avg);
-            const hasHalf = avg % 1 >= 0.5;
-
-            document.getElementById('avg-stars').textContent =
-                '★'.repeat(fullStars) + (hasHalf ? '½' : '') + '☆'.repeat(5 - fullStars - (hasHalf ? 1 : 0));
-            document.getElementById('avg-rating-text').textContent =
-                `${avg.toFixed(1)} out of 5 (${comments.length} review${comments.length > 1 ? 's' : ''})`;
-        }
-
-        // === Format Date (same as before) ===
-        function formatDate(dateStr) {
-            const date = new Date(dateStr);
-            const now = new Date();
-            const diff = now - date;
-            const days = Math.floor(diff / 86400000);
-
-            if (days === 0) return 'Today';
-            if (days === 1) return 'Yesterday';
-            if (days < 7) return `${days} days ago`;
-            return date.toLocaleDateString('en-GB');
-        }
-
-        // === Submit New Comment (saves to DB) ===
+        // Submit review (only if logged in)
         document.getElementById('submit-comment')?.addEventListener('click', async () => {
-            const nameInput = document.getElementById('comment-name');
-            const textInput = document.getElementById('comment-text');
-            const ratingInput = document.querySelector('input[name="rating"]:checked');
-
-            const name = nameInput?.value.trim() || 'Anonymous';
-            const text = textInput?.value.trim();
-            const rating = ratingInput ? parseInt(ratingInput.value) : null;
-
-            if (!text) {
-                alert('Please write a review!');
+            currentUser = getCurrentUser();
+            if (!currentUser) {
+                alert('Please login to leave a review!');
+                openPopup(); // your login popup
                 return;
             }
-            if (!rating) {
-                alert('Please select a star rating!');
-                return;
-            }
+
+            const text = document.getElementById('comment-text').value.trim();
+            const rating = document.querySelector('input[name="rating"]:checked');
+
+            if (!text) return alert('Please write a review!');
+            if (!rating) return alert('Please select a rating!');
 
             try {
                 const res = await fetch('/api/product-comments', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
+                        user_id: currentUser.id,
                         product_id: productId,
-                        name,
                         comment: text,
-                        rating
+                        rating: parseInt(rating.value)
                     })
                 });
 
-                const result = await res.json();
-
-                if (!res.ok) throw new Error(result.error || 'Failed to submit');
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
 
                 // Reset form
-                if (nameInput) nameInput.value = '';
-                if (textInput) textInput.value = '';
+                document.getElementById('comment-text').value = '';
                 document.querySelectorAll('input[name="rating"]').forEach(r => r.checked = false);
 
-                // Reload comments
                 loadComments();
-
-                // Optional toast
                 if (typeof showToast === 'function') showToast('Thank you for your review!');
 
             } catch (err) {
-                console.error('Submit error:', err);
-                alert('Error submitting review: ' + err.message);
+                alert('Error: ' + err.message);
             }
         });
 
-        // === Load comments when page loads ===
-        document.addEventListener('DOMContentLoaded', loadComments);
+        // Update your login() function to save user
+        async function login() {
+            const email = document.getElementById('login-email').value.trim();
+            const pass = document.getElementById('login-password').value;
+
+            const res = await fetch('/api/auth', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'login', email, password: pass })
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                setCurrentUser(data.user);  // Save user globally
+                showMessage(`Welcome, ${data.user.name}!`, 'green');
+                setTimeout(closePopup, 800);
+                loadComments(); // refresh reviews if needed
+            } else {
+                showMessage(data.message || 'Login failed', 'red');
+            }
+        }
+
+        // Load on start
+        document.addEventListener('DOMContentLoaded', () => {
+            currentUser = getCurrentUser();
+            updateLoginUI();
+            loadComments();
+        });
     </script>
 </body>
 

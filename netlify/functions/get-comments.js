@@ -6,37 +6,48 @@ export default async (req) => {
   const url = new URL(req.url);
   const productId = url.searchParams.get('id');
 
-  // GET = Load comments for product
+  // === GET: Load comments for this product ===
   if (req.method === 'GET') {
-    try {
-      const comments = await sql`
-        SELECT c.id, c.name, c.comment, c.rating, c.created_at AS date
-        FROM product_comments c
-        WHERE c.product_id = ${productId}
-        ORDER BY c.created_at DESC
-      `;
-      return new Response(JSON.stringify(comments), {
-        headers: { 'Content-Type': 'application/json' }
-      });
-    } catch (err) {
-      return new Response(JSON.stringify({ error: err.message }), { status: 500 });
-    }
+    const comments = await sql`
+      SELECT 
+        pc.id,
+        pc.comment,
+        pc.rating,
+        pc.created_at AS date,
+        u.name,
+        u.email
+      FROM product_comments pc
+      JOIN users u ON pc.user_id = u.id
+      WHERE pc.product_id = ${productId}
+      ORDER BY pc.created_at DESC
+    `;
+
+    return new Response(JSON.stringify(comments), {
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 
-  // POST = Save new comment
+  // === POST: Submit new review (login required) ===
   if (req.method === 'POST') {
     const body = await req.json();
-    const { product_id, name, comment, rating } = body;
+    const { user_id, product_id, comment, rating } = body;
 
-    try {
-      await sql`
-        INSERT INTO product_comments (product_id, name, comment, rating)
-        VALUES (${product_id}, ${name}, ${comment}, ${rating})
-      `;
-      return new Response(JSON.stringify({ success: true }), { status: 200 });
-    } catch (err) {
-      return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+    if (!user_id) {
+      return new Response(JSON.stringify({ error: 'Login required' }), { status: 401 });
     }
+    if (!comment?.trim()) {
+      return new Response(JSON.stringify({ error: 'Comment is required' }), { status: 400 });
+    }
+    if (!rating || rating < 1 || rating > 5) {
+      return new Response(JSON.stringify({ error: 'Valid rating (1–5) required' }), { status: 400 });
+    }
+
+    await sql`
+      INSERT INTO product_comments (user_id, product_id, comment, rating)
+      VALUES (${user_id}, ${product_id}, ${comment}, ${rating})
+    `;
+
+    return new Response(JSON.stringify({ success: true }), { status: 200 });
   }
 
   return new Response('Method not allowed', { status: 405 });
