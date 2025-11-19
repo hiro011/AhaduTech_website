@@ -419,6 +419,7 @@
     <div class="container2 comments-section">
         <h2>Customer Reviews</h2>
         <div id="comments-list">
+            <div id="current-user-test"></div>
             <!-- Comments loaded here -->
         </div>
     </div>
@@ -440,7 +441,12 @@
             return user ? JSON.parse(user) : null;
         }
 
-        let currentUser = getCurrentUser();
+        let currentUser2 = getCurrentUser();
+
+        function test(){
+            const cutest = document.getElementById('current-user-test');
+            cutest.innerHTML = `<p style="text-align:center; padding:2rem; color:#666;">here user ${currentUser2.name}</p>`;
+        }
 
         // Format date
         function formatDate(dateString) {
@@ -501,7 +507,7 @@
                     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
                 `;
 
-                    const canDelete = currentUser && c.user_id === currentUser.id;
+                    const canDelete = currentUser2 && c.user_id === currentUser2.id;
                     const deleteBtn = canDelete
                         ? `<div class="delete-btn" onclick="deleteComment(${c.id})" 
                          title="Delete your review"
@@ -546,7 +552,7 @@
                 const res = await fetch('/api/product-comments', {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ comment_id: commentId, user_id: currentUser.id })
+                    body: JSON.stringify({ comment_id: commentId, user_id: currentUser2.id })
                 });
 
                 if (!res.ok) throw new Error('Failed to delete');
@@ -560,9 +566,9 @@
 
         // Submit review
         document.getElementById('submit-comment')?.addEventListener('click', async () => {
-            currentUser = getCurrentUser();
+            currentUser2 = getCurrentUser();
 
-            if (!currentUser) {
+            if (!currentUser2) {
                 alert('Please login to leave a review!');
                 openPopup(); // This opens your login popup
                 return;
@@ -585,7 +591,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        user_id: currentUser.id,
+                        user_id: currentUser2.id,
                         product_id: productId,
                         comment: text,
                         rating: parseInt(rating.value)
@@ -617,19 +623,19 @@
 
             // Update logged-in message
             const msg = document.getElementById('logged-in-message');
-            if (currentUser && msg) {
-                msg.textContent = `Logged in as ${currentUser.name} — you can write a review!`;
+            if (currentUser2 && msg) {
+                msg.textContent = `Logged in as ${currentUser2.name} — you can write a review!`;
             }
 
             loadComments();
 
             // Refresh when user logs in (if you dispatch an event from login)
             window.addEventListener('storage', (e) => {
-                if (e.key === 'currentUser') {
-                    currentUser = getCurrentUser();
+                if (e.key === 'currentUser2') {
+                    currentUser2 = getCurrentUser();
                     loadComments();
-                    if (currentUser && msg) {
-                        msg.textContent = `Logged in as ${currentUser.name} — you can write a review!`;
+                    if (currentUser2 && msg) {
+                        msg.textContent = `Logged in as ${currentUser2.name} — you can write a review!`;
                     }
                 }
             });
