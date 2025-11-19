@@ -1,10 +1,12 @@
-import { sql } from 'https://cdn.jsdelivr.net/npm/@neondatabase/serverless@0.10.0/+esm';
+// netlify/functions/get-comments.js   ← exact path & filename
 
-export default async (req) => {
-  const client = sql(process.env.NETLIFY_DATABASE_URL);
+import { neon } from '@netlify/neon';
+
+export default async () => {
+  const sql = neon(); // automatically reads NETLIFY_DATABASE_URL – no config needed!
 
   try {
-    const data = await client`
+    const comments = await sql`
       SELECT 
         c.id,
         c.comment,
@@ -15,13 +17,15 @@ export default async (req) => {
       FROM comments c
       LEFT JOIN users u ON c.user_id = u.id
       ORDER BY c.created_at DESC
+      LIMIT 50
     `;
 
-    return new Response(JSON.stringify(data), {
+    return new Response(JSON.stringify(comments), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (error) {
+    console.error('DB Error:', error);
     return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   }
 };
