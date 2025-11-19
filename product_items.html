@@ -517,7 +517,7 @@
                     div.innerHTML = `
                 ${deleteBtn}
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <strong style="color:#1e293b; font-size:1.15rem;">${c.name || 'Anonymous'}</strong>
+                        <strong style="color:#1e293b; font-size:1.15rem;">${c.name || 'Anonymous'} c: ${commentUserId} u: ${currentUserId}</strong>
                         <div style="color:#f59e0b; font-size:1.5rem;">${'★'.repeat(c.rating)}${'☆'.repeat(5 - c.rating)}</div>
                     </div>
                     <div style="color:#64748b; font-size:0.95rem; margin-bottom:12px;">
