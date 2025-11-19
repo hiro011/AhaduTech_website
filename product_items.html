@@ -469,6 +469,7 @@
         }
 
         // Load comments
+        // Load comments — FINAL WORKING VERSION (handles string/number + admin 0)
         async function loadComments() {
             const commentsList = document.getElementById('comments-list');
             if (!commentsList) return;
@@ -482,7 +483,7 @@
                 commentsList.innerHTML = '';
 
                 if (comments.length === 0) {
-                    commentsList.innerHTML = '<p style="text-align:center; color:#777; padding:3rem; font-size:1.1rem;">No reviews yet. Be the first!</p>';
+                    commentsList.innerHTML = '<p style="text-align:center; color:#777; padding:3rem;">No reviews yet. Be the first!</p>';
                     updateAverageRating([]);
                     return;
                 }
@@ -492,44 +493,39 @@
                 comments.forEach(c => {
                     const div = document.createElement('div');
                     div.className = 'comment';
-                    div.style.cssText = 'position:relative; background:#f8f9fa; padding:1.3rem; margin:1rem 0; border-radius:14px; border-left:5px solid #007bff; box-shadow:0 2px 10px rgba(0,0,0,0.06);';
+                    div.style.cssText = 'position:relative; background:#f9f9f9; padding:1.3rem; margin:1rem 0; border-radius:14px; border-left:5px solid #007bff; box-shadow:0 3px 12px rgba(0,0,0,0.08);';
 
-                    // Check if current user is the comment owner OR admin (id === 0)
-                    // const isOwner = currentUser2 && (c.user_id === currentUser2.id || currentUser2.id === 0);
-                   // const isOwner = c.user_id === currentUser2.id || currentUser2.id === 0;
-                     const isOwner = true;
+                    // FORCE COMPARISON AS STRINGS + allow admin id 0
+                    const currentUserId = currentUser2 ? String(currentUser2.id) : null;
+                    const commentUserId = String(c.user_id);
+
+                    const isOwner = currentUserId && (commentUserId === currentUserId || currentUserId === "0");
 
                     const deleteBtn = isOwner
                         ? `<div class="delete-btn" onclick="deleteComment(${c.id})"
-                     style="position:absolute; top:10px; right:12px; width:25px; height:25px;
+                     style="position:absolute; top:12px; right:12px; width:36px; height:36px;
                             background:#dc3545; color:white; border-radius:50%;
                             display:flex; align-items:center; justify-content:center;
-                            font-weight:bold; font-size:16px; cursor:pointer;
-                            box-shadow:0 4px 12px rgba(220,53,69,0.4); z-index:10;
-                            transition:all 0.2s;"
-                     onmouseover="this.style.transform='scale(1.15)'"
+                            font-weight:bold; font-size:17px; cursor:pointer;
+                            box-shadow:0 4px 15px rgba(220,53,69,0.5); z-index:10;
+                            transition:0.2s; user-select:none;"
+                     onmouseover="this.style.transform='scale(1.2)'"
                      onmouseout="this.style.transform='scale(1)'"
-                     title="Delete review">
-                     X
-                   </div>`
+                     title="Delete this review">X</div>`
                         : '';
 
                     div.innerHTML = `
                 ${deleteBtn}
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <strong style="color:#1e293b; font-size:1.15rem;">${c.name || 'Anonymous'}</strong>
-                    <div style="color:#f59e0b; font-size:1.5rem; letter-spacing:2px;">
-                        ${'★'.repeat(c.rating)}${'☆'.repeat(5 - c.rating)}
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <strong style="color:#1e293b; font-size:1.15rem;">${c.name || 'Anonymous'}</strong>
+                        <div style="color:#f59e0b; font-size:1.5rem;">${'★'.repeat(c.rating)}${'☆'.repeat(5 - c.rating)}</div>
                     </div>
-                </div>
-                <div style="color:#64748b; font-size:0.95rem; margin-bottom:12px;">
-                    ${formatDate(c.date)}
-                    ${isOwner ? '<span style="color:#dc3545; font-weight:600; margin-left:10px;">(You)</span>' : ''}
-                </div>
-                <p style="margin:0; line-height:1.7; color:#334155; font-size:1rem;">
-                    ${c.comment.replace(/\n/g, '<br>')}
-                </p>
-            `;
+                    <div style="color:#64748b; font-size:0.95rem; margin-bottom:12px;">
+                        ${formatDate(c.date)}
+                        ${isOwner ? ' <span style="color:#dc3545; font-weight:600;">(You)</span>' : ''}
+                    </div>
+                    <p style="margin:0; line-height:1.7; color:#334155;">${c.comment.replace(/\n/g, '<br>')}</p>
+                `;
 
                     commentsList.appendChild(div);
                 });
@@ -537,11 +533,10 @@
                 updateAverageRating(comments);
 
             } catch (err) {
-                console.error(err);
+                console.error('Load comments error:', err);
                 commentsList.innerHTML = '<p style="color:red; text-align:center;">Failed to load reviews</p>';
             }
         }
-
         // Keep your deleteComment function exactly like this:
         async function deleteComment(commentId) {
             if (!confirm('Delete this review permanently?')) return;
