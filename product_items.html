@@ -496,8 +496,8 @@
 
                     // Check if current user is the comment owner OR admin (id === 0)
                     // const isOwner = currentUser2 && (c.user_id === currentUser2.id || currentUser2.id === 0);
-                    const isOwner = c.user_id === currentUser2.id || currentUser2.id === 0;
-                    // const isOwner = true;
+                   // const isOwner = c.user_id === currentUser2.id || currentUser2.id === 0;
+                     const isOwner = true;
 
                     const deleteBtn = isOwner
                         ? `<div class="delete-btn" onclick="deleteComment(${c.id})"
