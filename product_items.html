@@ -466,46 +466,56 @@
         // Load comments when page opens
         loadComments();
     </script>
-
     <script>
-        // Comment System (Add to your existing script.js or here)
+        // === Product ID from URL (e.g., ?id=2) ===
         const urlParams = new URLSearchParams(window.location.search);
         const productId = parseInt(urlParams.get('id')) || 1;
 
-        // Load comments for this product
-        function loadComments() {
-            const allComments = JSON.parse(localStorage.getItem('ecommerce_comments') || '{}');
-            const productComments = allComments[productId] || [];
-
+        // === Load comments from Neon DB (filtered by product) ===
+        async function loadComments() {
             const commentsList = document.getElementById('comments-list');
-            // commentsList.innerHTML = '';
+            commentsList.innerHTML = '<p>Loading reviews...</p>';
 
-            if (productComments.length === 0) {
-                commentsList.innerHTML = '<p style="text-align:center; color:#777; padding:2rem;">No reviews yet. Be the first to review!</p>';
-                updateAverageRating([]);
-                return;
-            }
+            try {
+                const res = await fetch(`/api/product-comments?id=${productId}`);
+                if (!res.ok) throw new Error('Failed to load reviews');
 
-            // Sort newest first
-            productComments.sort((a, b) => b.timestamp - a.timestamp);
+                const comments = await res.json();
 
-            productComments.forEach(c => {
-                const div = document.createElement('div');
-                div.className = 'comment';
-                div.innerHTML = `
-                    <div class="comment-header">
+                commentsList.innerHTML = '';
+
+                if (comments.length === 0) {
+                    commentsList.innerHTML = '<p style="text-align:center; color:#777; padding:2rem;">No reviews yet. Be the first to review!</p>';
+                    updateAverageRating([]);
+                    return;
+                }
+
+                // Sort newest first
+                comments.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                comments.forEach(c => {
+                    const div = document.createElement('div');
+                    div.className = 'comment';
+                    div.innerHTML = `
+                <div class="comment-header">
                     <div class="comment-author">${c.name || 'Anonymous'}</div>
                     <div class="comment-rating">${'★'.repeat(c.rating)}${'☆'.repeat(5 - c.rating)}</div>
-                    </div>
-                    <div class="comment-date">${formatDate(c.timestamp)}</div>
-                    <p>${c.text.replace(/\n/g, '<br>')}</p>
-                `;
-                commentsList.appendChild(div);
-            });
+                </div>
+                <div class="comment-date">${formatDate(c.date)}</div>
+                <p>${c.comment.replace(/\n/g, '<br>')}</p>
+            `;
+                    commentsList.appendChild(div);
+                });
 
-            updateAverageRating(productComments);
+                updateAverageRating(comments);
+
+            } catch (err) {
+                console.error('Load comments error:', err);
+                commentsList.innerHTML = `<p style="color:red;">Error loading reviews: ${err.message}</p>`;
+            }
         }
 
+        // === Average Rating (same as before) ===
         function updateAverageRating(comments) {
             if (comments.length === 0) {
                 document.getElementById('avg-stars').textContent = '☆☆☆☆☆';
@@ -523,8 +533,9 @@
                 `${avg.toFixed(1)} out of 5 (${comments.length} review${comments.length > 1 ? 's' : ''})`;
         }
 
-        function formatDate(timestamp) {
-            const date = new Date(timestamp);
+        // === Format Date (same as before) ===
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
             const now = new Date();
             const diff = now - date;
             const days = Math.floor(diff / 86400000);
@@ -535,43 +546,59 @@
             return date.toLocaleDateString('en-GB');
         }
 
-        // Submit comment
-        document.getElementById('submit-comment').onclick = () => {
-            const name = document.getElementById('comment-name').value.trim();
-            const text = document.getElementById('comment-text').value.trim();
-            const rating = document.querySelector('input[name="rating"]:checked');
+        // === Submit New Comment (saves to DB) ===
+        document.getElementById('submit-comment')?.addEventListener('click', async () => {
+            const nameInput = document.getElementById('comment-name');
+            const textInput = document.getElementById('comment-text');
+            const ratingInput = document.querySelector('input[name="rating"]:checked');
+
+            const name = nameInput?.value.trim() || 'Anonymous';
+            const text = textInput?.value.trim();
+            const rating = ratingInput ? parseInt(ratingInput.value) : null;
 
             if (!text) {
-                alert('Please write a comment!');
+                alert('Please write a review!');
                 return;
             }
             if (!rating) {
-                alert('Please select a rating!');
+                alert('Please select a star rating!');
                 return;
             }
 
-            const allComments = JSON.parse(localStorage.getItem('ecommerce_comments') || '{}');
-            if (!allComments[productId]) allComments[productId] = [];
+            try {
+                const res = await fetch('/api/product-comments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        product_id: productId,
+                        name,
+                        comment: text,
+                        rating
+                    })
+                });
 
-            allComments[productId].push({
-                name: name || 'Anonymous',
-                text: text,
-                rating: parseInt(rating.value),
-                timestamp: Date.now()
-            });
+                const result = await res.json();
 
-            localStorage.setItem('ecommerce_comments', JSON.stringify(allComments));
+                if (!res.ok) throw new Error(result.error || 'Failed to submit');
 
-            // Reset form
-            document.getElementById('comment-name').value = '';
-            document.getElementById('comment-text').value = '';
-            document.querySelectorAll('input[name="rating"]').forEach(r => r.checked = false);
+                // Reset form
+                if (nameInput) nameInput.value = '';
+                if (textInput) textInput.value = '';
+                document.querySelectorAll('input[name="rating"]').forEach(r => r.checked = false);
 
-            loadComments();
-            showToast && showToast && showToast('Thank you for your review!');
-        };
+                // Reload comments
+                loadComments();
 
-        // Load comments on page load
+                // Optional toast
+                if (typeof showToast === 'function') showToast('Thank you for your review!');
+
+            } catch (err) {
+                console.error('Submit error:', err);
+                alert('Error submitting review: ' + err.message);
+            }
+        });
+
+        // === Load comments when page loads ===
         document.addEventListener('DOMContentLoaded', loadComments);
     </script>
 </body>
