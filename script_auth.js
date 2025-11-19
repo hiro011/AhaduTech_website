@@ -1,6 +1,67 @@
-// Global user
 let currentUser = null;
 
+const SESSION_KEY = 'ahaduUser';
+const ONE_WEEK = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+
+function getCurrentUser() {
+  if (currentUser) return currentUser;
+
+  const data = localStorage.getItem(SESSION_KEY);
+  if (!data) return null;
+
+  try {
+    const parsed = JSON.parse(data);
+    // Check if expired
+    if (Date.now() > parsed.expiresAt) {
+      localStorage.removeItem(SESSION_KEY);
+      return null;
+    }
+    currentUser = parsed.user;
+    return currentUser;
+  } catch (e) {
+    localStorage.removeItem(SESSION_KEY);
+    return null;
+  }
+}
+
+function setCurrentUser(user) {
+  currentUser = user;
+  const sessionData = {
+    user: user,
+    expiresAt: Date.now() + ONE_WEEK
+  };
+  localStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
+  renderAuthButton();
+  loadComments?.();
+}
+
+function logout() {
+  currentUser = null;
+  localStorage.removeItem(SESSION_KEY);
+  renderAuthButton();
+  loadComments?.();
+  if (typeof showToast === 'function') showToast('Logged out');
+}
+
+function renderAuthButton() {
+  const container = document.getElementById('auth-container');
+  if (!container) return;
+
+  if (currentUser) {
+    container.innerHTML = `
+      <div class="profile-wrapper" title="${currentUser.name}">
+        <div class="profile-avatar">
+          ${currentUser.name.charAt(0).toUpperCase()}
+        </div>
+        <div class="logout-btn" onclick="logout()">Logout</div>
+      </div>
+    `;
+  } else {
+    container.innerHTML = `<button class="open-auth-btn" onclick="openPopup()">Login</button>`;
+  }
+}
+
+// Popup controls
 function openPopup() {
   document.getElementById('popup-overlay').style.display = 'block';
   document.getElementById('auth-popup').style.display = 'block';
@@ -11,39 +72,12 @@ function closePopup() {
   document.getElementById('auth-message').innerHTML = '';
 }
 function showRegister() {
-  openPopup();
   document.getElementById('login-form').style.display = 'none';
   document.getElementById('register-form').style.display = 'block';
 }
 function showLogin() {
-  openPopup();
   document.getElementById('register-form').style.display = 'none';
   document.getElementById('login-form').style.display = 'block';
-}
-
-function setCurrentUser(user) {
-  currentUser = user;
-  sessionStorage.setItem('currentUser', JSON.stringify(user));
-  updateAuthButton();
-  loadComments?.();
-}
-function getCurrentUser() {
-  if (currentUser) return currentUser;
-  const saved = sessionStorage.getItem('currentUser');
-  if (saved) currentUser = JSON.parse(saved);
-  return currentUser;
-}
-function updateAuthButton() {
-  const container = document.getElementById('auth-container');
-  if (currentUser) {
-    container.innerHTML = `
-      <div class="profile-avatar" onclick="openPopup()" title="${currentUser.name}">
-        ${currentUser.name.charAt(0).toUpperCase()}
-      </div>
-    `;
-  } else {
-    container.innerHTML = `<button class="open-auth-btn" onclick="openPopup()">Login</button>`;
-  }
 }
 
 // Register
@@ -64,7 +98,12 @@ async function register() {
   const data = await res.json();
 
   showMsg(data.error || 'Registered! Now login', data.success ? 'green' : 'red');
-  if (data.success) setTimeout(() => { showLogin(); document.getElementById('login-email').value = email; }, 1500);
+  if (data.success) {
+    setTimeout(() => {
+      showLogin();
+      document.getElementById('login-email').value = email;
+    }, 1200);
+  }
 }
 
 // Login
@@ -81,7 +120,7 @@ async function login() {
 
   if (data.success) {
     setCurrentUser(data.user);
-    showMsg('Login successful!', 'green');
+    showMsg('Welcome back!', 'green');
     setTimeout(closePopup, 800);
   } else {
     showMsg(data.error || 'Login failed', 'red');
@@ -94,8 +133,8 @@ function showMsg(text, color) {
   el.textContent = text;
 }
 
-// On page load
+// Run when page loads
 document.addEventListener('DOMContentLoaded', () => {
   getCurrentUser();
-  updateAuthButton();
+  renderAuthButton();
 });
