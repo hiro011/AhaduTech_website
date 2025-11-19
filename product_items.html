@@ -307,7 +307,6 @@
 </head>
 
 <body>
-
     <!-- Back Button -->
     <a href="products.html" class="back-btn" title="Back to Products">
         <img src="images/angle-left.svg" alt="angle-left" width="40" height="35">
@@ -467,6 +466,7 @@
         // Load comments when page opens
         loadComments();
     </script>
+
     <script>
         // Comment System (Add to your existing script.js or here)
         const urlParams = new URLSearchParams(window.location.search);
@@ -493,13 +493,13 @@
                 const div = document.createElement('div');
                 div.className = 'comment';
                 div.innerHTML = `
-          <div class="comment-header">
-            <div class="comment-author">${c.name || 'Anonymous'}</div>
-            <div class="comment-rating">${'★'.repeat(c.rating)}${'☆'.repeat(5 - c.rating)}</div>
-          </div>
-          <div class="comment-date">${formatDate(c.timestamp)}</div>
-          <p>${c.text.replace(/\n/g, '<br>')}</p>
-        `;
+                    <div class="comment-header">
+                    <div class="comment-author">${c.name || 'Anonymous'}</div>
+                    <div class="comment-rating">${'★'.repeat(c.rating)}${'☆'.repeat(5 - c.rating)}</div>
+                    </div>
+                    <div class="comment-date">${formatDate(c.timestamp)}</div>
+                    <p>${c.text.replace(/\n/g, '<br>')}</p>
+                `;
                 commentsList.appendChild(div);
             });
 
