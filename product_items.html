@@ -473,11 +473,16 @@
             const commentsList = document.getElementById('comments-list');
             if (!commentsList) return;
 
-            commentsList.innerHTML = '<p style="text-align:center; padding:2rem; color:#666;">Loading reviews...</p>';
+            commentsList.innerHTML = '<p style="text-align:center; color:#666; padding:2rem;">Loading...</p>';
 
             try {
                 const res = await fetch(`/api/product-comments?id=${productId}`);
                 const comments = await res.json();
+
+                // FORCE GET LATEST USER FROM AUTH SYSTEM
+                if (typeof getCurrentUser === 'function') {
+                    currentUser = getCurrentUser();  // This pulls from localStorage
+                }
 
                 commentsList.innerHTML = '';
 
@@ -487,16 +492,13 @@
                     return;
                 }
 
-                comments.sort((a, b) => new Date(b.date) - new Date(a.date));
-
                 comments.forEach(c => {
                     const div = document.createElement('div');
                     div.className = 'comment';
-                    div.style.cssText = 'position:relative; background:#f9f9f9; padding:1.3rem; margin:1rem 0; border-radius:14px; border-left:5px solid #007bff; box-shadow:0 3px 12px rgba(0,0,0,0.08);';
+                    div.style.cssText = 'position:relative; background:#f9f9f9; padding:1.4rem; margin:1rem 0; border-radius:14px; border-left:5px solid #007bff; box-shadow:0 4px 12px rgba(0,0,0,0.08);';
 
-                    // FORCE COMPARISON AS STRINGS + allow admin id 0
-                    const currentUserId = currentUser2 ? String(currentUser2.id) : null;
-                    const commentUserId = String(c.user_id);
+                    const commentUserId = c.user_id != null ? String(c.user_id) : null;
+                    const currentUserId = currentUser ? String(currentUser.id) : null;
 
                     const isOwner = currentUserId && (commentUserId === currentUserId || currentUserId === "0");
 
@@ -507,24 +509,24 @@
                             display:flex; align-items:center; justify-content:center;
                             font-weight:bold; font-size:17px; cursor:pointer;
                             box-shadow:0 4px 15px rgba(220,53,69,0.5); z-index:10;
-                            transition:0.2s; user-select:none;"
+                            transition:0.2s;"
                      onmouseover="this.style.transform='scale(1.2)'"
                      onmouseout="this.style.transform='scale(1)'"
-                     title="Delete this review">X</div>`
+                     title="Delete review">X</div>`
                         : '';
 
                     div.innerHTML = `
                 ${deleteBtn}
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                        <strong style="color:#1e293b; font-size:1.15rem;">${c.name || 'Anonymous'} c: ${commentUserId} u: ${currentUserId}</strong>
-                        <div style="color:#f59e0b; font-size:1.5rem;">${'★'.repeat(c.rating)}${'☆'.repeat(5 - c.rating)}</div>
-                    </div>
-                    <div style="color:#64748b; font-size:0.95rem; margin-bottom:12px;">
-                        ${formatDate(c.date)}
-                        ${isOwner ? ' <span style="color:#dc3545; font-weight:600;">(You)</span>' : ''}
-                    </div>
-                    <p style="margin:0; line-height:1.7; color:#334155;">${c.comment.replace(/\n/g, '<br>')}</p>
-                `;
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <strong style="color:#1e293b; font-size:1.15rem;">${c.name || 'Anonymous'} c: ${commentUserId} u: ${currentUserId}</strong>
+                    <div style="color:#f59e0b; font-size:1.5rem;">${'★'.repeat(c.rating)}${'☆'.repeat(5 - c.rating)}</div>
+                </div>
+                <div style="color:#64748b; font-size:0.95rem; margin-bottom:12px;">
+                    ${formatDate(c.date)}
+                    ${isOwner ? ' <span style="color:#dc3545; font-weight:600;">(You)</span>' : ''}
+                </div>
+                <p style="margin:0; line-height:1.7; color:#334155;">${c.comment.replace(/\n/g, '<br>')}</p>
+            `;
 
                     commentsList.appendChild(div);
                 });
@@ -532,11 +534,10 @@
                 updateAverageRating(comments);
 
             } catch (err) {
-                console.error('Load comments error:', err);
+                console.error(err);
                 commentsList.innerHTML = '<p style="color:red; text-align:center;">Failed to load reviews</p>';
             }
         }
-
         async function deleteComment(commentId) {
             if (!confirm('Delete this review permanently?')) return;
 
