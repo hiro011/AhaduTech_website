@@ -492,14 +492,14 @@
                     div.style.cssText = 'position:relative; background:#f8f9fa; padding:1rem; margin:1rem 0; border-radius:12px; border-left:4px solid #007bff;';
 
                     // Delete button (only for comment owner)
-                    const canDelete = currentUser && c.user_id === currentUser.id;
+                    const canDelete = currentUser2 && c.user_id === currentUser2.id;
                     const deleteBtn = canDelete
                         ? `<span class="delete-comment" onclick="deleteComment(${c.id})" 
-               style="position:absolute; top:10px; right:10px; cursor:pointer; 
-                      background:#dc3545; color:white; width:28px; height:28px; 
-                      border-radius:50%; display:flex; align-items:center; justify-content:center;
-                      font-weight:bold; font-size:14px; box-shadow:0 2px 8px rgba(220,53,69,0.3);"
-               title="Delete your review">X</span>`
+                            style="position:absolute; top:10px; right:10px; cursor:pointer; 
+                                    background:#dc3545; color:white; width:28px; height:28px; 
+                                    border-radius:50%; display:flex; align-items:center; justify-content:center;
+                                    font-weight:bold; font-size:14px; box-shadow:0 2px 8px rgba(220,53,69,0.3);"
+                            title="Delete your review">X</span>`
                         : '';
 
                     div.innerHTML = `
@@ -532,7 +532,7 @@
                 const res = await fetch('/api/product-comments', {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ comment_id: commentId, user_id: currentUser.id })
+                    body: JSON.stringify({ comment_id: commentId, user_id: currentUser2.id })
                 });
 
                 const data = await res.json();
@@ -547,8 +547,8 @@
 
         // Submit review
         document.getElementById('submit-comment')?.addEventListener('click', async () => {
-            currentUser = getCurrentUser();
-            if (!currentUser) {
+            currentUser2 = getCurrentUser();
+            if (!currentUser2) {
                 alert('Please login to leave a review!');
                 return;
             }
@@ -564,7 +564,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        user_id: currentUser.id,
+                        user_id: currentUser2.id,
                         product_id: productId,
                         comment: text,
                         rating: parseInt(rating.value)
