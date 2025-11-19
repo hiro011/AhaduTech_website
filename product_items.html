@@ -504,7 +504,7 @@
 
                     const deleteBtn = isOwner
                         ? `<div class="delete-btn" onclick="deleteComment(${c.id})"
-                     style="position:absolute; top:8px; right:12px; width:25px; height:25px;
+                     style="position:absolute; top:8px; right:8px; width:25px; height:25px;
                             background:#dc3545; color:white; border-radius:50%;
                             display:flex; align-items:center; justify-content:center;
                             font-weight:bold; font-size:17px; cursor:pointer;
@@ -538,8 +538,14 @@
                 commentsList.innerHTML = '<p style="color:red; text-align:center;">Failed to load reviews</p>';
             }
         }
+        // Delete comment
         async function deleteComment(commentId) {
             if (!confirm('Delete this review permanently?')) return;
+
+            if (!currentUser) {
+                alert('You must be logged in to delete');
+                return;
+            }
 
             try {
                 const res = await fetch('/api/product-comments', {
@@ -547,41 +553,24 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         comment_id: commentId,
-                        user_id: currentUser2.id
+                        user_id: String(currentUser.id)  // ← SEND AS STRING
                     })
                 });
 
+                const data = await res.json();
+
                 if (!res.ok) {
-                    const err = await res.json();
-                    throw new Error(err.error || 'Delete failed');
+                    throw new Error(data.error || 'Delete failed');
                 }
 
-                if (typeof showToast === 'function') showToast('Review deleted');
-                loadComments();
+                if (typeof showToast === 'function') showToast('Review deleted successfully!');
+                loadComments();  // Refresh
+
             } catch (err) {
+                console.error('Delete error:', err);
                 alert('Error: ' + err.message);
             }
         }
-        // Delete comment
-        async function deleteComment(commentId) {
-            if (!confirm('Are you sure you want to delete your review?')) return;
-
-            try {
-                const res = await fetch('/api/product-comments', {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ comment_id: commentId, user_id: currentUser2.id })
-                });
-
-                if (!res.ok) throw new Error('Failed to delete');
-
-                if (typeof showToast === 'function') showToast('Review deleted');
-                loadComments();
-            } catch (err) {
-                alert('Error deleting review');
-            }
-        }
-
         // Submit review
         document.getElementById('submit-comment')?.addEventListener('click', async () => {
             currentUser2 = getCurrentUser();

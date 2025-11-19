@@ -1,21 +1,28 @@
-async function deleteComment(commentId) {
-    if (!confirm('Delete this review permanently?')) return;
+if (req.method === 'DELETE') {
+  const { comment_id, user_id } = await req.json();
 
-    try {
-        const res = await fetch('/api/product-comments', {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                comment_id: commentId, 
-                user_id: currentUser.id  // keep as is — backend will handle
-            })
-        });
+  // Convert user_id to string for safe comparison
+  const userIdStr = String(user_id);
 
-        if (!res.ok) throw new Error('Delete failed');
+  const result = await sql`
+    DELETE FROM product_comments 
+    WHERE id = ${comment_id} 
+      AND (
+        user_id = ${userIdStr}::bigint    -- match owner
+        OR ${userIdStr} = '0'             -- allow admin id 0 to delete ANY comment
+      )
+    RETURNING id
+  `;
 
-        if (typeof showToast === 'function') showToast('Review deleted');
-        loadComments();
-    } catch (err) {
-        alert('Error deleting review');
-    }
+  if (result.length === 0) {
+    return new Response(JSON.stringify({ error: 'Not authorized or comment not found' }), { 
+      status: 403,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  return new Response(JSON.stringify({ success: true }), { 
+    status: 200,
+    headers: { 'Content-Type': 'application/json' }
+  });
 }
