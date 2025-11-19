@@ -433,36 +433,37 @@
         const urlParams = new URLSearchParams(window.location.search);
         const productId = parseInt(urlParams.get('id')) || 1;
 
-        // Get logged-in user (from your existing auth system)
+        // Get current logged-in user
         function getCurrentUser() {
             const user = sessionStorage.getItem('currentUser');
             return user ? JSON.parse(user) : null;
         }
 
-        let currentUser2 = getCurrentUser();
+        let currentUser = getCurrentUser();
 
-        // Format date nicely
+        // Format date
         function formatDate(dateString) {
             const date = new Date(dateString);
             return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
         }
 
-        // Calculate average rating
+        // Update average rating display
         function updateAverageRating(comments) {
+            const avgEl = document.getElementById('avg-rating-text');
+            const starsEl = document.getElementById('avg-stars');
+            if (!avgEl || !starsEl) return;
+
             if (comments.length === 0) {
-                document.getElementById('average-rating')?.remove();
+                starsEl.textContent = '☆☆☆☆☆';
+                avgEl.textContent = 'No reviews yet';
                 return;
             }
+
             const avg = comments.reduce((sum, c) => sum + c.rating, 0) / comments.length;
-            const stars = '★'.repeat(Math.round(avg)) + '☆'.repeat(5 - Math.round(avg));
-            let el = document.getElementById('average-rating');
-            if (!el) {
-                el = document.createElement('div');
-                el.id = 'average-rating';
-                el.style.cssText = 'font-size:1.5rem; margin:1rem 0; padding:1rem; background:#f8f9fa; border-radius:10px; text-align:center;';
-                document.getElementById('comments-section')?.prepend(el);
-            }
-            el.innerHTML = `<strong>Average Rating:</strong> ${stars} ${avg.toFixed(1)} (${comments.length} reviews)`;
+            const filled = '★'.repeat(Math.round(avg));
+            const empty = '☆'.repeat(5 - Math.round(avg));
+            starsEl.textContent = filled + empty;
+            avgEl.innerHTML = `<strong>${avg.toFixed(1)}</strong> out of 5 (${comments.length} reviews)`;
         }
 
         // Load comments
@@ -470,7 +471,7 @@
             const commentsList = document.getElementById('comments-list');
             if (!commentsList) return;
 
-            commentsList.innerHTML = '<p>Loading reviews...</p>';
+            commentsList.innerHTML = '<p style="text-align:center; padding:2rem; color:#666;">Loading reviews...</p>';
 
             try {
                 const res = await fetch(`/api/product-comments?id=${productId}`);
@@ -479,7 +480,7 @@
                 commentsList.innerHTML = '';
 
                 if (comments.length === 0) {
-                    commentsList.innerHTML = '<p style="text-align:center; color:#777; padding:2rem;">No reviews yet. Be the first!</p>';
+                    commentsList.innerHTML = '<p style="text-align:center; color:#777; padding:3rem; font-size:1.1rem;">No reviews yet. Be the first to share your experience!</p>';
                     updateAverageRating([]);
                     return;
                 }
@@ -489,90 +490,111 @@
                 comments.forEach(c => {
                     const div = document.createElement('div');
                     div.className = 'comment';
-                    div.style.cssText = 'position:relative; background:#f8f9fa; padding:1rem; margin:1rem 0; border-radius:12px; border-left:4px solid #007bff;';
+                    div.style.cssText = `
+                    position: relative;
+                    background: #f8f9fa;
+                    padding: 1.2rem;
+                    margin: 1rem 0;
+                    border-radius: 14px;
+                    border-left: 5px solid #007bff;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+                `;
 
-                    // Delete button (only for comment owner)
-                    const canDelete = currentUser2 && c.user_id === currentUser2.id;
+                    const canDelete = currentUser && c.user_id === currentUser.id;
                     const deleteBtn = canDelete
-                        ? `<span class="delete-comment" onclick="deleteComment(${c.id})" 
-                            style="position:absolute; top:10px; right:10px; cursor:pointer; 
-                                    background:#dc3545; color:white; width:28px; height:28px; 
-                                    border-radius:50%; display:flex; align-items:center; justify-content:center;
-                                    font-weight:bold; font-size:14px; box-shadow:0 2px 8px rgba(220,53,69,0.3);"
-                            title="Delete your review">X</span>`
+                        ? `<div class="delete-btn" onclick="deleteComment(${c.id})" 
+                         title="Delete your review"
+                         style="position:absolute; top:12px; right:12px; width:32px; height:32px; 
+                                background:#dc3545; color:white; border-radius:50%; 
+                                display:flex; align-items:center; justify-content:center;
+                                font-weight:bold; cursor:pointer; font-size:15px;
+                                box-shadow:0 3px 10px rgba(220,53,69,0.4); transition:0.2s;"
+                         onmouseover="this.style.transform='scale(1.1)'"
+                         onmouseout="this.style.transform='scale(1)'">
+                         X
+                       </div>`
                         : '';
 
                     div.innerHTML = `
-        ${deleteBtn}
-        <div class="comment-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <div class="comment-author" style="font-weight:600; color:#1e293b;">${c.name || 'Anonymous'}</div>
-          <div class="comment-rating" style="color:#f59e0b; font-size:1.2rem;">${'★'.repeat(c.rating)}${'☆'.repeat(5 - c.rating)}</div>
-        </div>
-        <div class="comment-date" style="color:#64748b; font-size:0.9rem; margin-bottom:8px;">
-          ${formatDate(c.date)}
-        </div>
-        <p style="margin:0; line-height:1.6; color:#334155;">${c.comment.replace(/\n/g, '<br>')}</p>
-      `;
+                    ${deleteBtn}
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <strong style="color:#1e293b; font-size:1.1rem;">${c.name || 'Anonymous'}</strong>
+                        <div style="color:#f59e0b; font-size:1.4rem;">${'★'.repeat(c.rating)}${'☆'.repeat(5 - c.rating)}</div>
+                    </div>
+                    <div style="color:#64748b; font-size:0.95rem; margin-bottom:10px;">
+                        ${formatDate(c.date)}
+                    </div>
+                    <p style="margin:0; line-height:1.7; color:#334155;">${c.comment.replace(/\n/g, '<br>')}</p>
+                `;
                     commentsList.appendChild(div);
                 });
 
                 updateAverageRating(comments);
 
             } catch (err) {
-                console.error('Load comments error:', err);
-                commentsList.innerHTML = `<p style="color:red;">Failed to load reviews</p>`;
+                console.error(err);
+                commentsList.innerHTML = '<p style="color:red; text-align:center;">Failed to load reviews</p>';
             }
         }
 
         // Delete comment
         async function deleteComment(commentId) {
-            if (!confirm('Delete your review? This cannot be undone.')) return;
+            if (!confirm('Are you sure you want to delete your review?')) return;
 
             try {
                 const res = await fetch('/api/product-comments', {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ comment_id: commentId, user_id: currentUser2.id })
+                    body: JSON.stringify({ comment_id: commentId, user_id: currentUser.id })
                 });
 
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error || 'Delete failed');
+                if (!res.ok) throw new Error('Failed to delete');
 
                 if (typeof showToast === 'function') showToast('Review deleted');
-                loadComments(); // Refresh
+                loadComments();
             } catch (err) {
-                alert('Error: ' + err.message);
+                alert('Error deleting review');
             }
         }
 
         // Submit review
         document.getElementById('submit-comment')?.addEventListener('click', async () => {
-            currentUser2 = getCurrentUser();
-            if (!currentUser2) {
+            currentUser = getCurrentUser();
+
+            if (!currentUser) {
                 alert('Please login to leave a review!');
+                openPopup(); // This opens your login popup
                 return;
             }
 
             const text = document.getElementById('comment-text').value.trim();
             const rating = document.querySelector('input[name="rating"]:checked');
 
-            if (!text) return alert('Please write a review!');
-            if (!rating) return alert('Please select a rating!');
+            if (!text) {
+                alert('Please write your review!');
+                return;
+            }
+            if (!rating) {
+                alert('Please select a star rating!');
+                return;
+            }
 
             try {
                 const res = await fetch('/api/product-comments', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        user_id: currentUser2.id,
+                        user_id: currentUser.id,
                         product_id: productId,
                         comment: text,
                         rating: parseInt(rating.value)
                     })
                 });
 
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error || 'Failed to post');
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.error || 'Failed to submit');
+                }
 
                 document.getElementById('comment-text').value = '';
                 document.querySelectorAll('input[name="rating"]').forEach(r => r.checked = false);
@@ -585,12 +607,31 @@
             }
         });
 
-        // Load on start
+        // Always show review form
         document.addEventListener('DOMContentLoaded', () => {
+            const formContainer = document.getElementById('review-form-container');
+            if (formContainer) {
+                formContainer.style.display = 'block'; // Always visible
+            }
+
+            // Update logged-in message
+            const msg = document.getElementById('logged-in-message');
+            if (currentUser && msg) {
+                msg.textContent = `Logged in as ${currentUser.name} — you can write a review!`;
+            }
+
             loadComments();
 
-            // Optional: Refresh comments when user logs in (if you have a global login event)
-            // window.addEventListener('userLoggedIn', loadComments);
+            // Refresh when user logs in (if you dispatch an event from login)
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'currentUser') {
+                    currentUser = getCurrentUser();
+                    loadComments();
+                    if (currentUser && msg) {
+                        msg.textContent = `Logged in as ${currentUser.name} — you can write a review!`;
+                    }
+                }
+            });
         });
     </script>
 </body>
