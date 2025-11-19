@@ -1,52 +1,94 @@
-// netlify/functions/auth.js  ← EXACT PATH
+// netlify/functions/auth.js
 import { neon } from '@netlify/neon';
-import { hash, verify } from 'https://cdn.jsdelivr.net/npm/argon2-browser@1.18.0/dist/argon2-bundled.min.js';
 
 export default async (req) => {
   const sql = neon();
 
+  // Helper: Hash password with PBKDF2 (Node.js native)
+  const hashPassword = async (password) => {
+    const enc = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey(
+      'raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveBits']
+    );
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const derived = await crypto.subtle.deriveBits(
+      { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+      keyMaterial, 256
+    );
+    return btoa(String.fromCharCode(...new Uint8Array(derived))) + '|' + btoa(String.fromCharCode(...salt));
+  };
+
+  // Helper: Verify password
+  const verifyPassword = async (password, hash) => {
+    const [hashed, saltStr] = hash.split('|');
+    const enc = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey(
+      'raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveBits']
+    );
+    const salt = Uint8Array.from(atob(saltStr), c => c.charCodeAt(0));
+    const derived = await crypto.subtle.deriveBits(
+      { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+      keyMaterial, 256
+    );
+    return btoa(String.fromCharCode(...new Uint8Array(derived))) === hashed;
+  };
+
   try {
-    const body = await req.json();
-    const { action, name, email, password } = body;
+    const { action, name, email, password } = await req.json();
 
     // REGISTER
     if (action === 'register') {
-      if (!name || !email || !password || password.length < 6) {
-        return new Response(JSON.stringify({ error: 'Invalid data' }), { status: 400 });
+      if (!name?.trim() || !email?.trim() || !password || password.length < 6) {
+        return new Response(JSON.stringify({ error: 'All fields required. Password min 6 chars.' }), { status: 400 });
       }
 
-      const hashResult = await hash({ pass: password, salt: crypto.getRandomValues(new Uint8Array(16)), type: 2 });
-      const password_hash = hashResult.hashHex;
+      const password_hash = await hashPassword(password);
 
       const result = await sql`
         INSERT INTO users (name, email, password_hash)
-        VALUES (${name}, ${email}, ${password_hash})
-        ON CONFLICT (email) DO NOTHING
+        VALUES (${name.trim()}, ${email.trim().toLowerCase()}, ${password_hash})
+        ON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name
         RETURNING id, name, email
       `;
 
-      if (!result.length) return new Response(JSON.stringify({ error: 'Email already exists' }), { status: 409 });
+      if (result.length === 0) {
+        return new Response(JSON.stringify({ error: 'Email already exists' }), { status: 409 });
+      }
 
       return new Response(JSON.stringify({ success: true, user: result[0] }));
     }
 
     // LOGIN
     if (action === 'login') {
-      const users = await sql`SELECT id, name, email, password_hash FROM users WHERE email = ${email}`;
-      if (!users.length) return new Response(JSON.stringify({ error: 'Invalid credentials' }), { status: 401 });
+      if (!email?.trim() || !password) {
+        return new Response(JSON.stringify({ error: 'Email and password required' }), { status: 400 });
+      }
+
+      const users = await sql`
+        SELECT id, name, email, password_hash
+        FROM users WHERE email = ${email.trim().toLowerCase()}
+      `;
+
+      if (users.length === 0) {
+        return new Response(JSON.stringify({ error: 'Invalid email or password' }), { status: 401 });
+      }
 
       const user = users[0];
-      const valid = await verify({ pass: password, hash: user.password_hash });
+      const valid = await verifyPassword(password, user.password_hash);
 
-      if (!valid) return new Response(JSON.stringify({ error: 'Invalid credentials' }), { status: 401 });
+      if (!valid) {
+        return new Response(JSON.stringify({ error: 'Invalid email or password' }), { status: 401 });
+      }
 
-      delete user.password_hash;
-      return new Response(JSON.stringify({ success: true, user }));
+      const { password_hash, ...safeUser } = user;
+      return new Response(JSON.stringify({ success: true, user: safeUser }));
     }
+
+    return new Response(JSON.stringify({ error: 'Invalid action' }), { status: 400 });
 
   } catch (err) {
     console.error('Auth error:', err);
-    return new Response(JSON.stringify({ error: 'Server error' }), { status: 500 });
+    return new Response(JSON.stringify({ error: 'Server error: ' + err.message }), { status: 500 });
   }
 };
 
