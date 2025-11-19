@@ -430,7 +430,6 @@
 
     <script src="script.js"></script>
     <script>
-        // product_items.html — Final Review System (No Login Button Touching + Delete Button)
         const urlParams = new URLSearchParams(window.location.search);
         const productId = parseInt(urlParams.get('id')) || 1;
 
@@ -440,7 +439,7 @@
             return user ? JSON.parse(user) : null;
         }
 
-        let currentUser = getCurrentUser();
+        let currentUser2 = getCurrentUser();
 
         // Format date nicely
         function formatDate(dateString) {
