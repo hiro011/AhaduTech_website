@@ -133,6 +133,7 @@ async function login() {
       document.getElementById('login-email').value = '';
       document.getElementById('login-password').value = '';
     }, 800);
+    closePopup();
   } else {
     showMsg(data.error || 'Invalid email or password', 'red');
   }
