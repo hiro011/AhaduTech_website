@@ -542,35 +542,30 @@
         async function deleteComment(commentId) {
             if (!confirm('Delete this review permanently?')) return;
 
-            if (!currentUser) {
-                alert('You must be logged in to delete');
-                return;
-            }
-
             try {
                 const res = await fetch('/api/product-comments', {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         comment_id: commentId,
-                        user_id: String(currentUser.id)  // ← SEND AS STRING
+                        user_id: currentUser.id
                     })
                 });
 
-                const data = await res.json();
+                const text = await res.text();
+                let data;
+                try { data = JSON.parse(text); } catch { data = { error: text }; }
 
-                if (!res.ok) {
-                    throw new Error(data.error || 'Delete failed');
-                }
+                if (!res.ok) throw new Error(data.error || 'Delete failed');
 
-                if (typeof showToast === 'function') showToast('Review deleted successfully!');
-                loadComments();  // Refresh
+                if (typeof showToast === 'function') showToast('Review deleted!');
+                loadComments();
 
             } catch (err) {
-                console.error('Delete error:', err);
                 alert('Error: ' + err.message);
             }
         }
+        
         // Submit review
         document.getElementById('submit-comment')?.addEventListener('click', async () => {
             currentUser2 = getCurrentUser();
