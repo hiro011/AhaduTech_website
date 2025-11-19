@@ -6,21 +6,25 @@ export default async (req) => {
   const url = new URL(req.url);
   const productId = url.searchParams.get('id');
 
-  // === GET: Load comments for this product ===
+  // GET comments
   if (req.method === 'GET') {
+    const url = new URL(req.url);
+    const productId = url.searchParams.get('id');
+
     const comments = await sql`
-      SELECT 
-        pc.id,
-        pc.comment,
-        pc.rating,
-        pc.created_at AS date,
-        u.name,
-        u.email
-      FROM product_comments pc
-      JOIN users u ON pc.user_id = u.id
-      WHERE pc.product_id = ${productId}
-      ORDER BY pc.created_at DESC
-    `;
+    SELECT 
+      pc.id,
+      pc.comment,
+      pc.rating,
+      pc.created_at AS date,
+      pc.user_id,           
+      u.name,
+      u.email        
+    FROM product_comments pc
+    LEFT JOIN users u ON pc.user_id = u.id
+    WHERE pc.product_id = ${productId}
+    ORDER BY pc.created_at DESC
+  `;
 
     return new Response(JSON.stringify(comments), {
       headers: { 'Content-Type': 'application/json' }

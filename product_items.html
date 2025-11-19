@@ -469,7 +469,6 @@
         }
 
         // Load comments
-        // Load comments — FINAL WORKING VERSION (handles string/number + admin 0)
         async function loadComments() {
             const commentsList = document.getElementById('comments-list');
             if (!commentsList) return;
@@ -537,7 +536,7 @@
                 commentsList.innerHTML = '<p style="color:red; text-align:center;">Failed to load reviews</p>';
             }
         }
-        // Keep your deleteComment function exactly like this:
+
         async function deleteComment(commentId) {
             if (!confirm('Delete this review permanently?')) return;
 
