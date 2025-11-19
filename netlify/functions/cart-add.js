@@ -4,17 +4,16 @@ const sql = neon();
 export default async (req) => {
   const { user_id, product_id } = await req.json();
 
-  // Get current cart qty + product stock
-  const [cartItem, product] = await Promise.all([
+  const [cart, product] = await Promise.all([
     sql`SELECT quantity FROM cart WHERE user_id = ${user_id} AND product_id = ${product_id}`,
     sql`SELECT stock FROM products WHERE id = ${product_id}`
   ]);
 
-  const currentQty = cartItem[0]?.quantity || 0;
+  const currentQty = cart[0]?.quantity || 0;
   const stock = product[0]?.stock || 0;
 
   if (currentQty >= stock) {
-    return new Response(JSON.stringify({ full: true }), { status: 200 });
+    return new Response(JSON.stringify({ full: true, available: stock }), { status: 200 });
   }
 
   await sql`
