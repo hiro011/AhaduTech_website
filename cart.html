@@ -8,6 +8,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="icon" type="image" href="images/image.png">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style_popup.css">
+  <script src="script_auth.js" defer></script>
 
   <style>
     /* Main */
@@ -249,9 +251,43 @@
         <a href="services.html">Services</a>
         <a href="cart.html" id="cart-link" class="active">Cart (0)</a>
         <a href="about.html">About</a>
+        <button class="open-auth-btn" onclick="openPopup()">Login</button>
       </div>
     </div>
   </nav>
+  <!-- Dark overlay – click to close -->
+  <div id="popup-overlay" onclick="closePopup()"></div>
+
+  <!-- White popup box -->
+  <div id="auth-popup" class="popup-box" style="display:none;">
+    <span class="close-btn" onclick="closePopup()">&times;</span>
+
+    <!-- Login Form -->
+    <div id="login-form" class="auth-form">
+      <h2 style="text-align:center; margin:0 0 25px;">Welcome Back</h2>
+      <input type="email" id="login-email" placeholder="Email" required>
+      <input type="password" id="login-password" placeholder="Password" required>
+      <button class="btn-primary btn-login" onclick="login()">Login</button>
+      <div class="switch-link">
+        Don't have an account? <a onclick="showRegister()">Register</a>
+      </div>
+    </div>
+
+    <!-- Register Form -->
+    <div id="register-form" class="auth-form" style="display:none;">
+      <h2 style="text-align:center; margin:0 0 25px;">Create Account</h2>
+      <input type="text" id="reg-name" placeholder="Full Name" required>
+      <input type="email" id="reg-email" placeholder="Email" required>
+      <input type="password" id="reg-password" placeholder="Password" required>
+      <input type="password" id="reg-confirm" placeholder="Confirm Password" required>
+      <button class="btn-primary btn-register" onclick="register()">Register</button>
+      <div class="switch-link">
+        Already have an account? <a onclick="showLogin()">Login</a>
+      </div>
+    </div>
+
+    <div id="auth-message"></div>
+  </div>
 
   <!-- Main Content -->
   <div class="container">

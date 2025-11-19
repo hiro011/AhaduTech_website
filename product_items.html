@@ -7,6 +7,8 @@
     <title>Product - ElectroHub</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style_popup.css">
+    <script src="script_auth.js" defer></script>
 
     <style>
         .back-btn {
@@ -302,7 +304,6 @@
             }
         }
     </style>
-
 </head>
 
 <body>
@@ -322,9 +323,44 @@
                 <a href="services.html">Services</a>
                 <a href="cart.html" id="cart-link">Cart (0)</a>
                 <a href="about.html">About</a>
+                <button class="open-auth-btn" onclick="openPopup()">Login</button>
             </div>
         </div>
     </nav>
+
+    <!-- Dark overlay – click to close -->
+    <div id="popup-overlay" onclick="closePopup()"></div>
+
+    <!-- White popup box -->
+    <div id="auth-popup" class="popup-box" style="display:none;">
+        <span class="close-btn" onclick="closePopup()">&times;</span>
+
+        <!-- Login Form -->
+        <div id="login-form" class="auth-form">
+            <h2 style="text-align:center; margin:0 0 25px;">Welcome Back</h2>
+            <input type="email" id="login-email" placeholder="Email" required>
+            <input type="password" id="login-password" placeholder="Password" required>
+            <button class="btn-primary btn-login" onclick="login()">Login</button>
+            <div class="switch-link">
+                Don't have an account? <a onclick="showRegister()">Register</a>
+            </div>
+        </div>
+
+        <!-- Register Form -->
+        <div id="register-form" class="auth-form" style="display:none;">
+            <h2 style="text-align:center; margin:0 0 25px;">Create Account</h2>
+            <input type="text" id="reg-name" placeholder="Full Name" required>
+            <input type="email" id="reg-email" placeholder="Email" required>
+            <input type="password" id="reg-password" placeholder="Password" required>
+            <input type="password" id="reg-confirm" placeholder="Confirm Password" required>
+            <button class="btn-primary btn-register" onclick="register()">Register</button>
+            <div class="switch-link">
+                Already have an account? <a onclick="showLogin()">Login</a>
+            </div>
+        </div>
+
+        <div id="auth-message"></div>
+    </div>
 
     <!-- Product Content -->
     <div class="container">
@@ -392,6 +428,46 @@
 
     <script src="script.js"></script>
     <script>
+        async function loadComments() {
+            try {
+                const res = await fetch('/api/comments');
+                const comments = await res.json();
+
+                if (!res.ok) throw new Error(comments.error || 'Failed to load');
+
+                const list = document.getElementById('comments-list');
+                list.innerHTML = '';
+
+                if (comments.length === 0) {
+                    list.innerHTML = '<p>No comments yet.</p>';
+                    return;
+                }
+
+                comments.forEach(c => {
+                    const div = document.createElement('div');
+                    div.style = 'border:1px solid #ddd; padding:15px; margin:10px 0; border-radius:8px;';
+                    div.innerHTML = `
+                <strong>${c.name || 'Anonymous'}</strong> 
+                <small>(${c.email || 'no email'})</small><br>
+                <p>${c.comment}</p>
+                <small>
+                Rating: ${'★'.repeat(c.rating)}${'☆'.repeat(5 - c.rating)} 
+                • ${new Date(c.date).toLocaleDateString()}
+                </small>
+            `;
+                    list.appendChild(div);
+                });
+
+            } catch (err) {
+                document.getElementById('comments-list').innerHTML =
+                    `<p style="color:red;">Error: ${err.message}</p>`;
+            }
+        }
+
+        // Load comments when page opens
+        loadComments();
+    </script>
+    <script>
         // Comment System (Add to your existing script.js or here)
         const urlParams = new URLSearchParams(window.location.search);
         const productId = parseInt(urlParams.get('id')) || 1;
@@ -402,7 +478,7 @@
             const productComments = allComments[productId] || [];
 
             const commentsList = document.getElementById('comments-list');
-            commentsList.innerHTML = '';
+            // commentsList.innerHTML = '';
 
             if (productComments.length === 0) {
                 commentsList.innerHTML = '<p style="text-align:center; color:#777; padding:2rem;">No reviews yet. Be the first to review!</p>';

@@ -1,0 +1,125 @@
+/* Dark overlay – click anywhere here to close */
+#popup-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 9998;
+}
+
+/* Popup Box */
+.popup-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 40px 30px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 420px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    animation: popupFadeIn 0.3s ease-out;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* Close button */
+.close-btn {
+    position: absolute;
+    top: 12px;
+    right: 18px;
+    font-size: 32px;
+    color: #aaa;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.close-btn:hover {
+    color: #333;
+}
+
+/* Form styling */
+.auth-form input {
+    width: 100%;
+    padding: 14px;
+    margin: 12px 0;
+    border: 1.5px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: border 0.2s;
+}
+
+.auth-form input:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+/* Buttons */
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-login {
+    background: #007bff;
+    color: white;
+}
+
+.btn-register {
+    background: #28a745;
+    color: white;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+/* Links */
+.switch-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 15px;
+}
+
+.switch-link a {
+    color: #007bff;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.switch-link a:hover {
+    color: #0056b3;
+}
+
+/* Message */
+#auth-message {
+    margin-top: 18px;
+    text-align: center;
+    font-weight: 600;
+    min-height: 24px;
+}
+
+/* Animation */
+@keyframes popupFadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
