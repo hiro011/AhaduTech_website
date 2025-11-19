@@ -330,12 +330,17 @@
   </footer>
 
   <script>
-    // Load cart
+    // Load cart from localStorage
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
     const cartContainer = document.getElementById('cart-container');
     const totalItemsEl = document.getElementById('total-items');
     const totalPriceEl = document.getElementById('total-price');
     const cartLink = document.getElementById('cart-link');
+
+    // Helper: Find product by ID
+    function findProductById(id) {
+      return products.find(p => p.id === id);
+    }
 
     // Update navbar cart count
     function updateCartCount() {
@@ -343,17 +348,56 @@
       cartLink.textContent = `Cart (${count})`;
     }
 
-    // Save cart
+    // Save cart to localStorage
     function saveCart() {
       localStorage.setItem('cart', JSON.stringify(cart));
       updateCartCount();
       renderCart();
     }
 
-    // Remove item
+    // Add or update item in cart
+    function addToCart(productId, quantityChange = 1) {
+      const product = findProductById(productId);
+      if (!product) return;
+
+      const existingItem = cart.find(item => item.id === productId);
+
+      if (existingItem) {
+        const newQty = existingItem.quantity + quantityChange;
+        if (newQty > product.stock) {
+          alert(`Sorry! Only ${product.stock} unit(s) available for "${product.name}".`);
+          return;
+        }
+        if (newQty <= 0) {
+          removeFromCart(productId);
+          return;
+        }
+        existingItem.quantity = newQty;
+      } else if (quantityChange > 0) {
+        if (quantityChange > product.stock) {
+          alert(`Sorry! Only ${product.stock} unit(s) available for "${product.name}".`);
+          return;
+        }
+        cart.push({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          img: product.img,
+          quantity: quantityChange
+        });
+      }
+      saveCart();
+    }
+
+    // Remove item completely
     function removeFromCart(productId) {
       cart = cart.filter(item => item.id !== productId);
       saveCart();
+    }
+
+    // Change quantity (used by + and - buttons)
+    function changeQuantity(productId, change) {
+      addToCart(productId, change);
     }
 
     // Render cart
@@ -362,10 +406,10 @@
 
       if (cart.length === 0) {
         cartContainer.innerHTML = `
-          <div class="empty-cart">
-            <p>Your cart is empty. <a href="index.html" style="color:#00d4ff;">Shop now!</a></p>
-          </div>
-        `;
+        <div class="empty-cart">
+          <p>Your cart is empty. <a href="index.html" style="color:#00d4ff;">Shop now!</a></p>
+        </div>
+      `;
         totalItemsEl.textContent = '0';
         totalPriceEl.textContent = '$0.00';
         return;
@@ -378,22 +422,30 @@
       grid.className = 'cart-items';
 
       cart.forEach(item => {
+        const product = findProductById(item.id);
+        const availableStock = product ? product.stock : 0;
+
         totalItems += item.quantity;
         totalPrice += item.price * item.quantity;
 
         const card = document.createElement('div');
         card.className = 'cart-card';
         card.innerHTML = `
-          <img src="${item.img}" alt="${item.name}" class="cart-img" onclick="openLightbox('${item.img}')">
-          <div class="cart-info">
-            <div class="cart-title">${item.name}</div>
-            <div class="cart-price">$${item.price.toFixed(2)}</div>
-            <div class="cart-quantity">Qty: ${item.quantity}</div>
-            <button class="remove-btn" onclick="removeFromCart(${item.id})">
-              Remove
-            </button>
+        <img src="${item.img}" alt="${item.name}" class="cart-img" onclick="openLightbox('${item.img}')">
+        <div class="cart-info">
+          <div class="cart-title">${item.name}</div>
+          <div class="cart-price">$${item.price.toFixed(2)}</div>
+          <div class="cart-quantity">
+            <button class="qty-btn minus" data-id="${item.id}">-</button>
+            <span class="qty-number">${item.quantity}</span>
+            <button class="qty-btn plus" data-id="${item.id}">+</button>
+            ${item.quantity >= availableStock ? '<small style="color:red; margin-left:8px;">(Max stock reached)</small>' : ''}
           </div>
-        `;
+          <button class="remove-btn" onclick="removeFromCart(${item.id})">
+            Remove
+          </button>
+        </div>
+      `;
         grid.appendChild(card);
       });
 
@@ -401,23 +453,34 @@
 
       totalItemsEl.textContent = totalItems;
       totalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
+
+      // Attach event listeners to + and - buttons (using event delegation)
+      document.querySelectorAll('.qty-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+          const id = parseInt(this.dataset.id);
+          const change = this.classList.contains('plus') ? 1 : -1;
+          changeQuantity(id, change);
+        });
+      });
     }
 
-    /* ---------- Light‑box functions ---------- */
+    /* ---------- Lightbox functions ---------- */
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightbox-img');
+
     function openLightbox(src) {
       lightboxImg.src = src;
       lightbox.classList.add('active');
-      document.body.style.overflow = 'hidden';   // prevent background scroll
+      document.body.style.overflow = 'hidden';
     }
+
     function closeLightbox() {
       lightbox.classList.remove('active');
       lightboxImg.src = '';
       document.body.style.overflow = '';
     }
-    // Close when clicking the overlay (anywhere except the image)
-    lightbox.addEventListener('click', e => {
+
+    lightbox?.addEventListener('click', e => {
       if (e.target === lightbox) closeLightbox();
     });
 
@@ -425,7 +488,6 @@
     renderCart();
     updateCartCount();
   </script>
-
 </body>
 
 </html>
