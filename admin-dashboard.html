@@ -123,14 +123,14 @@
   </div>
 
   <script>
-    //if (!localStorage.getItem('ahaduAdminSession')) location.href = 'admin-login.html';
+    if (!localStorage.getItem('ahaduAdminSession')) location.href = 'admin-login.html';
 
     // Load stats
     fetch('/api/admin/stats').then(r => r.json()).then(d => {
       document.getElementById('stats').innerHTML = `
     <div class="stat"><h3>${d.users || 0}</h3><p>Total Users</p></div>
-    <div class="stat"><h3>${d.products || 0}</h3><p>Products</p></div>
-    <div class="stat"><h3>${d.comments || 0}</h3><p>Reviews</p></div>
+    <div class="stat"><h3>${d.products || 0}</h3><p>Total Products</p></div>
+    <div class="stat"><h3>${d.comments || 0}</h3><p>Total Reviews</p></div>
   `;
     });
 
