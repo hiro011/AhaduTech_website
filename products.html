@@ -434,7 +434,7 @@
               : `<button class="add-to-cart sold-out" disabled>Sold Out</button>`;
 
             card.innerHTML = `
-              <img src="${product.img}" alt="${product.name}" class="product-img" onclick="openLightbox('${product.img}')">
+              <img src="../images/${product.img}" alt="${product.name}" class="product-img" onclick="openLightbox('${product.img}')">
               <div class="product-info">
                 <div class="product-title">
                   <a href="product_items.html?id=${product.id}">${product.name}</a>
@@ -449,37 +449,6 @@
           });
         })
     }
-
-    loadProducts3();
-    function loadProducts3() {
-      fetch('/api/products')
-        .then(r => r.json())
-        .then(products => {
-          const tbody = products.map(p => `
-            <tr>
-              <td><img src="../images/${p.image}" width="50" style="border-radius:8px;"></td>
-              <td><strong>${p.name}</strong></td>
-              <td>${p.price} Birr</td>
-              <td><span style="color:${p.stock > 0 ? 'green' : 'red'}; font-weight:bold;">${p.stock}</span></td>
-              <td>${p.description.substring(0, 50)}...</td>
-              <td class="actions">
-                <button class="btn-edit" onclick="editProduct(${p.id})"><i class="fas fa-edit"></i></button>
-                <button class="btn-delete" onclick="deleteProduct(${p.id})"><i class="fas fa-trash"></i></button>
-                <button class="btn-stock" onclick="updateStock(${p.id})"><i class="fas fa-box"></i></button>
-              </td>
-            </tr>
-          `).join('');
-          document.getElementById('product-list3').innerHTML = `
-            <table>
-              <thead><tr>
-                <th>Image</th><th>Name</th><th>Price</th><th>Stock</th><th>Description</th><th>Actions</th>
-              </tr></thead>
-              <tbody>${tbody || '<tr><td colspan="6">No products found</td></tr>'}</tbody>
-            </table>
-          `;
-        });
-    }
-
   </script>
 </body>
 
