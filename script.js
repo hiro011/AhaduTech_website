@@ -69,39 +69,10 @@ document.head.appendChild(style);
 
 // ====================== AUTO DETECT PAGE & RUN ======================
 document.addEventListener('DOMContentLoaded', () => {
-  const isProductListPage = !!document.getElementById('product-list');
   const isProductDetailPage = window.location.pathname.includes('product_items.html');
 
   // Update cart count on all pages
   updateCartCount();
-
-  // === 1. PRODUCT LIST PAGE (index.html) ===
-  if (isProductListPage) {
-    const productList = document.getElementById('product-list');
-
-    products.forEach(product => {
-      const card = document.createElement('div');
-      card.className = 'product-card';
-
-      const buttonHTML = product.stock > 0
-        ? `<button class="add-to-cart" onclick="addToCart(${product.id})">Add to Cart</button>`
-        : `<button class="add-to-cart sold-out" disabled>Sold Out</button>`;
-
-      card.innerHTML = `
-        <img src="${product.img}" alt="${product.name}" class="product-img" onclick="openLightbox('${product.img}')">
-        <div class="product-info">
-          <div class="product-title">
-            <a href="product_items.html?id=${product.id}">${product.name}</a>
-          </div>
-          <div class="product-price">${product.price} Birr</div>
-          <div class="product-stock">Available: ${product.stock} unit${product.stock !== 1 ? 's' : ''}</div>
-          <div class="product-phone">Phone: <a href="tel:${product.phone}">${product.phone.replace('+251', '')}</a></div>
-          ${buttonHTML}
-        </div>
-      `;
-      productList.appendChild(card);
-    });
-  }
 
   // === 2. SINGLE PRODUCT PAGE (product_items.html) ===
   if (isProductDetailPage) {

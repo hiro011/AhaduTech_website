@@ -408,7 +408,6 @@
     <!-- Comment Form Section -->
     <div class="container2 comment-form-section" id="review-form-container" style="display:none;">
         <!-- This message appears only when logged in -->
-        <p id="logged-in-message" style="color:#007bff; font-weight:600; margin-bottom:15px;"></p>
         <h2>Write a Review</h2>
 
         <div class="comment-form">
@@ -438,7 +437,7 @@
             <!-- Comments loaded here -->
         </div>
     </div>
-    
+
     <!-- Footer -->
     <footer>
         &copy; 2025 AhaduTech • Your #1 Digital Store in Ethiopia<br>
@@ -450,14 +449,14 @@
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const productId = parseInt(urlParams.get('id')) || 1;
-
+     
         // Get current logged-in user
         function getCurrentUser() {
             const user = sessionStorage.getItem('currentUser');
             return user ? JSON.parse(user) : null;
         }
 
-        let currentUser2 = getCurrentUser() ;
+        let currentUser2 = getCurrentUser();
 
         // Format date
         function formatDate(dateString) {
@@ -582,7 +581,7 @@
                 alert('Error: ' + err.message);
             }
         }
-        
+
         // Submit review
         document.getElementById('submit-comment')?.addEventListener('click', async () => {
             currentUser2 = getCurrentUser();
@@ -632,18 +631,69 @@
                 alert('Error: ' + err.message);
             }
         });
+   
+        // Fetch single product from DB
+        async function loadProductDetail() {
+            try {
+                const res = await fetch(`/api/products/${productId}`);
+                if (!res.ok) throw new Error('Product not found');
+
+                const product = await res.json();
+
+                // Update page
+                document.title = `${product.name} - AhaduTech`;
+                document.getElementById('product-name').textContent = product.name;
+                document.getElementById('product-price').textContent = `${product.price} Birr`;
+                document.getElementById('product-stock').textContent =
+                    `Available: ${product.stock} unit${product.stock !== 1 ? 's' : ''}`;
+                document.getElementById('product-phone').innerHTML =
+                    `Phone: <a href="tel:${product.phone}">${product.phone}</a>`;
+                document.getElementById('product-img').src = `../images/${product.image}`;
+                document.getElementById('product-desc').textContent = product.description || 'No description available.';
+
+                // Add to cart button
+                const btn = document.getElementById('add-to-cart');
+                if (product.stock <= 0) {
+                    btn.textContent = "Sold Out";
+                    btn.classList.add('sold-out');
+                    btn.disabled = true;
+                } else {
+                    btn.textContent = "Add to Cart";
+                    btn.classList.remove('sold-out');
+                    btn.disabled = false;
+                }
+
+                btn.onclick = () => {
+                    if (product.stock <= 0) return;
+
+                    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+                    const existing = cart.find(i => i.id === product.id);
+                    if (existing) existing.quantity += 1;
+                    else cart.push({ ...product, quantity: 1 });
+
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    showToast(`${product.name} added to cart!`);
+                };
+
+            } catch (err) {
+                document.body.innerHTML = `
+                    <div style="text-align:center; margin-top:100px; color:#e74c3c; font-size:1.5rem;">
+                        <h1>Product Not Found</h1>
+                        <p>${err.message}</p>
+                        <a href="index.html" style="color:#007bff;">← Back to Shop</a>
+                    </div>
+                `;
+            }
+        }
+
+        // Load on page ready
+        document.addEventListener('DOMContentLoaded', loadProductDetail);
 
         // Always show review form
         document.addEventListener('DOMContentLoaded', () => {
             const formContainer = document.getElementById('review-form-container');
             if (formContainer) {
                 formContainer.style.display = 'block'; // Always visible
-            }
-
-            // Update logged-in message
-            const msg = document.getElementById('logged-in-message');
-            if (currentUser2 && msg) {
-                msg.textContent = `Logged in as ${currentUser2.name} — you can write a review!`;
             }
 
             loadComments();
