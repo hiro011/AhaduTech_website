@@ -83,7 +83,10 @@ function renderAuthButton() {
         <div class="profile-avatar">
           ${currentUser.name.charAt(0).toUpperCase()}
         </div>
-        <div class="logout-btn" onclick="logout()">Logout</div>
+        <div class="profile-btns">
+          <div class="logout-btn" onclick="logout()">Logout</div>
+          <div class="changePass-btn" onclick="changePass()">Change Password</div>
+        </div>
       </div>
     `;
   } else {
@@ -100,6 +103,8 @@ function closePopup() {
   document.getElementById('popup-overlay').style.display = 'none';
   document.getElementById('auth-popup').style.display = 'none';
   document.getElementById('auth-message').innerHTML = '';
+  document.getElementById('changePassModal').classList.remove('show');
+  document.getElementById('cpMsg').textContent = '';
 }
 function showRegister() {
   openPopup();
@@ -111,6 +116,43 @@ function showLogin() {
   document.getElementById('register-form').style.display = 'none';
   document.getElementById('login-form').style.display = 'block';
 }
+
+// Open / Close Popup
+function changePass() {
+  document.getElementById('popup-overlay').style.display = 'block';
+  document.getElementById('changePassModal').classList.add('show');
+}
+
+// Submit Change Password
+document.getElementById('changePassForm').onsubmit = async (e) => {
+  e.preventDefault();
+  const current = document.getElementById('cp-current').value;
+  const newP = document.getElementById('cp-new').value;
+  const confirm = document.getElementById('cp-confirm').value;
+  const msg = document.getElementById('cpMsg');
+
+  if (newP !== confirm) return msg.textContent = 'New passwords do not match!', msg.style.color = 'red';
+  if (newP.length < 6) return msg.textContent = 'Password too short!', msg.style.color = 'red';
+
+  msg.textContent = 'Updating...';
+  msg.style.color = '#f59e0b';
+
+  const res = await fetch('/api/change-password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ currentPassword: current, newPassword: newP })
+  });
+
+  const data = await res.json();
+  if (data.success) {
+    msg.textContent = 'Password changed successfully!';
+    msg.style.color = 'green';
+    setTimeout(closeChangePass, 1500);
+  } else {
+    msg.textContent = data.error || 'Wrong current password';
+    msg.style.color = 'red';
+  }
+};
 
 // Register
 async function register() {

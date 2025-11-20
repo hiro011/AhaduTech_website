@@ -187,6 +187,22 @@
   <!-- Dark overlay – click to close -->
   <div id="popup-overlay" onclick="closePopup()"></div>
 
+  <!-- Change Password Popup -->
+  <div id="changePassModal" class="cp-modal">
+    <div class="cp-header">
+      <h3>Change Password</h3>
+      <span class="cp-close" onclick="closePopup()">×</span>
+    </div>
+    <form id="changePassForm">
+      <input type="password" placeholder="Current Password" id="cp-current" required minlength="6">
+      <input type="password" placeholder="New Password" id="cp-new" required minlength="6">
+      <input type="password" placeholder="Confirm New Password" id="cp-confirm" required minlength="6">
+      <button type="submit">Update Password</button>
+      <div class="cp-msg" id="cpMsg"></div>
+    </form>
+  </div>
+
+  <!-- Login / Register Popup -->
   <div id="auth-popup" class="popup-box" style="display:none;">
     <span class="close-btn" onclick="closePopup()">&times;</span>
 
