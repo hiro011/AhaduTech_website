@@ -270,6 +270,17 @@
         grid-template-columns: 1fr;
       }
     }
+
+    .btn2 {
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      padding: 16px;
+      font-size: 18px;
+    }
+    .btn2:hover {
+      opacity: 0.7;
+    }
   </style>
 </head>
 
@@ -332,7 +343,7 @@
           <textarea name="description" placeholder="Product Description" required></textarea>
         </div>
         <div style="grid-column: span 2;">
-          <button type="submit" style="background:var(--success); padding:16px; font-size:18px;">
+          <button type="submit" style="background:var(--success);" class="btn2">
             <i class="fas fa-plus"></i> Add Product
           </button>
         </div>
@@ -348,7 +359,7 @@
         <input type="password" id="confirmPass" placeholder="Confirm New Password" required />
 
         <div style="grid-column: span 2;">
-          <button type="submit" style="background:#6366f1; padding:16px; font-size:18px;">
+          <button type="submit" style="background:#6366f1;" class="btn2">
             <i class="fas fa-lock"></i> Update Password
           </button>
         </div>
