@@ -278,6 +278,7 @@
       padding: 16px;
       font-size: 18px;
     }
+
     .btn2:hover {
       opacity: 0.7;
     }
@@ -489,7 +490,6 @@
               <td><span style="color:${p.stock > 0 ? 'green' : 'red'}; font-weight:bold;">${p.stock}</span></td>
               <td>${p.description.substring(0, 50)}...</td>
               <td class="actions">
-                <button class="btn-edit" onclick="editProduct(${p.id})"><i class="fas fa-edit"></i></button>
                 <button class="btn-delete" onclick="deleteProduct(${p.id})"><i class="fas fa-trash"></i></button>
                 <button class="btn-stock" onclick="updateStock(${p.id})"><i class="fas fa-box"></i></button>
               </td>
@@ -506,39 +506,56 @@
         });
     }
     loadProducts();
-
-    // Add Product
+    // ADD PRODUCT 
     document.getElementById('addProduct').onsubmit = async (e) => {
       e.preventDefault();
       const data = Object.fromEntries(new FormData(e.target));
-      await fetch('/api/products', {
+
+      const res = await fetch('/api/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
-      showToast('Product added successfully!');
-      e.target.reset();
-      loadProducts();
-    };
 
-    // Delete Product
-    window.deleteProduct = (id) => {
-      if (confirm('Delete this product permanently?')) {
-        fetch(`/api/products/${id}`, { method: 'DELETE' })
-          .then(() => { showToast('Product deleted'); loadProducts(); });
+      if (res.ok) {
+        showToast('Product added successfully!');
+        e.target.reset();
+        loadProducts();
+      } else {
+        showToast('Failed to add product', 'error');
       }
     };
 
-    // Simple stock update (you can expand this)
+    // DELETE PRODUCT
+    window.deleteProduct = async (id) => {
+      if (!confirm('Delete this product forever?')) return;
+
+      const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        showToast('Product deleted');
+        loadProducts();
+      } else {
+        showToast('Delete failed', 'error');
+      }
+    };
+
+    // UPDATE STOCK 
     window.updateStock = (id) => {
-      const stock = prompt('Enter new stock quantity:');
-      if (stock && !isNaN(stock)) {
-        fetch(`/api/products/${id}/stock`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ stock: parseInt(stock) })
-        }).then(() => { showToast('Stock updated'); loadProducts(); });
-      }
+      const newStock = prompt('Enter new stock amount:');
+      if (newStock === null || newStock === '' || isNaN(newStock)) return;
+
+      fetch(`/api/products/${id}/stock`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stock: +newStock })
+      }).then(res => {
+        if (res.ok) {
+          showToast('Stock updated');
+          loadProducts();
+        } else {
+          showToast('Failed to update stock', 'error');
+        }
+      });
     };
 
     // Search
