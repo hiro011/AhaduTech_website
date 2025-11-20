@@ -146,7 +146,7 @@ document.getElementById('changePassForm').onsubmit = async (e) => {
       email: currentUser.email                     // ← ADD THIS LINE
     })
   });
-  
+
   const data = await res.json();
   if (data.success) {
     msg.textContent = 'Password changed successfully!';
@@ -205,13 +205,12 @@ async function login() {
     setCurrentUser(data.user);
     showMsg('Login successful!', 'green');
 
-    // Close popup after 800ms
+    // Close popup + clear fields
     setTimeout(() => {
-      closePopup();           // ← This was missing/broken before
+      closePopup();
       document.getElementById('login-email').value = '';
       document.getElementById('login-password').value = '';
-    }, 800);
-    closePopup();
+    }, 600);   // ← only one call, short delay = smooth
   } else {
     showMsg(data.error || 'Invalid email or password', 'red');
   }
