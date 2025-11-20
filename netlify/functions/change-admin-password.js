@@ -1,43 +1,38 @@
 // netlify/functions/change-admin-password.js
-import { Pool } from '@neondatabase/serverless';
+
+import { neon } from '@netlify/neon';
 import bcrypt from 'bcryptjs';
 
-export async function handler(event) {
-    if (event.httpMethod !== 'POST') return { statusCode: 405 };
+const ADMINS = ['admin@ahadutech.com', 'superadmin@ahadutech.com'];
 
-    const { currentPassword, newPassword } = JSON.parse(event.body);
-    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+export default async (req) => {
+  const sql = neon();
+  const { currentPassword, newPassword } = await req.json();
 
-    try {
-        // Get current admin (you can filter by allowed emails)
-        const { rows } = await pool.query(
-            `SELECT password_hash FROM users WHERE email = ANY($1)`,
-            [['admin@ahadutech.com', 'superadmin@ahadutech.com']]
-        );
+  try {
+    const admins = await sql`
+      SELECT password_hash FROM users WHERE email = ANY(${ADMINS})
+    `;
 
-        if (rows.length === 0) {
-            return { statusCode: 400, body: JSON.stringify({ error: 'Admin not found' }) };
-        }
-
-        const admin = rows[0];
-        const match = await bcrypt.compare(currentPassword, admin.password_hash);
-
-        if (!match) {
-            return { statusCode: 400, body: JSON.stringify({ error: 'Current password is wrong' }) };
-        }
-
-        const newHash = await bcrypt.hash(newPassword, 10);
-
-        await pool.query(
-            `UPDATE users SET password_hash = $1 WHERE email = ANY($2)`,
-            [newHash, ['admin@ahadutech.com', 'superadmin@ahadutech.com']]
-        );
-
-        await pool.end();
-        return { statusCode: 200, body: JSON.stringify({ success: true }) };
-
-    } catch (error) {
-        console.error(error);
-        return { statusCode: 500, body: JSON.stringify({ error: 'Server error' }) };
+    if (admins.length === 0) {
+      return new Response(JSON.stringify({ error: 'Admin not found' }), { status: 400 });
     }
-}
+
+    const valid = await bcrypt.compare(currentPassword, admins[0].password_hash);
+    if (!valid) {
+      return new Response(JSON.stringify({ error: 'Wrong current password' }), { status: 400 });
+    }
+
+    const hash = await bcrypt.hash(newPassword, 10);
+
+    await sql`
+      UPDATE users SET password_hash = ${hash} WHERE email = ANY(${ADMINS})
+    `;
+
+    return new Response(JSON.stringify({ success: true }), { status: 200 });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: 'Server error' }), { status: 500 });
+  }
+};
+
+export const config = { path: '/api/change-admin-password' };
