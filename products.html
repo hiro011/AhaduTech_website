@@ -240,6 +240,9 @@
     <div class="products" id="product-list2">
       <!-- Products injected via JS -->
     </div>
+    <div class="products" id="product-list3">
+      <!-- Products injected via JS -->
+    </div>
   </div>
 
 
@@ -415,37 +418,40 @@
 
   <script>
     // Load Products
-    let currentUser2 = null;
-    function getCurrentUser2() {
-      if (currentUser2) return currentUser2;
+    const productList = document.getElementById('product-list2');
 
-      const data = localStorage.getItem(SESSION_KEY);
-      if (!data) return null;
+    loadProducts2();
+    function loadProducts2() {
+      fetch('/api/products')
+        .then(r => r.json())
+        .then(products => {
+          products.forEach(product => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
 
-      try {
-        const parsed = JSON.parse(data);
-        // Check if expired
-        if (Date.now() > parsed.expiresAt) {
-          localStorage.removeItem(SESSION_KEY);
-          return null;
-        }
-        currentUser2 = parsed.user;
-        return currentUser2;
-      } catch (e) {
-        localStorage.removeItem(SESSION_KEY);
-        return null;
-      }
+            const buttonHTML = product.stock > 0
+              ? `<button class="add-to-cart" onclick="addToCart(${product.id})">Add to Cart</button>`
+              : `<button class="add-to-cart sold-out" disabled>Sold Out</button>`;
+
+            card.innerHTML = `
+              <img src="${product.img}" alt="${product.name}" class="product-img" onclick="openLightbox('${product.img}')">
+              <div class="product-info">
+                <div class="product-title">
+                  <a href="product_items.html?id=${product.id}">${product.name}</a>
+                </div>
+                <div class="product-price">${product.price} Birr</div>
+                <div class="product-stock">Available: ${product.stock} unit${product.stock !== 1 ? 's' : ''}</div>
+                <div class="product-phone">Phone: <a href="tel:${product.phone}">${product.phone.replace('+251', '')}</a></div>
+                ${buttonHTML}
+              </div>
+            `;
+            productList.appendChild(card);
+          });
+        })
     }
-    loadProducts();
-    // Run when page loads + when another tab updates login state
-    function initAuth2() {
-      currentUser2 = getCurrentUser2();
-      if (currentUser2.email == "superadmin@ahadutech.com") {
-        loadProducts();
-      }
-    }
-    
-    function loadProducts() {
+
+    loadProducts3();
+    function loadProducts3() {
       fetch('/api/products')
         .then(r => r.json())
         .then(products => {
@@ -463,7 +469,7 @@
               </td>
             </tr>
           `).join('');
-          document.getElementById('product-list2').innerHTML = `
+          document.getElementById('product-list3').innerHTML = `
             <table>
               <thead><tr>
                 <th>Image</th><th>Name</th><th>Price</th><th>Stock</th><th>Description</th><th>Actions</th>
@@ -473,6 +479,7 @@
           `;
         });
     }
+
   </script>
 </body>
 
