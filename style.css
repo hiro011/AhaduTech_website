@@ -136,9 +136,11 @@ body {
   top: 58px;
 }
 
-.logout-btn:hover, .changePass-btn:hover {
+.logout-btn:hover,
+.changePass-btn:hover {
   /* background: #c82333; */
-  opacity: 0.85;
+  border: 1.5px solid #95a8dd;
+  /* opacity: 0.85; */
   cursor: pointer;
 }
 
