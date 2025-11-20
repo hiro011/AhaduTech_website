@@ -81,8 +81,8 @@ body {
 }
 
 .profile-avatar {
-  width: 35px;
-  height: 35px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: #007bff;
   color: white;
@@ -138,9 +138,7 @@ body {
 
 .logout-btn:hover,
 .changePass-btn:hover {
-  /* background: #c82333; */
-  border: 1.5px solid #95a8dd;
-  /* opacity: 0.85; */
+  border: 2px solid #041955;
   cursor: pointer;
 }
 
