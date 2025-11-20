@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/hiro011/AhaduTech_website#readme",
   "dependencies": {
-    "@netlify/neon": "^0.1.0"
+    "@neondatabase/serverless": "^1.0.2",
+    "@netlify/neon": "^0.1.0",
+    "bcryptjs": "^3.0.3"
   }
 }
