@@ -84,8 +84,8 @@ function renderAuthButton() {
           ${currentUser.name.charAt(0).toUpperCase()}
         </div>
         <div class="profile-btns">
-          <div class="logout-btn" onclick="logout()">Logout</div>
           <div class="changePass-btn" onclick="changePass()">Change Password</div>
+          <div class="logout-btn" onclick="logout()">Logout</div>
         </div>
       </div>
     `;
@@ -140,9 +140,13 @@ document.getElementById('changePassForm').onsubmit = async (e) => {
   const res = await fetch('/api/change-password', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ currentPassword: current, newPassword: newP })
+    body: JSON.stringify({
+      currentPassword: current,
+      newPassword: newP,
+      email: currentUser.email                     // ← ADD THIS LINE
+    })
   });
-
+  
   const data = await res.json();
   if (data.success) {
     msg.textContent = 'Password changed successfully!';

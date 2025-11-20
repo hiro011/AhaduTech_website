@@ -138,7 +138,7 @@ body {
 
 .logout-btn:hover, .changePass-btn:hover {
   /* background: #c82333; */
-  opacity: 0.7;
+  opacity: 0.85;
   cursor: pointer;
 }
 
