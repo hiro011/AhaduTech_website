@@ -52,40 +52,35 @@ export default async (req) => {
       });
     }
 
-    // DELETE: Remove comment (owner or admin id 0)
+    // DELETE: Remove comment (owner OR admin with id 8 or 9)
     if (req.method === 'DELETE') {
       const body = await req.json();
       const { comment_id, user_id } = body;
 
       if (!comment_id || user_id === undefined) {
-        return new Response(JSON.stringify({ error: 'Missing data' }), {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' }
-        });
+        return new Response(JSON.stringify({ error: 'Missing data' }), { status: 400 });
       }
 
       const userIdStr = String(user_id);
 
+      // Allow: comment owner OR admin with id 8 or 9
       const result = await sql`
-        DELETE FROM product_comments 
-        WHERE id = ${comment_id} 
-          AND (user_id::text = ${userIdStr} OR ${userIdStr} = '0')
-        RETURNING id
-      `;
+    DELETE FROM product_comments 
+    WHERE id = ${comment_id} 
+      AND (
+        user_id::text = ${userIdStr} 
+        OR ${userIdStr} IN ('8', '9')
+      )
+    RETURNING id
+  `;
 
       if (result.length === 0) {
-        return new Response(JSON.stringify({ error: 'Not authorized or comment not found' }), {
-          status: 403,
-          headers: { 'Content-Type': 'application/json' }
-        });
+        return new Response(JSON.stringify({ error: 'Not authorized or comment not found' }), { status: 403 });
       }
 
-      return new Response(JSON.stringify({ success: true }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(JSON.stringify({ success: true }), { status: 200 });
     }
-
+    
     // If method not allowed
     return new Response(JSON.stringify({ error: 'Method not allowed' }), {
       status: 405,
