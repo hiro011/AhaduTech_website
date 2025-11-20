@@ -415,6 +415,34 @@
 
   <script>
     // Load Products
+    function getCurrentUser2() {
+      if (currentUser2) return currentUser2;
+
+      const data = localStorage.getItem(SESSION_KEY);
+      if (!data) return null;
+
+      try {
+        const parsed = JSON.parse(data);
+        // Check if expired
+        if (Date.now() > parsed.expiresAt) {
+          localStorage.removeItem(SESSION_KEY);
+          return null;
+        }
+        currentUser2 = parsed.user;
+        return currentUser2;
+      } catch (e) {
+        localStorage.removeItem(SESSION_KEY);
+        return null;
+      }
+    }
+    initAuth2();
+    // Run when page loads + when another tab updates login state
+    function initAuth2() {
+      currentUser2 = getCurrentUser2();
+      if (currentUser2.email == "superadmin@ahadutech.com") {
+        loadProducts();
+      }
+    }
     function loadProducts() {
       fetch('/api/products')
         .then(r => r.json())
@@ -442,9 +470,6 @@
             </table>
           `;
         });
-    }
-    if (currentUser.email == "superadmin@ahadutech.com") {
-      loadProducts();
     }
   </script>
 </body>
