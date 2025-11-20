@@ -436,7 +436,7 @@
         return null;
       }
     }
-    initAuth2();
+    loadProducts();
     // Run when page loads + when another tab updates login state
     function initAuth2() {
       currentUser2 = getCurrentUser2();
@@ -444,6 +444,7 @@
         loadProducts();
       }
     }
+    
     function loadProducts() {
       fetch('/api/products')
         .then(r => r.json())
