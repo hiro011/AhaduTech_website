@@ -188,7 +188,6 @@
         const ALLOWED_ADMIN_EMAILS = [
             "admin@ahadutech.com",
             "superadmin@ahadutech.com"
-            // Add more if needed in future
         ];
 
         const ADMIN_SESSION_KEY = "ahaduAdminSession";
@@ -242,7 +241,7 @@
                     msgEl.textContent = "Admin login successful! Redirecting...";
 
                     setTimeout(() => {
-                        window.location.href = "/admin/dashboard.html"; // Your admin panel
+                        window.location.href = "/admin-dashboard.html"; // Your admin panel
                     }, 1200);
 
                 } else {
