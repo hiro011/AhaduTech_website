@@ -59,7 +59,7 @@ body {
   color: #1a1a2e;
 }
 
-/* Open button (the one outside popup) */
+/* Open button */
 .open-auth-btn {
   font-weight: 500;
   font-size: 1rem;
@@ -137,13 +137,15 @@ body {
 }
 
 .logout-btn:hover {
-  background: #e01328;
+  background: #e60c22;
+  transform: scale(1.1);
   cursor: pointer;
 }
 
 .changePass-btn:hover {
-  background: #07df48;
+  background: #21f306;
   cursor: pointer;
+  transform: scale(1.1);
 }
 
 /* Optional arrow */
