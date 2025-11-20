@@ -39,11 +39,21 @@ function showToast(message) {
   toast.style.cssText = `
     position:fixed;top:20px;right:20px;background:#27ae60;color:white;
     padding:1rem 1.5rem;border-radius:8px;font-weight:600;z-index:9999;
-    box-shadow:0 4px 12px rgba(0,0,0,0.3);
-    animation:slideIn 0.4s, fadeOut 0.4s 2.6s forwards;
+    box-shadow:0 4px 12px rgba(0,0,0,0.3);cursor:pointer;
+    animation:slideIn 0.4s;
   `;
+
+  // Click to dismiss instantly
+  toast.onclick = () => toast.remove();
+
   document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
+
+  // Auto-remove after 3 seconds (if not clicked)
+  setTimeout(() => {
+    if (document.getElementById('toast') === toast) {
+      toast.remove();
+    }
+  }, 3000);
 }
 
 // Add animations & styles
@@ -136,14 +146,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = document.getElementById('lightbox-img');
 
-  window.openLightbox = function(src) {
+  window.openLightbox = function (src) {
     if (!lightbox || !lightboxImg) return;
     lightboxImg.src = src;
     lightbox.classList.add('active');
     document.body.style.overflow = 'hidden';
   };
 
-  window.closeLightbox = function() {
+  window.closeLightbox = function () {
     if (!lightbox) return;
     lightbox.classList.remove('active');
     lightboxImg.src = '';
@@ -157,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Add to cart function (global)
-  window.addToCart = function(id) {
+  window.addToCart = function (id) {
     const product = products.find(p => p.id === id);
     if (!product || product.stock <= 0) return;
 
