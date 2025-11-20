@@ -456,7 +456,7 @@
             return user ? JSON.parse(user) : null;
         }
 
-        let currentUser2 = getCurrentUser();
+        let currentUser2 = getCurrentUser() || {};
 
         // Format date
         function formatDate(dateString) {
@@ -553,32 +553,34 @@
                 commentsList.innerHTML = '<p style="color:red; text-align:center;">Failed to load reviews</p>';
             }
         }
-        // Delete comment
-        async function deleteComment(commentId) {
-            if (!confirm('Delete this review permanently?')) return;
 
-            try {
-                const res = await fetch('/api/product-comments', {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        comment_id: commentId,
-                        user_id: currentUser.id
-                    })
-                });
+        // DELETE: Remove comment (owner OR admin with id 8 or 9)
+        if (req.method === 'DELETE') {
+            const body = await req.json();
+            const { comment_id, user_id } = body;
 
-                const text = await res.text();
-                let data;
-                try { data = JSON.parse(text); } catch { data = { error: text }; }
-
-                if (!res.ok) throw new Error(data.error || 'Delete failed');
-
-                if (typeof showToast === 'function') showToast('Review deleted!');
-                loadComments();
-
-            } catch (err) {
-                alert('Error: ' + err.message);
+            if (!comment_id || user_id === undefined) {
+                return new Response(JSON.stringify({ error: 'Missing data' }), { status: 400 });
             }
+
+            const userIdStr = String(user_id);
+
+            // Allow: comment owner OR admin with id 8 or 9
+            const result = await sql`
+                DELETE FROM product_comments 
+                WHERE id = ${comment_id} 
+                AND (
+                    user_id::text = ${userIdStr} 
+                    OR ${userIdStr} IN ('8', '9')
+                )
+                RETURNING id
+            `;
+
+            if (result.length === 0) {
+                return new Response(JSON.stringify({ error: 'Not authorized or comment not found' }), { status: 403 });
+            }
+
+            return new Response(JSON.stringify({ success: true }), { status: 200 });
         }
 
         // Submit review
