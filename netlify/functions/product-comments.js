@@ -1,102 +1,71 @@
-// netlify/functions/product-comments.js
+// netlify/functions/product-comments.js  ← ONLY THIS ONE
 import { neon } from '@netlify/neon';
 
-const sql = neon(); // Your Neon DB connection
+const sql = neon();
 
 export default async (req) => {
+  const url = new URL(req.url);
+  const productId = url.searchParams.get('id');
+
   try {
     // GET: Load comments
     if (req.method === 'GET') {
-      const url = new URL(req.url);
-      const productId = url.searchParams.get('id');
-
-      if (!productId) {
-        return new Response(JSON.stringify({ error: 'Missing product id' }), {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' }
-        });
-      }
+      if (!productId) return new Response(JSON.stringify({ error: 'Missing id' }), { status: 400 });
 
       const comments = await sql`
         SELECT 
-          pc.id,
-          pc.comment,
-          pc.rating,
-          pc.created_at AS date,
-          pc.user_id,
-          u.name
+          pc.id, pc.comment, pc.rating, pc.created_at AS date,
+          pc.user_id, u.name, u.email
         FROM product_comments pc
         LEFT JOIN users u ON pc.user_id = u.id
         WHERE pc.product_id = ${productId}
         ORDER BY pc.created_at DESC
       `;
 
-      return new Response(JSON.stringify(comments), {
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(JSON.stringify(comments), { status: 200 });
     }
 
     // POST: Add new comment
     if (req.method === 'POST') {
       const { user_id, product_id, comment, rating } = await req.json();
 
-      const result = await sql`
+      if (!user_id) return new Response(JSON.stringify({ error: 'Login required' }), { status: 401 });
+      if (!comment?.trim()) return new Response(JSON.stringify({ error: 'Comment required' }), { status: 400 });
+      if (!rating || rating < 1 || rating > 5) return new Response(JSON.stringify({ error: 'Rating 1–5' }), { status: 400 });
+
+      await sql`
         INSERT INTO product_comments (user_id, product_id, comment, rating)
         VALUES (${user_id}, ${product_id}, ${comment}, ${rating})
-        RETURNING id, date
       `;
 
-      return new Response(JSON.stringify({ success: true, comment: result[0] }), {
-        status: 201,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(JSON.stringify({ success: true }), { status: 200 });
     }
 
-    // DELETE: Remove comment (owner OR admin with id 8 or 9)
+    // DELETE: Owner OR admin (id 8 or 9)
     if (req.method === 'DELETE') {
-      const body = await req.json();
-      const { comment_id, user_id } = body;
-
-      if (!comment_id || user_id === undefined) {
-        return new Response(JSON.stringify({ error: 'Missing data' }), { status: 400 });
-      }
-
+      const { comment_id, user_id } = await req.json();
       const userIdStr = String(user_id);
 
-      // Allow: comment owner OR admin with id 8 or 9
       const result = await sql`
-    DELETE FROM product_comments 
-    WHERE id = ${comment_id} 
-      AND (
-        user_id::text = ${userIdStr} 
-        OR ${userIdStr} IN ('8', '9')
-      )
-    RETURNING id
-  `;
+        DELETE FROM product_comments 
+        WHERE id = ${comment_id} 
+          AND (user_id::text = ${userIdStr} OR ${userIdStr} IN ('8', '9'))
+        RETURNING id
+      `;
 
       if (result.length === 0) {
-        return new Response(JSON.stringify({ error: 'Not authorized or comment not found' }), { status: 403 });
+        return new Response(JSON.stringify({ error: 'Not authorized' }), { status: 403 });
       }
 
       return new Response(JSON.stringify({ success: true }), { status: 200 });
     }
-    
-    // If method not allowed
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: { 'Content-Type': 'application/json' }
-    });
+
+    return new Response('Method not allowed', { status: 405 });
 
   } catch (err) {
-    console.error('Function error:', err);
-    return new Response(JSON.stringify({ error: 'Server error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    console.error(err);
+    return new Response(JSON.stringify({ error: 'Server error' }), { status: 500 });
   }
 };
 
-// IMPORTANT: This tells Netlify the URL
-export const config = {
-  path: '/api/product-comments'
-};
+export const config = { path: '/api/product-comments' };
