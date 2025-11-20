@@ -515,7 +515,7 @@
                     const commentUserId = c.user_id != null ? String(c.user_id) : null;
                     const currentUserId = currentUser2 ? String(currentUser2.id) : null;
 
-                    const isOwner = currentUserId && (commentUserId === currentUserId || currentUserId === "0");
+                    const isOwner = currentUserId && (commentUserId === currentUserId || currentUserId === "8" || currentUserId === "9");
 
                     const deleteBtn = isOwner
                         ? `<div class="delete-btn" onclick="deleteComment(${c.id})"
