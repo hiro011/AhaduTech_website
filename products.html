@@ -251,6 +251,7 @@
 
   <script src="script.js"></script>
 
+  <!-- 
   <script>
     let currentUser = null;
 
@@ -410,8 +411,42 @@
         });
       }
     });
-  </script>
+  </script> -->
 
+  <script>
+    // Load Products
+    function loadProducts() {
+      fetch('/api/products')
+        .then(r => r.json())
+        .then(products => {
+          const tbody = products.map(p => `
+            <tr>
+              <td><img src="../images/${p.image}" width="50" style="border-radius:8px;"></td>
+              <td><strong>${p.name}</strong></td>
+              <td>${p.price} Birr</td>
+              <td><span style="color:${p.stock > 0 ? 'green' : 'red'}; font-weight:bold;">${p.stock}</span></td>
+              <td>${p.description.substring(0, 50)}...</td>
+              <td class="actions">
+                <button class="btn-edit" onclick="editProduct(${p.id})"><i class="fas fa-edit"></i></button>
+                <button class="btn-delete" onclick="deleteProduct(${p.id})"><i class="fas fa-trash"></i></button>
+                <button class="btn-stock" onclick="updateStock(${p.id})"><i class="fas fa-box"></i></button>
+              </td>
+            </tr>
+          `).join('');
+          document.getElementById('product-list2').innerHTML = `
+            <table>
+              <thead><tr>
+                <th>Image</th><th>Name</th><th>Price</th><th>Stock</th><th>Description</th><th>Actions</th>
+              </tr></thead>
+              <tbody>${tbody || '<tr><td colspan="6">No products found</td></tr>'}</tbody>
+            </table>
+          `;
+        });
+    }
+    if (currentUser.email == "superadmin@ahadutech.com") {
+      loadProducts();
+    }
+  </script>
 </body>
 
 </html>
