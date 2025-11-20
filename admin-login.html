@@ -183,41 +183,109 @@
             </form>
         </div>
     </div>
-
     <script>
-        async function adminLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value.trim();
-            const pass = document.getElementById('pass').value;
-            const msg = document.getElementById('msg');
+        // === ONLY THESE TWO EMAILS ARE ALLOWED TO LOG IN AS ADMIN ===
+        const ALLOWED_ADMIN_EMAILS = [
+            "admin@ahadutech.com",
+            "superadmin@ahadutech.com"
+            // Add more if needed in future
+        ];
 
-            msg.textContent = 'Verifying...';
-            msg.style.color = 'var(--primary)';
+        const ADMIN_SESSION_KEY = "ahaduAdminSession";
+        const SESSION_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
 
+        async function adminLogin(event) {
+            event.preventDefault();
+
+            const email = document.getElementById("email").value.trim().toLowerCase();
+            const password = document.getElementById("pass").value;
+            const msgEl = document.getElementById("msg");
+
+            // Clear previous message
+            msgEl.textContent = "";
+            msgEl.style.color = "orange";
+            msgEl.textContent = "Validating admin access...";
+
+            // Step 1: Check if email is in allowed list
+            if (!ALLOWED_ADMIN_EMAILS.includes(email)) {
+                msgEl.style.color = "red";
+                msgEl.textContent = "Access denied. You are not an authorized admin.";
+                return;
+            }
+
+            // Step 2: Send login request to backend (same endpoint as users, but we control access here)
             try {
-                const res = await fetch('/api/admin/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password: pass })
+                const res = await fetch("/api/auth", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        action: "login",
+                        email: email,
+                        password: password
+                    })
                 });
+
                 const data = await res.json();
 
-                if (data.success) {
-                    // Save admin session (7 days)
-                    localStorage.setItem('adminSession', JSON.stringify({
-                        admin: data.admin,
-                        expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000
-                    }));
-                    location.href = 'admin-dashboard.html';
+                if (data.success && data.user) {
+                    // Success: Create admin session
+                    const adminSession = {
+                        email: data.user.email,
+                        name: data.user.name || "Admin",
+                        role: "admin",
+                        expiresAt: Date.now() + SESSION_DURATION
+                    };
+
+                    localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(adminSession));
+
+                    msgEl.style.color = "green";
+                    msgEl.textContent = "Admin login successful! Redirecting...";
+
+                    setTimeout(() => {
+                        window.location.href = "/admin/dashboard.html"; // Your admin panel
+                    }, 1200);
+
                 } else {
-                    msg.textContent = data.error || 'Login failed';
-                    msg.style.color = 'var(--danger)';
+                    msgEl.style.color = "red";
+                    msgEl.textContent = data.error || "Invalid admin credentials";
                 }
+
             } catch (err) {
-                msg.textContent = 'Network error';
-                msg.style.color = 'var(--danger)';
+                msgEl.style.color = "red";
+                msgEl.textContent = "Network error. Please try again.";
+                console.error(err);
             }
         }
+
+        // Optional: Protect all admin pages (add this script to every admin page)
+        function protectAdminPage() {
+            const session = localStorage.getItem(ADMIN_SESSION_KEY);
+            if (!session) {
+                alert("Admin access required");
+                window.location.href = "/admin-login.html";
+                return;
+            }
+
+            try {
+                const admin = JSON.parse(session);
+                if (Date.now() > admin.expiresAt || !ALLOWED_ADMIN_EMAILS.includes(admin.email)) {
+                    localStorage.removeItem(ADMIN_SESSION_KEY);
+                    alert("Admin session expired or invalid");
+                    window.location.href = "/admin-login.html";
+                }
+            } catch {
+                localStorage.removeItem(ADMIN_SESSION_KEY);
+                window.location.href = "/admin-login.html";
+            }
+        }
+
+        // Run protection on admin pages (dashboard, manage products, etc.)
+        document.addEventListener("DOMContentLoaded", () => {
+            if (window.location.pathname.includes("/admin/") &&
+                !window.location.pathname.includes("admin-login.html")) {
+                protectAdminPage();
+            }
+        });
     </script>
 
 </body>
