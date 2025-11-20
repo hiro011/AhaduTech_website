@@ -75,43 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
   updateCartCount();
 
   // === 2. SINGLE PRODUCT PAGE (product_items.html) ===
-  if (isProductDetailPage) {
-    const urlParams = new URLSearchParams(window.location.search);
-    const productId = parseInt(urlParams.get('id')) || 1;
-    const product = products.find(p => p.id === productId);
-
-    if (!product) {
-      document.body.innerHTML = "<h1 style='text-align:center;margin-top:100px;color:#e74c3c;'>Product Not Found</h1>";
-      return;
-    }
-
-    // Fill product details
-    document.title = `${product.name} - ElectroHub`;
-    document.getElementById('product-name').textContent = product.name;
-    document.getElementById('product-price').textContent = `${product.price} Birr`;
-    document.getElementById('product-stock').textContent = `Available: ${product.stock} unit${product.stock !== 1 ? 's' : ''}`;
-    document.getElementById('product-phone').innerHTML = `Phone: <a href="tel:${product.phone}">${product.phone}</a>`;
-    document.getElementById('product-img').src = product.img;
-    document.getElementById('product-desc').textContent = product.description;
-
-    const btn = document.getElementById('add-to-cart');
-    if (product.stock <= 0) {
-      btn.textContent = "Sold Out";
-      btn.classList.add('sold-out');
-      btn.disabled = true;
-    }
-
-    btn.onclick = () => {
-      if (product.stock <= 0) return;
-
-      const existing = cart.find(i => i.id === product.id);
-      if (existing) existing.quantity += 1;
-      else cart.push({ ...product, quantity: 1 });
-
-      saveCart();
-      showToast(`${product.name} added to cart!`);
-    };
-  }
 
   // === 3. LIGHTBOX (works on both pages) ===
   const lightbox = document.getElementById('lightbox');
