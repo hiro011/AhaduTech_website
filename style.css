@@ -136,9 +136,13 @@ body {
   top: 58px;
 }
 
-.logout-btn:hover,
+.logout-btn:hover {
+  background: #e01328;
+  cursor: pointer;
+}
+
 .changePass-btn:hover {
-  border: 2px solid #041955;
+  background: #07df48;
   cursor: pointer;
 }
 
@@ -151,7 +155,7 @@ body {
   transform: translateX(-50%);
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
-  border-bottom: 6px solid #dc3545;
+  border-bottom: 6px solid #2a26eb;
 }
 
 /* ---------- FOOTER ---------- */
