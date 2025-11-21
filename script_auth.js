@@ -249,10 +249,10 @@ async function login() {
     // If you're using .active class for overlay, otherwise use: .style.display = 'none'
 
     // Optional: tiny delay so user sees "Login successful!" message
-    setTimeout(() => {
-      document.getElementById('auth-message').textContent = '';
-      closePopup();
-    }, 1500);
+    // setTimeout(() => {
+    //   document.getElementById('auth-message').textContent = '';
+    //   closePopup();
+    // }, 1500);
   } else {
     showMsg(data.error || 'Invalid email or password', 'red');
   }
