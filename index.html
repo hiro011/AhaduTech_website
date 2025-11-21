@@ -203,85 +203,65 @@
   </div>
 
   <!-- Login / Register Popup -->
-  <div id="auth-popup" class="popup-box" style="display:none;">
-    <span class="close-btn" onclick="closePopup()">&times;</span>
-
-    <!-- Login Form -->
-    <div id="login-form" class="auth-form">
-      <h2 style="text-align:center; margin:0 0 25px;">Welcome Back</h2>
-      <input type="email" id="login-email" placeholder="Email" required>
-      <input type="password" id="login-password" placeholder="Password" required>
-      <button class="btn-primary btn-login" onclick="login()">Login</button>
-      <div class="switch-link">
-        Don't have an account? <a onclick="showRegister()">Register</a>
-      </div>
-      <div style="text-align: center; margin-top: 15px;">
-        <a href="#" onclick="openForgotPassword(); return false;">Forgot Password?</a>
-      </div>
+  <div id="register-form" class="auth-form scrollable-form" style="display:none;">
+    <div class="form-header">
+      <h2>Create Account</h2>
+      <p style="margin:8px 0 0; color:#64748b; font-size:14px;">
+        Join us — it's free and takes less than a minute!
+      </p>
     </div>
 
-    <!-- Register Form - Now Scrollable -->
-    <div id="register-form" class="auth-form scrollable-form" style="display:none;">
-      <div class="form-header">
-        <h2>Create Account</h2>
-        <p style="margin: 8px 0 0; color:#64748b; font-size:14px;">
-          Join us — it's free and takes less than a minute!
-        </p>
-      </div>
+    <div class="form-scroll-container">
+      <div class="form-fields">
 
-      <div class="form-scroll-container">
-        <div class="form-fields">
-          <input type="text" id="reg-name" placeholder="Full Name" required>
-          <input type="email" id="reg-email" placeholder="Email Address" required>
-          <input type="password" id="reg-password" placeholder="Create Password" required>
-          <input type="password" id="reg-confirm" placeholder="Confirm Password" required>
+        <input type="text" id="reg-name" placeholder="Full Name" maxlength="30" required>
+        <input type="email" id="reg-email" placeholder="Email Address" maxlength="60" required>
+        <input type="password" id="reg-password" placeholder="Password (6-12 chars)" maxlength="12" required>
+        <input type="password" id="reg-confirm" placeholder="Confirm Password" maxlength="12" required>
 
-          <!-- Security Questions Group -->
-          <div class="security-section">
-            <h4 style="margin: 24px 0 16px; color:#1e293b; font-weight:600;">
-              Security Questions (for password recovery)
-            </h4>
+        <div class="security-section">
+          <h4 style="margin:0 0 16px; color:#1e293b; font-weight:600;">
+            Security Questions (for password recovery)
+          </h4>
 
-            <label>Question 1</label>
-            <select id="reg-q1" required>
-              <option value="">Choose a question...</option>
-              <option>What was the name of your first pet?</option>
-              <option>In what city were you born?</option>
-              <option>What is your mother's maiden name?</option>
-              <option>What was your childhood nickname?</option>
-              <option>What is the name of your favorite teacher?</option>
-            </select>
+          <label>Question 1</label>
+          <select id="reg-q1" required>
+            <option value="">Choose a question...</option>
+            <option>What was the name of your first pet?</option>
+            <option>In what city were you born?</option>
+            <option>What is your mother's maiden name?</option>
+            <option>What was your childhood nickname?</option>
+            <option>What is the name of your favorite teacher?</option>
+          </select>
 
-            <label style="margin-top:16px;">Answer 1</label>
-            <input type="text" id="reg-a1" required placeholder="Your answer (case insensitive)">
+          <label>Answer 1</label>
+          <input type="text" id="reg-a1" maxlength="50" required placeholder="Your answer">
 
-            <label style="margin-top:20px;">Question 2</label>
-            <select id="reg-q2" required>
-              <option value="">Choose another question...</option>
-              <option>What was the name of your first pet?</option>
-              <option>In what city were you born?</option>
-              <option>What is your mother's maiden name?</option>
-              <option>What was your childhood nickname?</option>
-              <option>What is the name of your favorite teacher?</option>
-            </select>
+          <label>Question 2</label>
+          <select id="reg-q2" required>
+            <option value="">Choose another question...</option>
+            <option>What was the name of your first pet?</option>
+            <option>In what city were you born?</option>
+            <option>What is your mother's maiden name?</option>
+            <option>What was your childhood nickname?</option>
+            <option>What is the name of your favorite teacher?</option>
+          </select>
 
-            <label style="margin-top:16px;">Answer 2</label>
-            <input type="text" id="reg-a2" required placeholder="Your answer (case insensitive)">
-          </div>
-
-          <!-- Submit Button - Fixed at bottom -->
-          <button class="btn-primary btn-register" onclick="register()">
-            Create My Account
-          </button>
-
-          <div class="switch-link" style="margin-top: 20px; padding-bottom: 10px;">
-            Already have an account? <a onclick="showLogin()">Login here</a>
-          </div>
+          <label>Answer 2</label>
+          <input type="text" id="reg-a2" maxlength="50" required placeholder="Your answer">
         </div>
+
+        <!-- Button and link MUST be inside scroll container -->
+        <button class="btn-primary btn-register" onclick="register()">
+          Create My Account
+        </button>
+
+        <div class="switch-link" style="text-align:center; margin:20px 0 10px;">
+          Already have an account? <a onclick="showLogin()">Login here</a>
+        </div>
+
       </div>
     </div>
-
-    <div id="auth-message"></div>
   </div>
 
   <div id="forgotPassModal" class="modal" style="display:none;">
