@@ -484,6 +484,57 @@
     margin: 20px 0 10px;
 }
 
+/* Main popup container - MUST have fixed height */
+#auth-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 420px;
+  max-height: 90vh;        /* This is key */
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  overflow: hidden;        /* This enables scrolling inside */
+  z-index: 1000;
+  display: none;
+}
+
+/* Make only the form content scrollable */
+.scrollable-form {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.scrollable-form > *:not(.form-scroll-container) {
+  flex-shrink: 0;
+  padding: 0 28px;
+}
+
+.scrollable-form h2 {
+  padding-top: 28px;
+  padding-bottom: 10px;
+}
+
+/* This is the scrollable area */
+.scrollable-form .form-scroll-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 28px 30px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Optional: nice scrollbar */
+.scrollable-form .form-scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+.scrollable-form .form-scroll-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
 /* Smooth scrollbar (optional - looks premium) */
 .form-scroll-container::-webkit-scrollbar {
     width: 6px;
