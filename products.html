@@ -268,7 +268,7 @@
         </button>
 
         <div style="text-align:center; margin:20px 0 10px;">
-          Already have an account? <a onclick="showLogin()" style="color:#3b82f6; font-weight:600;">Login here</a>
+          Already have an account? <a onclick="showLogin()" style="color:#3b82f6; font-weight:600; cursor: pointer;">Login here</a>
         </div>
 
       </div>
@@ -319,7 +319,7 @@
       </div>
     </div>
   </div>
-  
+
   <!-- Main Content -->
   <div class="container">
     <div class="hero">
@@ -349,168 +349,6 @@
   </footer>
 
   <script src="script.js"></script>
-
-  <!-- 
-  <script>
-    let currentUser = null;
-
-    // Get logged-in user
-    function getCurrentUser() {
-      const data = localStorage.getItem('ahaduUser');
-      if (!data) return null;
-      try {
-        const parsed = JSON.parse(data);
-        if (Date.now() > parsed.expiresAt) {
-          localStorage.removeItem('ahaduUser');
-          return null;
-        }
-        return parsed.user;
-      } catch { return null; }
-    }
-
-    // Toast
-    function showToast(msg, type = 'success') {
-      const toast = document.createElement('div');
-      toast.textContent = msg;
-      toast.style.cssText = `
-      position:fixed;top:20px;right:20px;z-index:9999;padding:1rem 1.5rem;
-      border-radius:12px;color:white;font-weight:600;box-shadow:0 8px 25px rgba(0,0,0,0.3);
-      animation:slideIn 0.4s, fadeOut 0.4s 2.6s forwards;
-      ${type === 'error' ? 'background:#e74c3c;' : 'background:#27ae60;'}
-    `;
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 3000);
-    }
-
-    const style = document.createElement('style');
-    style.textContent = `
-    @keyframes slideIn { from {transform:translateX(100%);opacity:0} to {transform:translateX(0);opacity:1} }
-    @keyframes fadeOut { to {opacity:0;transform:translateY(-20px)} }
-    .add-to-cart-btn:disabled, .add-to-cart.sold-out { background:#95a5a6 !important; cursor:not-allowed; opacity:0.7; }
-  `;
-    document.head.appendChild(style);
-
-    // Update cart count from DB
-    async function updateCartCount() {
-      if (!currentUser || !document.getElementById('cart-link')) return;
-      try {
-        const res = await fetch(`/api/cart/count?user_id=${currentUser.id}`);
-        const data = await res.json();
-        document.getElementById('cart-link').textContent = `Cart (${data.count || 0})`;
-      } catch {
-        document.getElementById('cart-link').textContent = 'Cart (?)';
-      }
-    }
-
-    // Add to cart — saves to DB + respects stock
-    async function addToCart(productId) {
-      currentUser = getCurrentUser();
-      if (!currentUser) {
-        showToast('Please login to add to cart', 'error');
-        openPopup?.();
-        return;
-      }
-
-      try {
-        const res = await fetch('/api/cart/add', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            user_id: currentUser.id,
-            product_id: productId
-          })
-        });
-
-        const result = await res.json();
-
-        if (!res.ok) throw new Error(result.error || 'Failed');
-
-        if (result.full) {
-          showToast(`Stock full! Only ${result.available} left`, 'error');
-        } else {
-          showToast('Added to cart!');
-          updateCartCount();
-        }
-      } catch (err) {
-        showToast('Error: ' + err.message, 'error');
-      }
-    }
-
-    // Global function for list page
-    window.addToCartDB = addToCart;
-
-    // ====================== PAGE LOAD ======================
-    document.addEventListener('DOMContentLoaded', async () => {
-      currentUser = getCurrentUser();
-      updateCartCount();
-
-      const isDetailPage = window.location.pathname.includes('product_items.html');
-      const isListPage = !!document.getElementById('product-list2');
-
-      // PRODUCT DETAIL PAGE
-      if (isDetailPage) {
-        const urlParams = new URLSearchParams(window.location.search);
-        const productId = parseInt(urlParams.get('id')) || 1;
-
-        const res = await fetch(`/api/products?id=${productId}`);
-        const products = await res.json();
-        const product = products[0];
-
-        if (!product) {
-          document.body.innerHTML = `<h1 style="text-align:center;margin:100px;color:red;">Product Not Found</h1>`;
-          return;
-        }
-
-        document.title = product.name + " - AhaduTech";
-        document.getElementById('product-name').textContent = product.name;
-        document.getElementById('product-price').textContent = product.price + " Birr";
-        document.getElementById('product-stock').textContent = "Stock: " + product.stock;
-        document.getElementById('product-phone').innerHTML = `Call: <a href="tel:${product.phone}">${product.phone}</a>`;
-        document.getElementById('product-img').src = product.image || "images/placeholder.jpg";
-        document.getElementById('product-desc').textContent = product.description || "No description.";
-
-        const btn = document.getElementById('add-to-cart');
-        btn.onclick = () => addToCart(product.id);
-
-        if (product.stock <= 0) {
-          btn.textContent = "Sold Out";
-          btn.disabled = true;
-          btn.classList.add('sold-out');
-        }
-      }
-
-      // PRODUCT LIST PAGE
-      if (isListPage) {
-        const res = await fetch('/api/products');
-        const products = await res.json();
-
-        const container = document.getElementById('product-list2');
-        container.innerHTML = '';
-
-        products.forEach(p => {
-          const card = document.createElement('div');
-          card.className = 'product-card';
-          card.innerHTML = `
-          <img src="${p.image || 'images/placeholder.jpg'}" alt="${p.name}" class="product-img">
-          <div class="product-info">
-            <div class="product-title"><a href="product_items.html?id=${p.id}">${p.name}</a></div>
-            <div class="product-price">${p.price} Birr</div>
-            <div class="product-stock">Stock: ${p.stock}</div>
-            <button class="add-to-cart" onclick="addToCartDB(${p.id})" 
-                    ${p.stock <= 0 ? 'disabled style="background:#95a5a6"' : ''}>
-              ${p.stock > 0 ? 'Add to Cart' : 'Sold Out'}
-            </button>
-          </div>
-        `;
-          const card2 = document.createElement('div');
-          card.innerHTML = '<p>test test</p>';
-
-          container.appendChild(card);
-          container.appendChild(card2);
-        });
-      }
-    });
-  </script> -->
 
   <script>
     // Load Products

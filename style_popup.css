@@ -439,7 +439,6 @@
 /* Header fixed at top */
 #register-form .form-header {
   flex-shrink: 0;
-  padding: 28px 28px 16px;
   text-align: center;
   background: white;
   border-bottom: 1px solid #e2e8f0;
@@ -456,7 +455,7 @@
   flex: 1 !important;
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch;
-  padding: 24px 28px 50px !important;
+  /* padding: 24px 28px 50px !important; */
   background: #f9fafb;
 }
 
