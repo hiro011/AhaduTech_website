@@ -143,10 +143,10 @@
     left: 50%;
     backdrop-filter: blur(10px);
     display: none;
+    border-radius: 20px;
     align-items: center;
     justify-content: center;
     z-index: 9999;
-    background: white;
     transform: translate(-50%, -50%);
 }
 
@@ -162,7 +162,7 @@
     background: white;
     width: 100%;
     max-width: 420px;
-    border-radius: 18px;
+    border-radius: 20px;
     box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
     position: relative;
 }
@@ -447,7 +447,7 @@
 
 /* Register form scrollable */
 #register-form.scrollable-form {
-    display: flex ;
+    display: flex !important;;
     flex-direction: column !important;
     height: 100% !important;
 }
