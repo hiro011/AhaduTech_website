@@ -96,9 +96,7 @@ function renderAuthButton() {
 
 // Popup controls
 function openPopup() {
-  document.getElementById('popup-overlay').style.display = 'block';
-  document.getElementById('auth-popup').style.display = 'block';
-  showRegister();
+  showLogin();
 }
 function closePopup() {
   document.getElementById('popup-overlay').style.display = 'none';
@@ -110,12 +108,14 @@ function closePopup() {
   closeForgotPassword();
 }
 function showRegister() {
-  openPopup();
+  document.getElementById('popup-overlay').style.display = 'block';
+  document.getElementById('auth-popup').style.display = 'block';
   document.getElementById('login-form').style.display = 'none';
   document.getElementById('register-form').style.display = 'block';
 }
 function showLogin() {
-  openPopup();
+  document.getElementById('popup-overlay').style.display = 'block';
+  document.getElementById('auth-popup').style.display = 'block';
   document.getElementById('register-form').style.display = 'none';
   document.getElementById('login-form').style.display = 'block';
 }
