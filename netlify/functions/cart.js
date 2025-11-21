@@ -24,11 +24,11 @@ export default async (req) => {
 
         // Add to cart
         await sql`
-      INSERT INTO cart_items (user_id, product_id, quantity)
-      VALUES (${uid}, ${pid}, ${qty})
-      ON CONFLICT (user_id, product_id)
-      DO UPDATE SET quantity = cart_items.quantity + ${qty}
-    `
+            INSERT INTO cart_items (user_id, product_id, quantity)
+            VALUES (${uid}, ${pid}, ${qty})
+            ON CONFLICT (user_id, product_id)
+            DO UPDATE SET quantity = cart_items.quantity + ${qty}
+        `
 
         return new Response(JSON.stringify({ success: true }), { status: 200 })
 

@@ -415,6 +415,10 @@
         return;
       }
 
+      // Disable button immediately to prevent double-click
+      btn.disabled = true;
+      btn.textContent = 'Adding...';
+
       try {
         const res = await fetch('/api/cart', {
           method: 'POST',
@@ -429,27 +433,37 @@
         const data = await res.json();
 
         if (data.success) {
-          const originalText = btn.textContent;
           btn.textContent = 'Added!';
           btn.style.background = '#28a745';
-          btn.disabled = true;
 
           setTimeout(() => {
-            btn.textContent = originalText;
+            btn.textContent = 'Add to Cart';
             btn.style.background = '';
             btn.disabled = false;
           }, 1500);
 
-          updateCartCount();  // ← Updates count instantly
-        } else {
+          updateCartCount();
+        }
+        else if (data.error && data.error.includes('stock')) {
+          // This means backend said "not enough stock"
+          alert('Maximum available quantity reached for this item!');
+          btn.textContent = 'Max Reached';
+          btn.style.background = '#dc3545';
+          btn.disabled = true;
+        }
+        else {
           alert(data.error || 'Failed to add to cart');
+          btn.textContent = 'Add to Cart';
+          btn.disabled = false;
         }
       } catch (err) {
         console.error(err);
         alert('Network error. Try again.');
+        btn.textContent = 'Add to Cart';
+        btn.disabled = false;
       }
     }
-
+    
     // Update cart count in navbar
     async function updateCartCount() {
       const user = getCurrentUser();
