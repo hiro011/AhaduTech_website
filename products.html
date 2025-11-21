@@ -365,6 +365,7 @@
       fetch('/api/products')
         .then(r => r.json())
         .then(products => {
+          productList.innerHTML = ''; // clear old ones
           products.forEach(product => {
             const card = document.createElement('div');
             card.className = 'product-card';
@@ -374,36 +375,37 @@
               : `<button class="add-to-cart sold-out" disabled>Sold Out</button>`;
 
             card.innerHTML = `
-              <img src="../images/${product.image}" alt="${product.name}" class="product-img" onclick="openLightbox('../images/${product.image}')">
-              <div class="product-info">
-                <div class="product-title">
-                  <a href="product_items.html?id=${product.id}">${product.name}</a>
-                </div>
-                <div class="product-price">${product.price} Birr</div>
-                <div class="product-stock">Available: ${product.stock} unit${product.stock !== 1 ? 's' : ''}</div>
-                <div class="product-phone">Phone: <a href="tel:${product.phone}">${product.phone.replace('+251', '')}</a></div>
-                ${buttonHTML}
-              </div>
-            `;
+          <img src="../images/${product.image}" alt="${product.name}" class="product-img" onclick="openLightbox('../images/${product.image}')">
+          <div class="product-info">
+            <div class="product-title"><a href="product_items.html?id=${product.id}">${product.name}</a></div>
+            <div class="product-price">${product.price} Birr</div>
+            <div class="product-stock">Available: ${product.stock} unit${product.stock !== 1 ? 's' : ''}</div>
+            <div class="product-phone">Phone: <a href="tel:${product.phone}">${product.phone.replace('+251', '')}</a></div>
+            ${buttonHTML}
+          </div>
+        `;
             productList.appendChild(card);
           });
         })
+        .catch(err => console.error('Load products error:', err));
     }
 
-    // add-to-cart.js
+    // ——— ADD TO CART ———
     (() => {
       if (window.addToCartReady) return;
       window.addToCartReady = true;
 
+      // Session ID (always exists)
       let sessionId = localStorage.getItem('cartSession');
       if (!sessionId) {
         sessionId = crypto.randomUUID();
         localStorage.setItem('cartSession', sessionId);
       }
 
+      // User ID (only if logged in)
       let userId = null;
       try {
-        const s = localStorage.getItem('userSession') || localStorage.getItem('SESSION_KEY');
+        const s = localStorage.getItem('userSession');
         if (s) {
           const d = JSON.parse(s);
           userId = d?.user?.id || d?.id || null;
@@ -412,19 +414,32 @@
 
       window.addToCart = async (productId) => {
         try {
+          const payload = {
+            action: 'add',
+            sessionId: sessionId,
+            userId: userId ? Number(userId) : null,
+            productId: Number(productId),
+            quantity: 1
+          };
+
+          console.log('Sending to /api/cart:', payload); // ← check this in console
+
           const res = await fetch('/api/cart', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              action: 'add',
-              sessionId,
-              userId: userId ? Number(userId) : null,
-              productId: Number(productId),
-              quantity: 1
-            })
+            body: JSON.stringify(payload)
           });
 
-          const data = await res.json();
+          const text = await res.text();        // read raw text first
+          console.log('Raw response:', text);   // ← this will show the real error
+
+          let data;
+          try { data = JSON.parse(text); }
+          catch (e) {
+            console.error('Not JSON:', text);
+            alert('Server error – check console');
+            return;
+          }
 
           if (data.success) {
             const btn = event.target.closest('button');
@@ -436,24 +451,23 @@
               btn.style.background = '';
             }, 1000);
 
-            // Update navbar count
+            // update cart count
             const link = document.getElementById('cart-link');
             if (link) {
-              const current = parseInt(link.textContent.match(/\d+/)?.[0] || 0);
-              link.textContent = `Cart (${current + 1})`;
+              const cur = parseInt(link.textContent.match(/\d+/)?.[0] || 0);
+              link.textContent = `Cart (${cur + 1})`;
             }
           } else {
-            alert(data.error || 'Failed');
+            alert(data.error || 'Failed to add');
           }
         } catch (err) {
-          console.error(err);
+          console.error('addToCart error:', err);
           alert('Network error');
         }
       };
 
       console.log('Add to Cart ready!');
     })();
-
   </script>
 </body>
 
