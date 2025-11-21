@@ -49,6 +49,7 @@ function setCurrentUser(user) {
   };
   localStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
   renderAuthButton();
+  if (typeof updateCartCount === 'function') updateCartCount();
 
   closePopup();
 }
@@ -57,6 +58,10 @@ function logout() {
   currentUser = null;
   localStorage.removeItem(SESSION_KEY);
   renderAuthButton();
+
+  // Reset cart count to 0 when logged out
+  const link = document.getElementById('cart-link');
+  if (link) link.textContent = 'Cart (0)';
 
   if (typeof showToast === 'function') showToast('Logged out');
   closePopup();
@@ -227,6 +232,7 @@ async function login() {
   if (data.success) {
     setCurrentUser(data.user);
     showMsg('Login successful!', 'green');
+    if (typeof updateCartCount === 'function') updateCartCount();
 
     // Clear fields
     document.getElementById('login-email').value = '';
