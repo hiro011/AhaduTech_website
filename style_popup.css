@@ -389,7 +389,7 @@
 
 /* Message */
 #auth-message {
-    margin-top: 18px;
+    margin-top: 3px;
     text-align: center;
     font-weight: 600;
     min-height: 24px;
@@ -415,7 +415,7 @@
 
 /* Popup Box */
 .popup-box {
-    padding: 40px 30px;
+    padding: 40px 30px 50px 30px;
     animation: popupFadeIn 0.3s ease-out;
 }
 

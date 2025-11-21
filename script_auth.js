@@ -110,6 +110,7 @@ function showRegister() {
   document.getElementById('auth-popup').style.display = 'block';
   document.getElementById('login-form').style.display = 'none';
   document.getElementById('register-form').style.display = 'flex';
+  document.getElementById('auth-message').innerHTML = '';
 }
 function showLogin() {
   closeForgotPassword();
@@ -117,6 +118,7 @@ function showLogin() {
   document.getElementById('auth-popup').style.display = 'block';
   document.getElementById('register-form').style.display = 'none';
   document.getElementById('login-form').style.display = 'block';
+  document.getElementById('auth-message').innerHTML = '';
 }
 
 // Open / Close Popup
