@@ -41,18 +41,6 @@ window.addEventListener('storage', (e) => {
   }
 });
 
-// Also re-render if user logs in/out on same page
-const originalSet = setCurrentUser;
-setCurrentUser = function (user) {
-  originalSet(user);
-  loadComments?.(); // if on product page
-};
-
-const originalLogout = logout;
-logout = function () {
-  originalLogout();
-  loadComments?.();
-};
 function setCurrentUser(user) {
   currentUser = user;
   const sessionData = {
@@ -62,11 +50,6 @@ function setCurrentUser(user) {
   localStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
   renderAuthButton();
 
-  // ONLY call loadComments if it actually exists (safe on all pages)
-  if (typeof loadComments === 'function') {
-    loadComments();
-  }
-
   closePopup();
 }
 
@@ -74,8 +57,9 @@ function logout() {
   currentUser = null;
   localStorage.removeItem(SESSION_KEY);
   renderAuthButton();
-  loadComments?.();
+
   if (typeof showToast === 'function') showToast('Logged out');
+  closePopup();
 }
 
 function renderAuthButton() {
