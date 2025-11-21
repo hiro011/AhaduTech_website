@@ -358,19 +358,21 @@
   <script>
     const productList = document.getElementById('product-list2');
 
-    // Check if user is logged in
-    function getUserId() {
+    // ——— FINAL: Correct way to get logged-in user (matches your auth.js) ———
+    function getCurrentUser() {
       try {
-        const session = localStorage.getItem('userSession');
-        if (!session) return null;
-        const data = JSON.parse(session);
-        return data?.user?.id || data?.id || null;
+        const data = localStorage.getItem('ahaduUser');  // ← This is your key!
+        if (!data) return null;
+        const parsed = JSON.parse(data);
+        if (Date.now() > parsed.expiresAt) {
+          localStorage.removeItem('ahaduUser');
+          return null;
+        }
+        return parsed.user;
       } catch (e) {
         return null;
       }
     }
-
-    const currentUserId = getUserId();
 
     // Load Products
     function loadProducts2() {
@@ -402,12 +404,11 @@
         .catch(err => console.error('Load products error:', err));
     }
 
-    // Add to Cart – Only for logged-in users
+    // Add to Cart
     async function addToCart(productId, clickEvent) {
       const btn = clickEvent.target;
-
-      // Check login
       const user = getCurrentUser();
+
       if (!user) {
         alert('You must be logged in to add items to cart!');
         showLogin();
@@ -428,12 +429,10 @@
         const data = await res.json();
 
         if (data.success) {
-          // Success animation
           const originalText = btn.textContent;
           btn.textContent = 'Added!';
           btn.style.background = '#28a745';
           btn.disabled = true;
-          updateCartCount();
 
           setTimeout(() => {
             btn.textContent = originalText;
@@ -441,6 +440,7 @@
             btn.disabled = false;
           }, 1500);
 
+          updateCartCount();  // ← Updates count instantly
         } else {
           alert(data.error || 'Failed to add to cart');
         }
@@ -452,28 +452,29 @@
 
     // Update cart count in navbar
     async function updateCartCount() {
-      const user = getCurrentUser()
+      const user = getCurrentUser();
+      const link = document.getElementById('cart-link');
+      if (!link) return;
+
       if (!user) {
-        // Not logged in → show 0
-        const link = document.getElementById('cart-link')
-        if (link) link.textContent = 'Cart (0)'
-        return
+        link.textContent = 'Cart (0)';
+        return;
       }
 
       try {
-        const res = await fetch(`/api/cart/count?userId=${user.id}`)
-        const data = await res.json()
-        const link = document.getElementById('cart-link')
-        if (link) {
-          link.textContent = `Cart (${data.count || 0})`
-        }
+        const res = await fetch(`/api/cart/count?userId=${user.id}`);
+        if (!res.ok) throw new Error('Failed');
+        const data = await res.json();
+        link.textContent = `Cart (${data.count || 0})`;
       } catch (e) {
-        console.error('Failed to update cart count')
+        link.textContent = 'Cart (?)';
+        console.error('Cart count failed');
       }
     }
-    // Run on load
-    loadProducts2()
-    updateCartCount()  // ← This shows correct count when page opens
+
+    // Run everything on load
+    loadProducts2();
+    updateCartCount();
   </script>
 </body>
 

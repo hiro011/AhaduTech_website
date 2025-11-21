@@ -3,13 +3,19 @@ import { neon } from '@netlify/neon'
 const sql = neon()
 
 export default async (req) => {
-    if (req.method === 'POST') {
-        return handleAdd(req)
-    }
-    if (req.method === 'GET') {
-        return handleGetCount(req)
-    }
-    return new Response('Method not allowed', { status: 405 })
+  const url = new URL(req.url)
+
+  // GET /api/cart/count?userId=123
+  if (url.pathname === '/api/cart/count' && req.method === 'GET') {
+    return handleGetCount(req)
+  }
+
+  // POST /api/cart (add to cart)
+  if (req.method === 'POST') {
+    return handleAdd(req)
+  }
+
+  return new Response('Not Found', { status: 404 })
 }
 
 // ADD TO CART
