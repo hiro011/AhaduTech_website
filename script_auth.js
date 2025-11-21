@@ -258,6 +258,7 @@ function openForgotPassword() {
 }
 
 function closeForgotPassword() {
+  document.getElementById('popup-overlay').style.display = 'none';
   document.getElementById('popup-overlay').classList.remove('active');
   document.getElementById('forgotPassModal').classList.remove('active');
   document.getElementById('forgotPassModal').style.display = 'none';
