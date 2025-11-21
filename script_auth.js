@@ -53,7 +53,6 @@ logout = function () {
   originalLogout();
   loadComments?.();
 };
-
 function setCurrentUser(user) {
   currentUser = user;
   const sessionData = {
@@ -62,7 +61,13 @@ function setCurrentUser(user) {
   };
   localStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
   renderAuthButton();
-  loadComments?.();
+
+  // ONLY call loadComments if it actually exists (safe on all pages)
+  if (typeof loadComments === 'function') {
+    loadComments();
+  }
+
+  closePopup();
 }
 
 function logout() {
