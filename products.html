@@ -433,7 +433,7 @@
               : `<button class="add-to-cart sold-out" disabled>Sold Out</button>`;
 
             card.innerHTML = `
-              <img src="../images/${product.image}" alt="${product.name}" class="product-img" onclick="openLightbox('${product.image}')">
+              <img src="../images/${product.image}" alt="${product.name}" class="product-img" onclick="openLightbox('../images/${product.image}')">
               <div class="product-info">
                 <div class="product-title">
                   <a href="product_items.html?id=${product.id}">${product.name}</a>

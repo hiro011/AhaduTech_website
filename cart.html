@@ -484,7 +484,7 @@
         const card = document.createElement('div');
         card.className = 'cart-card';
         card.innerHTML = `
-        <img src="${item.img}" alt="${item.name}" class="cart-img" onclick="openLightbox('${item.img}')">
+        <img src="../images/${item.img}" alt="${item.name}" class="cart-img" onclick="openLightbox('../images/${item.img}')">
         <div class="cart-info">
           <div class="cart-title">${item.name}</div>
           <div class="cart-price">$${item.price.toFixed(2)}</div>
