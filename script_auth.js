@@ -98,6 +98,7 @@ function renderAuthButton() {
 function openPopup() {
   document.getElementById('popup-overlay').style.display = 'block';
   document.getElementById('auth-popup').style.display = 'block';
+  showRegister();
 }
 function closePopup() {
   document.getElementById('popup-overlay').style.display = 'none';
