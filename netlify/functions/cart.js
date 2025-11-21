@@ -3,23 +3,8 @@ import { neon } from '@netlify/neon'
 const sql = neon()
 
 export default async (req) => {
-  const url = new URL(req.url)
+    if (req.method !== 'POST') return new Response('Method Not Allowed', { status: 405 })
 
-  // GET /api/cart/count?userId=123
-  if (url.pathname === '/api/cart/count' && req.method === 'GET') {
-    return handleGetCount(req)
-  }
-
-  // POST /api/cart (add to cart)
-  if (req.method === 'POST') {
-    return handleAdd(req)
-  }
-
-  return new Response('Not Found', { status: 404 })
-}
-
-// ADD TO CART
-async function handleAdd(req) {
     try {
         const { userId, productId, quantity = 1 } = await req.json()
 
@@ -37,7 +22,7 @@ async function handleAdd(req) {
             return new Response(JSON.stringify({ success: false, error: 'Out of stock' }), { status: 400 })
         }
 
-        // UPSERT
+        // Add to cart
         await sql`
       INSERT INTO cart_items (user_id, product_id, quantity)
       VALUES (${uid}, ${pid}, ${qty})
@@ -50,28 +35,6 @@ async function handleAdd(req) {
     } catch (err) {
         console.error('Add to cart error:', err)
         return new Response(JSON.stringify({ success: false, error: 'Server error' }), { status: 500 })
-    }
-}
-
-// GET CART COUNT (for navbar)
-async function handleGetCount(req) {
-    try {
-        const url = new URL(req.url)
-        const userId = url.searchParams.get('userId')
-        if (!userId) return new Response(JSON.stringify({ count: 0 }))
-
-        const rows = await sql`
-      SELECT COALESCE(SUM(quantity), 0) as total 
-      FROM cart_items 
-      WHERE user_id = ${Number(userId)}
-    `
-
-        const count = Number(rows[0]?.total || 0)
-        return new Response(JSON.stringify({ count }), { status: 200 })
-
-    } catch (err) {
-        console.error('Count error:', err)
-        return new Response(JSON.stringify({ count: 0 }))
     }
 }
 
