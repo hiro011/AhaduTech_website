@@ -38,11 +38,27 @@ export default async (req) => {
 
     // REGISTER
     if (action === 'register') {
+      const {
+        name,
+        email,
+        password,
+        security_question_1,
+        security_answer_1,
+        security_question_2,
+        security_answer_2
+      } = await req.json();
+
       if (!name?.trim() || !email?.trim() || !password || password.length < 6) {
         return new Response(JSON.stringify({ error: 'Fill all fields. Password min 6 chars.' }), { status: 400 });
       }
+      if (!security_question_1 || !security_answer_1 || !security_question_2 || !security_answer_2) {
+        return new Response(JSON.stringify({ error: 'Please answer both security questions' }), { status: 400 });
+      }
+      if (security_question_1 === security_question_2) {
+        return new Response(JSON.stringify({ error: 'Please choose two different questions' }), { status: 400 });
+      }
 
-      // First check if email already exists
+      // Check if email exists
       const existing = await sql`SELECT id FROM users WHERE email = ${email.trim().toLowerCase()}`;
       if (existing.length > 0) {
         return new Response(JSON.stringify({ error: 'This email is already registered!' }), { status: 409 });
@@ -50,11 +66,24 @@ export default async (req) => {
 
       const password_hash = await hashPassword(password);
 
+      // INSERT with security questions
       const result = await sql`
-        INSERT INTO users (name, email, password_hash)
-        VALUES (${name.trim()}, ${email.trim().toLowerCase()}, ${password_hash})
-        RETURNING id, name, email
-      `;
+    INSERT INTO users (
+      name, email, password_hash,
+      security_question_1, security_answer_1,
+      security_question_2, security_answer_2
+    )
+    VALUES (
+      ${name.trim()},
+      ${email.trim().toLowerCase()},
+      ${password_hash},
+      ${security_question_1},
+      ${security_answer_1.toLowerCase().trim()},
+      ${security_question_2},
+      ${security_answer_2.toLowerCase().trim()}
+    )
+    RETURNING id, name, email
+  `;
 
       return new Response(JSON.stringify({ success: true, user: result[0] }));
     }
