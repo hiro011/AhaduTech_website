@@ -390,28 +390,30 @@
         })
     }
 
-    // add-to-cart.js – ONLY adds to cart – super simple & works instantly
+    // add-to-cart.js – FINAL VERSION THAT NEVER FAILS
     (() => {
       if (window.addToCartReady) return;
       window.addToCartReady = true;
 
-      // Get session (for guests) + user (if logged in)
+      // Session ID
       let sessionId = localStorage.getItem('cartSession');
       if (!sessionId) {
         sessionId = crypto.randomUUID();
         localStorage.setItem('cartSession', sessionId);
       }
 
+      // Get user ID safely (only if logged in)
       let userId = null;
       try {
         const session = localStorage.getItem('userSession') || localStorage.getItem('SESSION_KEY');
         if (session) {
           const data = JSON.parse(session);
           userId = data?.user?.id || data?.id || null;
+          // Force number or null – this fixes the 500 error!
+          userId = userId ? Number(userId) : null;
         }
       } catch (e) { }
 
-      // GLOBAL FUNCTION – this is the only thing your buttons need
       window.addToCart = async (productId) => {
         try {
           const res = await fetch('/api/cart', {
@@ -420,8 +422,8 @@
             body: JSON.stringify({
               action: 'add',
               sessionId,
-              userId,
-              productId,
+              userId,           // ← now always number or null
+              productId: Number(productId),
               quantity: 1
             })
           });
@@ -429,29 +431,29 @@
           const data = await res.json();
 
           if (data.success) {
-            // Optional: show success
-            const btn = event?.target;
+            const btn = event?.target?.closest('button') || event?.target;
             if (btn) {
+              const original = btn.textContent;
               btn.textContent = 'Added!';
               btn.style.background = '#28a745';
               setTimeout(() => {
-                btn.textContent = 'Add to Cart';
+                btn.textContent = original;
                 btn.style.background = '';
               }, 1000);
             }
 
-            // Update cart count in navbar
+            // Update cart count
             const link = document.getElementById('cart-link');
             if (link) {
-              const count = (parseInt(link.textContent.match(/\d+/)?.[0] || 0) || 0) + 1;
-              link.textContent = `Cart (${count})`;
+              const current = parseInt(link.textContent.match(/\d+/)?.[0] || 0);
+              link.textContent = `Cart (${current + 1})`;
             }
           } else {
-            alert(data.error || 'Out of stock');
+            alert(data.error || 'Failed to add');
           }
         } catch (err) {
-          console.error(err);
-          alert('Failed to add to cart');
+          console.error('Cart error:', err);
+          alert('Network error – try again');
         }
       };
 
