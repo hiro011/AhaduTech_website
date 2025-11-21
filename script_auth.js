@@ -232,18 +232,27 @@ async function login() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ action: 'login', email, password: pass })
   });
+
   const data = await res.json();
 
   if (data.success) {
     setCurrentUser(data.user);
     showMsg('Login successful!', 'green');
 
-    // Close popup + clear fields
-    // setTimeout(() => { // not working properly so removing it to check
+    // Clear fields
     document.getElementById('login-email').value = '';
     document.getElementById('login-password').value = '';
-    closePopup();
-    // }, 600);   // ← only one call, short delay = smooth
+
+    // THIS IS THE FIX – force close everything
+    document.getElementById('auth-popup').style.display = 'none';
+    document.getElementById('popup-overlay').classList.remove('active');
+    // If you're using .active class for overlay, otherwise use: .style.display = 'none'
+
+    // Optional: tiny delay so user sees "Login successful!" message
+    setTimeout(() => {
+      document.getElementById('auth-message').textContent = '';
+      closePopup();
+    }, 1500);
   } else {
     showMsg(data.error || 'Invalid email or password', 'red');
   }
