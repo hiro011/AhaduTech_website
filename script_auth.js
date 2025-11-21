@@ -60,8 +60,6 @@ function setCurrentUser(user) {
     expiresAt: Date.now() + ONE_WEEK
   };
   localStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
-  window.dispatchEvent(new CustomEvent('userChanged', { detail: data.user }));
-
   renderAuthButton();
 
   // ONLY call loadComments if it actually exists (safe on all pages)
@@ -77,7 +75,6 @@ function logout() {
   localStorage.removeItem(SESSION_KEY);
   renderAuthButton();
   loadComments?.();
-  window.dispatchEvent(new CustomEvent('userChanged', { detail: null }));
   if (typeof showToast === 'function') showToast('Logged out');
 }
 
