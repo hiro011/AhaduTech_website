@@ -90,14 +90,11 @@ function renderAuthButton() {
       </div>
     `;
   } else {
-    container.innerHTML = `<button class="open-auth-btn" onclick="openPopup()">Login</button>`;
+    container.innerHTML = `<button class="open-auth-btn" onclick="showLogin()">Login</button>`;
   }
 }
 
 // Popup controls
-function openPopup() {
-  showLogin();
-}
 function closePopup() {
   document.getElementById('popup-overlay').style.display = 'none';
   document.getElementById('popup-overlay').classList.remove('active');
