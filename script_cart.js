@@ -5,12 +5,64 @@ if (!localStorage.getItem('cartSession')) {
     localStorage.setItem('cartSession', sessionId);
 }
 
+// script_cart.js – TOP OF FILE
+if (window.cartLoaded) {
+    console.log('Cart script already loaded');
+} else {
+    window.cartLoaded = true;
+
+    // SAFE USER DETECTION
+    let currentUser = null;
+    try {
+        const sessionData = localStorage.getItem('userSession') || localStorage.getItem('SESSION_KEY');
+        if (sessionData) {
+            const parsed = JSON.parse(sessionData);
+            currentUser = parsed.user || parsed || null;
+        }
+    } catch (e) { }
+
+    // Listen for login/logout
+    window.addEventListener('userChanged', (e) => {
+        currentUser = e.detail || null;
+        loadCart();
+    });
+
+    // Your sessionId
+    let sessionId = localStorage.getItem('cartSession') || crypto.randomUUID();
+    if (!localStorage.getItem('cartSession')) {
+        localStorage.setItem('cartSession', sessionId);
+    }
+
+    // ... rest of your cart code (addToCart, loadCart, etc.)
+
+    // EXPOSE SAFE FUNCTION
+    window.addToCartSafe = function (productId, qty = 1) {
+        addToCart(productId, qty);
+    };
+
+    // Load cart when ready
+    document.addEventListener('DOMContentLoaded', () => {
+        loadCart();
+    });
+}
+
 // Get current user (from your auth system)
 let currentUser = null;
 try {
-    const session = JSON.parse(localStorage.getItem('userSession') || '{}');
-    currentUser = session.user || null;
-} catch (e) { }
+    const sessionData = localStorage.getItem('userSession') || localStorage.getItem('SESSION_KEY');
+    if (sessionData) {
+        const parsed = JSON.parse(sessionData);
+        currentUser = parsed.user || parsed || null;
+    }
+} catch (e) {
+    console.warn('Failed to read user session');
+}
+
+// Listen for login/logout from auth.js
+window.addEventListener('userChanged', (e) => {
+    currentUser = e.detail || null;
+    loadCart(); // refresh cart when user logs in/out
+});
 
 const cartContainer = document.getElementById('cart-container');
 const totalItemsEl = document.getElementById('total-items');
@@ -156,3 +208,16 @@ function closeLightbox() {
 
 // Start
 loadCart();
+
+// Make addToCart available globally but only after script loads
+window.addToCartSafe = function (productId, qty = 1) {
+    if (typeof addToCart === 'function') {
+        addToCart(productId, qty);
+    } else {
+        console.error('Cart not loaded yet');
+        alert('Cart is still loading. Please try again.');
+    }
+};
+
+// Optional: dispatch event when cart is ready
+window.dispatchEvent(new CustomEvent('cartReady'));
