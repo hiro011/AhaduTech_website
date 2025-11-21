@@ -433,6 +433,7 @@
           btn.textContent = 'Added!';
           btn.style.background = '#28a745';
           btn.disabled = true;
+          updateCartCount();
 
           setTimeout(() => {
             btn.textContent = originalText;
@@ -440,10 +441,6 @@
             btn.disabled = false;
           }, 1500);
 
-          // Update cart count
-          if (typeof updateCartCount === 'function') {
-            updateCartCount();
-          }
         } else {
           alert(data.error || 'Failed to add to cart');
         }
@@ -452,22 +449,31 @@
         alert('Network error. Try again.');
       }
     }
+
     // Update cart count in navbar
     async function updateCartCount() {
-      if (!currentUserId) return;
-      try {
-        const res = await fetch(`/api/cart/count?userId=${currentUserId}`);
-        const data = await res.json();
-        const link = document.getElementById('cart-link');
-        if (link && data.count !== undefined) {
-          link.textContent = `Cart (${data.count})`;
-        }
-      } catch (e) { }
-    }
+      const user = getCurrentUser()
+      if (!user) {
+        // Not logged in → show 0
+        const link = document.getElementById('cart-link')
+        if (link) link.textContent = 'Cart (0)'
+        return
+      }
 
+      try {
+        const res = await fetch(`/api/cart/count?userId=${user.id}`)
+        const data = await res.json()
+        const link = document.getElementById('cart-link')
+        if (link) {
+          link.textContent = `Cart (${data.count || 0})`
+        }
+      } catch (e) {
+        console.error('Failed to update cart count')
+      }
+    }
     // Run on load
-    loadProducts2();
-    // if (currentUserId) updateCartCount();
+    loadProducts2()
+    updateCartCount()  // ← This shows correct count when page opens
   </script>
 </body>
 
