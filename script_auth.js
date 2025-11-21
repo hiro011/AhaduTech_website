@@ -164,34 +164,45 @@ async function register() {
   const email = document.getElementById('reg-email').value.trim().toLowerCase();
   const pass = document.getElementById('reg-password').value;
   const confirm = document.getElementById('reg-confirm').value;
-
   const q1 = document.getElementById('reg-q1').value;
-  const a1 = document.getElementById('reg-a1').value.trim().toLowerCase();
+  const a1 = document.getElementById('reg-a1').value.trim();
   const q2 = document.getElementById('reg-q2').value;
-  const a2 = document.getElementById('reg-a2').value.trim().toLowerCase();
+  const a2 = document.getElementById('reg-a2').value.trim();
 
+  // === Validation with clear messages ===
+  if (!name || name.length < 3) return showMsg('Name must be at least 3 characters', 'red');
+  if (name.length > 30) return showMsg('Name too long (max 30 characters)', 'red');
+
+  if (!email || !/^\S+@\S+\.\S+$/.test(email)) return showMsg('Please enter a valid email', 'red');
+
+  if (!pass || pass.length < 6) return showMsg('Password too short (minimum 6 characters)', 'red');
+  if (pass.length > 12) return showMsg('Password too long (maximum 12 characters)', 'red');
   if (pass !== confirm) return showMsg('Passwords do not match', 'red');
-  if (pass.length < 6) return showMsg('Password too short', 'red');
-  if (!q1 || !a1 || !q2 || !a2) return showMsg('Please fill all security questions', 'red');
+
+  if (!q1 || !q2) return showMsg('Please select both security questions', 'red');
   if (q1 === q2) return showMsg('Please choose two different questions', 'red');
 
+  if (!a1 || a1.length < 2) return showMsg('Answer 1 too short', 'red');
+  if (a1.length > 50) return showMsg('Answer 1 too long (max 50)', 'red');
+  if (!a2 || a2.length < 2) return showMsg('Answer 2 too short', 'red');
+  if (a2.length > 50) return showMsg('Answer 2 too long (max 50)', 'red');
+
+  // If all good → send to server
   const res = await fetch('/api/auth', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       action: 'register',
-      name,
-      email,
-      password: pass,
+      name, email, password: pass,
       security_question_1: q1,
-      security_answer_1: a1,
+      security_answer_1: a1.toLowerCase(),
       security_question_2: q2,
-      security_answer_2: a2
+      security_answer_2: a2.toLowerCase()
     })
   });
 
   const data = await res.json();
-  showMsg(data.error || 'Registered! Now login', data.success ? 'green' : 'red');
+  showMsg(data.error || 'Account created! Please login', data.success ? 'green' : 'red');
 
   if (data.success) {
     setTimeout(() => {
