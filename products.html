@@ -383,7 +383,7 @@
             card.className = 'product-card';
 
             const buttonHTML = product.stock > 0
-              ? `<button class="add-to-cart" onclick="addToCart(${product.id})">Add to Cart</button>`
+              ? `<button class="add-to-cart" onclick="addToCart(${product.id}, event)">Add to Cart</button>`
               : `<button class="add-to-cart sold-out" disabled>Sold Out</button>`;
 
             card.innerHTML = `
@@ -403,23 +403,23 @@
     }
 
     // Add to Cart – Only for logged-in users
-    async function addToCart(productId) {
-      // Check if user is logged in
-      const user = getCurrentUser();  // ← This uses your auth system
+    async function addToCart(productId, clickEvent) {
+      const btn = clickEvent.target;
+
+      // Check login
+      const user = getCurrentUser();
       if (!user) {
         alert('You must be logged in to add items to cart!');
-        showLogin(); // opens your login popup
+        showLogin();
         return;
       }
-
-      const userId = user.id;
 
       try {
         const res = await fetch('/api/cart', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            userId: userId,
+            userId: user.id,
             productId: Number(productId),
             quantity: 1
           })
@@ -428,26 +428,30 @@
         const data = await res.json();
 
         if (data.success) {
-          const btn = event.target;
-          const original = btn.textContent;
+          // Success animation
+          const originalText = btn.textContent;
           btn.textContent = 'Added!';
           btn.style.background = '#28a745';
+          btn.disabled = true;
+
           setTimeout(() => {
-            btn.textContent = original;
+            btn.textContent = originalText;
             btn.style.background = '';
+            btn.disabled = false;
           }, 1500);
 
           // Update cart count
-          updateCartCount();
+          if (typeof updateCartCount === 'function') {
+            updateCartCount();
+          }
         } else {
           alert(data.error || 'Failed to add to cart');
         }
       } catch (err) {
         console.error(err);
-        alert('Network error. Please try again.');
+        alert('Network error. Try again.');
       }
     }
-    
     // Update cart count in navbar
     async function updateCartCount() {
       if (!currentUserId) return;
@@ -463,7 +467,7 @@
 
     // Run on load
     loadProducts2();
-    if (currentUserId) updateCartCount();
+    // if (currentUserId) updateCartCount();
   </script>
 </body>
 
