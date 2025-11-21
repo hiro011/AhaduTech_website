@@ -5,11 +5,14 @@ const sql = neon(process.env.DATABASE_URL);
 
 export default async (req) => {
     if (req.method !== 'POST') {
-        return new Response('Method not allowed', { status: 405 });
+        return new Response('Only POST allowed', { status: 405 });
     }
 
     try {
-        const { userId, productId, quantity = 1 } = await req.json();
+        const body = await req.json();
+        const { userId, productId, quantity = 1 } = body;
+
+        console.log('Received cart request:', body); // ← This will show in Netlify logs
 
         if (!userId || !productId) {
             return new Response(JSON.stringify({ success: false, error: 'Login required' }), {
@@ -27,19 +30,20 @@ export default async (req) => {
         }
 
         // Check stock
-        const [product] = await sql`SELECT stock FROM products WHERE id = ${pid}`;
-        if (!product || product.stock < qty) {
-            return new Response(JSON.stringify({ success: false, error: 'Out of stock' }), { status: 400 });
+        const productResult = await sql`SELECT stock FROM products WHERE id = ${pid}`;
+        if (productResult.length === 0) {
+            return new Response(JSON.stringify({ success: false, error: 'Product not found' }), { status: 404 });
+        }
+        if (productResult[0].stock < qty) {
+            return new Response(JSON.stringify({ success: false, error: 'Not enough stock' }), { status: 400 });
         }
 
-        // UPSERT into cart
+        // Add to cart (upsert)
         await sql`
       INSERT INTO cart_items (user_id, product_id, quantity)
       VALUES (${uid}, ${pid}, ${qty})
       ON CONFLICT (user_id, product_id)
-      DO UPDATE SET 
-        quantity = cart_items.quantity + ${qty},
-        updated_at = NOW()
+      DO UPDATE SET quantity = cart_items.quantity + ${qty}
     `;
 
         return new Response(JSON.stringify({ success: true }), {
@@ -48,12 +52,12 @@ export default async (req) => {
         });
 
     } catch (err) {
-        console.error('Cart function error:', err);
-        return new Response(JSON.stringify({ success: false, error: 'Server error' }), {
+        console.error('CART FUNCTION CRASH:', err);
+        return new Response(JSON.stringify({ success: false, error: 'Server error', details: err.message }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
         });
     }
 };
 
-export const config = { path: '/api/cart' };
+export const config = { path: "/api/cart" };
