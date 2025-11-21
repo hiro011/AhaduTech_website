@@ -324,7 +324,7 @@
                 <a href="cart.html" id="cart-link">Cart (0)</a>
                 <a href="about.html">About</a>
                 <div id="auth-container">
-                    <button class="open-auth-btn" onclick="openPopup()">Login</button>
+                    <button class="open-auth-btn" onclick="showLogin()">Login</button>
                 </div>
             </div>
         </div>
@@ -348,69 +348,144 @@
         </form>
     </div>
 
-    <!-- White popup box -->
+    <!-- Login / Register Auth Popup -->
     <div id="auth-popup" class="popup-box" style="display:none;">
         <span class="close-btn" onclick="closePopup()">&times;</span>
 
         <!-- Login Form -->
         <div id="login-form" class="auth-form">
-            <h2 style="text-align:center; margin:0 0 25px;">Welcome Back</h2>
+            <h2 style="text-align:center; margin:0 0 25px; color: rgb(3, 3, 3);">Welcome Back</h2>
             <input type="email" id="login-email" placeholder="Email" required>
             <input type="password" id="login-password" placeholder="Password" required>
             <button class="btn-primary btn-login" onclick="login()">Login</button>
             <div class="switch-link">
                 Don't have an account? <a onclick="showRegister()">Register</a>
             </div>
+            <div style="text-align: center; margin-top: 15px;">
+                <a href="#" onclick="openForgotPassword(); return false;">Forgot Password?</a>
+            </div>
         </div>
 
-        <!-- Register Form -->
+        <!-- Register Form - Now Scrollable -->
         <div id="register-form" class="auth-form scrollable-form" style="display:none;">
+            <div class="form-header">
+                <h2>Create Account</h2>
+                <p style="margin:8px 0 0; color:#64748b; font-size:14px;">
+                    Join us — it's free and takes less than a minute!
+                </p>
+            </div>
+
+            <!-- SCROLLABLE AREA -->
             <div class="form-scroll-container">
-                <h2 style="text-align:center; margin:0 0 25px;">Create Account</h2>
-                <input type="text" id="reg-name" placeholder="Full Name" required>
-                <input type="email" id="reg-email" placeholder="Email" required>
-                <input type="password" id="reg-password" placeholder="Password" required>
-                <input type="password" id="reg-confirm" placeholder="Confirm Password" required>
-                <div class="form-group">
-                    <label>Security Question 1</label>
+
+                <input type="text" id="reg-name" placeholder="Full Name" maxlength="30" required>
+                <input type="email" id="reg-email" placeholder="Email Address" maxlength="60" required>
+                <input type="password" id="reg-password" placeholder="Password (6-12 chars)" maxlength="12" required>
+                <input type="password" id="reg-confirm" placeholder="Confirm Password" maxlength="12" required>
+
+                <div
+                    style="background:white; padding:20px; border-radius:12px; margin:20px 0; border:1px solid #e2e8f0;">
+                    <h4 style="margin:0 0 16px; color:#1e293b;">Security Questions</h4>
+
+                    <label>Question 1</label>
                     <select id="reg-q1" required>
-                        <option value="">Choose a question...</option>
-                        <option>What was the name of your first pet?</option>
-                        <option>In what city were you born?</option>
-                        <option>What is your mother's maiden name?</option>
-                        <option>What was your childhood nickname?</option>
-                        <option>What is the name of your favorite teacher?</option>
+                        <option value="">Choose question 1...</option>
+                        <option value="What was the name of your first pet?">What was the name of your first pet?
+                        </option>
+                        <option value="In what city were you born?">In what city were you born?</option>
+                        <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+                        <option value="What was your childhood nickname?">What was your childhood nickname?</option>
+                        <option value="What is the name of your favorite teacher?">What is the name of your favorite
+                            teacher?
+                        </option>
                     </select>
-                </div>
-                <div class="form-group">
-                    <label>Answer 1</label>
-                    <input type="text" id="reg-a1" required placeholder="Your answer">
-                </div>
 
-                <div class="form-group">
-                    <label>Security Question 2</label>
+                    <label style="margin-top:16px;">Answer 1</label>
+                    <input type="text" id="reg-a1" maxlength="50" required placeholder="Your answer">
+
+                    <label style="margin-top:20px;">Question 2</label>
+
                     <select id="reg-q2" required>
-                        <option value="">Choose another question...</option>
-                        <option>What was the name of your first pet?</option>
-                        <option>In what city were you born?</option>
-                        <option>What is your mother's maiden name?</option>
-                        <option>What was your childhood nickname?</option>
-                        <option>What is the name of your favorite teacher?</option>
+                        <option value="">Choose question 2...</option>
+                        <option value="What was the name of your first pet?">What was the name of your first pet?
+                        </option>
+                        <option value="In what city were you born?">In what city were you born?</option>
+                        <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+                        <option value="What was your childhood nickname?">What was your childhood nickname?</option>
+                        <option value="What is the name of your favorite teacher?">What is the name of your favorite
+                            teacher?
+                        </option>
                     </select>
+                    <label style="margin-top:16px;">Answer 2</label>
+                    <input type="text" id="reg-a2" maxlength="50" required placeholder="Your answer">
                 </div>
-                <div class="form-group">
-                    <label>Answer 2</label>
-                    <input type="text" id="reg-a2" required placeholder="Your answer">
-                </div>
-                <button class="btn-primary btn-register" onclick="register()">Register</button>
 
-                <div class="switch-link">
-                    Already have an account? <a onclick="showLogin()">Login</a>
+                <!-- Button and link inside the scroll container -->
+                <button class="btn-primary btn-register" onclick="register()"
+                    style="padding:16px; font-size:16px; font-weight:600;">
+                    Create My Account
+                </button>
+
+                <div style="text-align:center; margin:20px 0 10px;">
+                    Already have an account? <a onclick="showLogin()"
+                        style="color:#3b82f6; font-weight:600; cursor: pointer;">Login here</a>
                 </div>
+
             </div>
         </div>
 
         <div id="auth-message"></div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgotPassModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeForgotPassword()">×</span>
+            <h2>Recover Password</h2>
+
+            <div id="forgot-step-1">
+                <input type="email" id="fp-email" placeholder="Your email" required>
+
+                <select id="fp-q1" required>
+                    <option value="">Choose question 1...</option>
+                    <option value="What was the name of your first pet?">What was the name of your first pet?</option>
+                    <option value="In what city were you born?">In what city were you born?</option>
+                    <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+                    <option value="What was your childhood nickname?">What was your childhood nickname?</option>
+                    <option value="What is the name of your favorite teacher?">What is the name of your favorite
+                        teacher?
+                    </option>
+                </select>
+                <input type="text" id="fp-a1" placeholder="Answer 1" required>
+
+                <select id="fp-q2" required>
+                    <option value="">Choose question 2...</option>
+                    <option value="What was the name of your first pet?">What was the name of your first pet?</option>
+                    <option value="In what city were you born?">In what city were you born?</option>
+                    <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+                    <option value="What was your childhood nickname?">What was your childhood nickname?</option>
+                    <option value="What is the name of your favorite teacher?">What is the name of your favorite
+                        teacher?
+                    </option>
+                </select>
+                <input type="text" id="fp-a2" placeholder="Answer 2" required>
+
+                <button onclick="verifySecurityAnswers()">Verify Answers</button>
+                <p id="fp-msg"></p>
+            </div>
+
+            <div id="forgot-step-2" style="display:none;">
+                <h3>Set New Password</h3>
+                <input type="password" id="fp-newpass" placeholder="New password" required>
+                <input type="password" id="fp-confirm" placeholder="Confirm password" required>
+                <button onclick="resetPassword()">Update Password</button>
+                <p id="fp-msg2"></p>
+            </div>
+
+            <div style="text-align:center; padding-bottom: 20px;">
+                <a onclick="showLogin()" style="color:#3b82f6; font-weight:600; cursor: pointer;">Back To Login</a>
+            </div>
+        </div>
     </div>
 
     <!-- Product Content -->
