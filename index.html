@@ -215,6 +215,9 @@
       <div class="switch-link">
         Don't have an account? <a onclick="showRegister()">Register</a>
       </div>
+      <div style="text-align: center; margin-top: 15px;">
+        <a href="#" onclick="openForgotPassword(); return false;">Forgot Password?</a>
+      </div>
     </div>
 
     <!-- Register Form -->
@@ -224,6 +227,37 @@
       <input type="email" id="reg-email" placeholder="Email" required>
       <input type="password" id="reg-password" placeholder="Password" required>
       <input type="password" id="reg-confirm" placeholder="Confirm Password" required>
+      <div class="form-group">
+        <label>Security Question 1</label>
+        <select id="reg-q1" required>
+          <option value="">Choose a question...</option>
+          <option>What was the name of your first pet?</option>
+          <option>In what city were you born?</option>
+          <option>What is your mother's maiden name?</option>
+          <option>What was your childhood nickname?</option>
+          <option>What is the name of your favorite teacher?</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Answer 1</label>
+        <input type="text" id="reg-a1" required placeholder="Your answer">
+      </div>
+
+      <div class="form-group">
+        <label>Security Question 2</label>
+        <select id="reg-q2" required>
+          <option value="">Choose another question...</option>
+          <option>What was the name of your first pet?</option>
+          <option>In what city were you born?</option>
+          <option>What is your mother's maiden name?</option>
+          <option>What was your childhood nickname?</option>
+          <option>What is the name of your favorite teacher?</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Answer 2</label>
+        <input type="text" id="reg-a2" required placeholder="Your answer">
+      </div>
       <button class="btn-primary btn-register" onclick="register()">Register</button>
       <div class="switch-link">
         Already have an account? <a onclick="showLogin()">Login</a>
@@ -231,6 +265,38 @@
     </div>
 
     <div id="auth-message"></div>
+  </div>
+
+  <div id="forgotPassModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close" onclick="closeForgotPassword()">×</span>
+      <h2>Recover Password</h2>
+
+      <div id="forgot-step-1">
+        <input type="email" id="fp-email" placeholder="Your email" required>
+
+        <select id="fp-q1" required>
+          <option value="">Question 1...</option>
+        </select>
+        <input type="text" id="fp-a1" placeholder="Answer 1" required>
+
+        <select id="fp-q2" required>
+          <option value="">Question 2...</option>
+        </select>
+        <input type="text" id="fp-a2" placeholder="Answer 2" required>
+
+        <button onclick="verifySecurityAnswers()">Verify Answers</button>
+        <p id="fp-msg"></p>
+      </div>
+
+      <div id="forgot-step-2" style="display:none;">
+        <h3>Set New Password</h3>
+        <input type="password" id="fp-newpass" placeholder="New password" required>
+        <input type="password" id="fp-confirm" placeholder="Confirm password" required>
+        <button onclick="resetPassword()">Update Password</button>
+        <p id="fp-msg2"></p>
+      </div>
+    </div>
   </div>
 
   <!-- Hero Welcome -->

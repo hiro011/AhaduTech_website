@@ -370,7 +370,39 @@
             <input type="email" id="reg-email" placeholder="Email" required>
             <input type="password" id="reg-password" placeholder="Password" required>
             <input type="password" id="reg-confirm" placeholder="Confirm Password" required>
+            <div class="form-group">
+                <label>Security Question 1</label>
+                <select id="reg-q1" required>
+                    <option value="">Choose a question...</option>
+                    <option>What was the name of your first pet?</option>
+                    <option>In what city were you born?</option>
+                    <option>What is your mother's maiden name?</option>
+                    <option>What was your childhood nickname?</option>
+                    <option>What is the name of your favorite teacher?</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Answer 1</label>
+                <input type="text" id="reg-a1" required placeholder="Your answer">
+            </div>
+
+            <div class="form-group">
+                <label>Security Question 2</label>
+                <select id="reg-q2" required>
+                    <option value="">Choose another question...</option>
+                    <option>What was the name of your first pet?</option>
+                    <option>In what city were you born?</option>
+                    <option>What is your mother's maiden name?</option>
+                    <option>What was your childhood nickname?</option>
+                    <option>What is the name of your favorite teacher?</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Answer 2</label>
+                <input type="text" id="reg-a2" required placeholder="Your answer">
+            </div>
             <button class="btn-primary btn-register" onclick="register()">Register</button>
+
             <div class="switch-link">
                 Already have an account? <a onclick="showLogin()">Login</a>
             </div>
@@ -449,7 +481,7 @@
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const productId = parseInt(urlParams.get('id')) || 1;
-     
+
         // Get current logged-in user
         function getCurrentUser() {
             const user = sessionStorage.getItem('currentUser');
@@ -631,7 +663,7 @@
                 alert('Error: ' + err.message);
             }
         });
-   
+
         // Fetch single product from DB
         async function loadProductDetail() {
             try {

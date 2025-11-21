@@ -69,12 +69,8 @@ document.head.appendChild(style);
 
 // ====================== AUTO DETECT PAGE & RUN ======================
 document.addEventListener('DOMContentLoaded', () => {
-  const isProductDetailPage = window.location.pathname.includes('product_items.html');
-
   // Update cart count on all pages
   updateCartCount();
-
-  // === 2. SINGLE PRODUCT PAGE (product_items.html) ===
 
   // === 3. LIGHTBOX (works on both pages) ===
   const lightbox = document.getElementById('lightbox');

@@ -8,8 +8,9 @@
     height: 100%;
     background: rgba(0, 0, 0, 0.75);
     z-index: 9998;
+    inset: 0;
+    backdrop-filter: blur(6px);
 }
-
 
 /* Change Password Popup */
 .cp-modal {
@@ -93,6 +94,216 @@
     text-align: center;
     font-weight: bold;
     min-height: 24px;
+}
+
+
+/* ===================== SECURITY QUESTIONS IN REGISTER FORM ===================== */
+.security-questions-group {
+    margin: 18px 0;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.security-questions-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 14px;
+}
+
+.security-questions-group select,
+.security-questions-group input[type="text"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 15px;
+    background: white;
+    transition: all 0.2s;
+}
+
+.security-questions-group select:focus,
+.security-questions-group input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.security-questions-group .form-group+.form-group {
+    margin-top: 16px;
+}
+
+/* ===================== FORGOT PASSWORD MODAL ===================== */
+#forgotPassModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease-out;
+}
+
+#forgotPassModal .modal-content {
+    background: white;
+    width: 90%;
+    max-width: 440px;
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    animation: slideUp 0.4s ease-out;
+}
+
+#forgotPassModal .modal-content h2 {
+    margin: 0;
+    padding: 24px 28px 12px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #1e293b;
+    text-align: center;
+}
+
+#forgotPassModal .modal-content h3 {
+    margin: 0 0 16px;
+    font-size: 18px;
+    color: #475569;
+    text-align: center;
+}
+
+#forgotPassModal .close {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #94a3b8;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+#forgotPassModal .close:hover {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+/* Form inputs inside modal */
+#forgotPassModal input,
+#forgotPassModal select {
+    width: 100%;
+    padding: 13px 16px;
+    margin: 10px 0;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 15px;
+    transition: all 0.2s;
+}
+
+#forgotPassModal input:focus,
+#forgotPassModal select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+}
+
+/* Buttons */
+#forgotPassModal button {
+    width: 100%;
+    padding: 14px;
+    margin: 16px 0 8px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+#forgotPassModal button:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+#forgotPassModal button:active {
+    transform: translateY(0);
+}
+
+/* Messages */
+#fp-msg,
+#fp-msg2 {
+    text-align: center;
+    margin: 12px 0;
+    font-size: 14px;
+    min-height: 20px;
+}
+
+/* Padding for form content */
+#forgot-step-1,
+#forgot-step-2 {
+    padding: 0 28px 28px;
+    position: relative;
+}
+
+/* Smooth transitions between steps */
+#forgot-step-1,
+#forgot-step-2 {
+    transition: opacity 0.3s ease;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+    #forgotPassModal .modal-content {
+        width: 95%;
+        border-radius: 14px;
+    }
+
+    #forgotPassModal .modal-content h2 {
+        font-size: 20px;
+        padding: 20px 20px 10px;
+    }
+
+    #forgot-step-1,
+    #forgot-step-2 {
+        padding: 0 20px 24px;
+    }
 }
 
 /* Popup Box */

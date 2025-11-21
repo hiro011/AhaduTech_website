@@ -161,21 +161,38 @@ document.getElementById('changePassForm').onsubmit = async (e) => {
 // Register
 async function register() {
   const name = document.getElementById('reg-name').value.trim();
-  const email = document.getElementById('reg-email').value.trim();
+  const email = document.getElementById('reg-email').value.trim().toLowerCase();
   const pass = document.getElementById('reg-password').value;
   const confirm = document.getElementById('reg-confirm').value;
 
+  const q1 = document.getElementById('reg-q1').value;
+  const a1 = document.getElementById('reg-a1').value.trim().toLowerCase();
+  const q2 = document.getElementById('reg-q2').value;
+  const a2 = document.getElementById('reg-a2').value.trim().toLowerCase();
+
   if (pass !== confirm) return showMsg('Passwords do not match', 'red');
   if (pass.length < 6) return showMsg('Password too short', 'red');
+  if (!q1 || !a1 || !q2 || !a2) return showMsg('Please fill all security questions', 'red');
+  if (q1 === q2) return showMsg('Please choose two different questions', 'red');
 
   const res = await fetch('/api/auth', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'register', name, email, password: pass })
+    body: JSON.stringify({
+      action: 'register',
+      name,
+      email,
+      password: pass,
+      security_question_1: q1,
+      security_answer_1: a1,
+      security_question_2: q2,
+      security_answer_2: a2
+    })
   });
-  const data = await res.json();
 
+  const data = await res.json();
   showMsg(data.error || 'Registered! Now login', data.success ? 'green' : 'red');
+
   if (data.success) {
     setTimeout(() => {
       showLogin();
@@ -206,14 +223,91 @@ async function login() {
     showMsg('Login successful!', 'green');
 
     // Close popup + clear fields
-    setTimeout(() => {
-      closePopup();
-      document.getElementById('login-email').value = '';
-      document.getElementById('login-password').value = '';
-    }, 600);   // ← only one call, short delay = smooth
+    // setTimeout(() => { // not working properly so removing it to check
+    closePopup();
+    document.getElementById('login-email').value = '';
+    document.getElementById('login-password').value = '';
+    // }, 600);   // ← only one call, short delay = smooth
   } else {
     showMsg(data.error || 'Invalid email or password', 'red');
   }
+}
+
+let forgotEmail = '';
+
+function openForgotPassword() {
+  closePopup();
+  document.getElementById('forgotPassModal').style.display = 'block';
+  document.getElementById('forgot-step-1').style.display = 'block';
+  document.getElementById('forgot-step-2').style.display = 'none';
+  document.getElementById('fp-msg').textContent = '';
+}
+
+function closeForgotPassword() {
+  document.getElementById('forgotPassModal').style.display = 'none';
+}
+
+async function verifySecurityAnswers() {
+  const email = document.getElementById('fp-email').value.trim().toLowerCase();
+  const a1 = document.getElementById('fp-a1').value.trim().toLowerCase();
+  const a2 = document.getElementById('fp-a2').value.trim().toLowerCase();
+
+  if (!email || !a1 || !a2) return showFpMsg('All fields required', 'red');
+
+  const res = await fetch('/api/forgot-password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'verify', email, answer1: a1, answer2: a2 })
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    forgotEmail = email;
+    document.getElementById('forgot-step-1').style.display = 'none';
+    document.getElementById('forgot-step-2').style.display = 'block';
+    showFpMsg('Answers correct! Set new password.', 'green');
+  } else {
+    showFpMsg(data.error || 'Incorrect answers or email not found', 'red');
+  }
+}
+
+async function resetPassword() {
+  const newpass = document.getElementById('fp-newpass').value;
+  const confirm = document.getElementById('fp-confirm').value;
+
+  if (newpass !== confirm) return showFpMsg2('Passwords do not match', 'red');
+  if (newpass.length < 6) return showFpMsg2('Password too short', 'red');
+
+  const res = await fetch('/api/forgot-password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'reset', email: forgotEmail, newPassword: newpass })
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    showFpMsg2('Password updated! You can now login.', 'green');
+    setTimeout(() => {
+      closeForgotPassword();
+      showLogin();
+      document.getElementById('login-email').value = forgotEmail;
+    }, 2000);
+  } else {
+    showFpMsg2(data.error || 'Something went wrong', 'red');
+  }
+}
+
+function showFpMsg(text, color) {
+  const el = document.getElementById('fp-msg');
+  el.textContent = text;
+  el.style.color = color;
+}
+function showFpMsg2(text, color) {
+  const el = document.getElementById('fp-msg2');
+  el.textContent = text;
+  el.style.color = color;
 }
 
 function showMsg(text, color) {
