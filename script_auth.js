@@ -101,10 +101,12 @@ function openPopup() {
 }
 function closePopup() {
   document.getElementById('popup-overlay').style.display = 'none';
+  document.getElementById('popup-overlay').classList.remove('active');
   document.getElementById('auth-popup').style.display = 'none';
   document.getElementById('auth-message').innerHTML = '';
   document.getElementById('changePassModal').classList.remove('show');
   document.getElementById('cpMsg').textContent = '';
+  closeForgotPassword();
 }
 function showRegister() {
   openPopup();
@@ -248,14 +250,18 @@ async function login() {
 let forgotEmail = '';
 
 function openForgotPassword() {
-  closePopup();
+  document.getElementById('auth-popup').style.display = 'none';
+  document.getElementById('popup-overlay').classList.add('active');
   document.getElementById('forgotPassModal').style.display = 'block';
+  document.getElementById('forgotPassModal').classList.add('active');
   document.getElementById('forgot-step-1').style.display = 'block';
   document.getElementById('forgot-step-2').style.display = 'none';
   document.getElementById('fp-msg').textContent = '';
 }
 
 function closeForgotPassword() {
+  document.getElementById('popup-overlay').classList.remove('active');
+  document.getElementById('forgotPassModal').classList.remove('active');
   document.getElementById('forgotPassModal').style.display = 'none';
 }
 

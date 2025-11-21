@@ -1,17 +1,4 @@
 /* Dark overlay – click anywhere here to close */
-/* #popup-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.75);
-    z-index: 9998;
-    inset: 0;
-    backdrop-filter: blur(6px);
-} */ 
-
 #popup-overlay {
   position: fixed;
   inset: 0;
@@ -19,6 +6,10 @@
   backdrop-filter: blur(8px);
   z-index: 9998;
   display: none;
+}
+
+#popup-overlay.active {
+  display: block;
 }
 
 /* Change Password Popup */
@@ -145,17 +136,20 @@
     margin-top: 16px;
 }
 
-/* ===================== FORGOT PASSWORD MODAL ===================== */
-/* FORGOT PASSWORD MODAL – FIXED & CENTERED */
+/* ===================== FORGOT PASSWORD MODAL ===================== */ 
 #forgotPassModal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.65);
-  backdrop-filter: blur(8px);
-  display: none;                   
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(10px);
+  display: none;
   align-items: center;
   justify-content: center;
   z-index: 9999;
+}
+
+#forgotPassModal.active {
+  display: flex;
 }
 
 #forgotPassModal.show {
@@ -165,10 +159,10 @@
 #forgotPassModal .modal-content {
   background: white;
   width: 90%;
-  max-width: 440px;
-  border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-  overflow: hidden;
+  max-width: 420px;
+  border-radius: 18px;
+  box-shadow: 0 25px 80px rgba(0,0,0,0.4);
+  position: relative;
   animation: slideUp 0.4s ease-out;
 }
 
@@ -422,33 +416,24 @@
 .popup-box {
     padding: 40px 30px;
     animation: popupFadeIn 0.3s ease-out;
-    font-family: system-ui, -apple-system, sans-serif;
-}
-#auth-popup {
-  /* padding: 0 !important;        */
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 92%;
-  max-width: 440px;
-  height: 90vh;                   
-  max-height: 90vh;
-  background: white;
-  border-radius: 18px;
-  box-shadow: 0 25px 80px rgba(0,0,0,0.35);
-  overflow: hidden;
-  z-index: 9999;
-  display: none;
-  flex-direction: column;          
 }
 
-/* Register form takes full height */
-#register-form.scrollable-form {
-  display: flex;
+#auth-popup {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 92% !important;
+  max-width: 440px !important;
+  height: 90vh !important;
+  max-height: 90vh !important;
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 25px 80px rgba(0,0,0,0.4);
+  overflow: hidden !important;
+  z-index: 9999;
+  display: none;
   flex-direction: column;
-  height: 100%;
-  width: 100%;
 }
 
 /* Header fixed at top */
@@ -460,12 +445,18 @@
   border-bottom: 1px solid #e2e8f0;
 }
 
-/* ONLY THIS scrolls */
+/* Register form scrollable */
+#register-form.scrollable-form {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+}
+
 #register-form .form-scroll-container {
-  flex: 1;
-  overflow-y: auto;
+  flex: 1 !important;
+  overflow-y: auto !important;
   -webkit-overflow-scrolling: touch;
-  padding: 24px 28px 40px;
+  padding: 24px 28px 50px !important;
   background: #f9fafb;
 }
 

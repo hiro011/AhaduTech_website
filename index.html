@@ -32,7 +32,7 @@
       margin-bottom: 1rem;
       line-height: 1.1;
       background: linear-gradient(90deg, #00d4ff, #ff6b6b);
-     /*  -webkit-background-clip: text; */
+      /*  -webkit-background-clip: text; */
       -webkit-text-fill-color: transparent;
     }
 
@@ -243,27 +243,29 @@
 
           <label>Question 1</label>
           <select id="reg-q1" required>
-            <option value="">Choose a question...</option>
-            <option>What was the name of your first pet?</option>
-            <option>In what city were you born?</option>
-            <option>What is your mother's maiden name?</option>
-            <option>What was your childhood nickname?</option>
-            <option>What is the name of your favorite teacher?</option>
+            <option value="">Choose question 1...</option>
+            <option value="What was the name of your first pet?">What was the name of your first pet?</option>
+            <option value="In what city were you born?">In what city were you born?</option>
+            <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+            <option value="What was your childhood nickname?">What was your childhood nickname?</option>
+            <option value="What is the name of your favorite teacher?">What is the name of your favorite teacher?
+            </option>
           </select>
 
           <label style="margin-top:16px;">Answer 1</label>
           <input type="text" id="reg-a1" maxlength="50" required placeholder="Your answer">
 
           <label style="margin-top:20px;">Question 2</label>
-          <select id="reg-q2" required>
-            <option value="">Choose another question...</option>
-            <option>What was the name of your first pet?</option>
-            <option>In what city were you born?</option>
-            <option>What is your mother's maiden name?</option>
-            <option>What was your childhood nickname?</option>
-            <option>What is the name of your favorite teacher?</option>
-          </select>
 
+          <select id="reg-q2" required>
+            <option value="">Choose question 2...</option>
+            <option value="What was the name of your first pet?">What was the name of your first pet?</option>
+            <option value="In what city were you born?">In what city were you born?</option>
+            <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+            <option value="What was your childhood nickname?">What was your childhood nickname?</option>
+            <option value="What is the name of your favorite teacher?">What is the name of your favorite teacher?
+            </option>
+          </select>
           <label style="margin-top:16px;">Answer 2</label>
           <input type="text" id="reg-a2" maxlength="50" required placeholder="Your answer">
         </div>
@@ -278,7 +280,7 @@
           Already have an account? <a onclick="showLogin()" style="color:#3b82f6; font-weight:600;">Login here</a>
         </div>
 
-      </div> 
+      </div>
     </div>
     <div id="auth-message"></div>
   </div>
@@ -292,12 +294,24 @@
         <input type="email" id="fp-email" placeholder="Your email" required>
 
         <select id="fp-q1" required>
-          <option value="">Question 1...</option>
+          <option value="">Choose question 1...</option>
+          <option value="What was the name of your first pet?">What was the name of your first pet?</option>
+          <option value="In what city were you born?">In what city were you born?</option>
+          <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+          <option value="What was your childhood nickname?">What was your childhood nickname?</option>
+          <option value="What is the name of your favorite teacher?">What is the name of your favorite teacher?
+          </option>
         </select>
         <input type="text" id="fp-a1" placeholder="Answer 1" required>
 
         <select id="fp-q2" required>
-          <option value="">Question 2...</option>
+          <option value="">Choose question 2...</option>
+          <option value="What was the name of your first pet?">What was the name of your first pet?</option>
+          <option value="In what city were you born?">In what city were you born?</option>
+          <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+          <option value="What was your childhood nickname?">What was your childhood nickname?</option>
+          <option value="What is the name of your favorite teacher?">What is the name of your favorite teacher?
+          </option>
         </select>
         <input type="text" id="fp-a2" placeholder="Answer 2" required>
 
