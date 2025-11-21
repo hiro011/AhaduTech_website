@@ -1,6 +1,5 @@
-// script_cart.js – FINAL VERSION THAT WORKS WITH YOUR CURRENT SETUP
+// script_cart.js – 
 (() => {
-    // Prevent double loading + fix "currentUser already declared"
     if (window.cartReady) return;
     window.cartReady = true;
 

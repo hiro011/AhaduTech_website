@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="style_popup.css">
   <script src="script_auth.js" defer></script>
-  <script src="script_cart.js" defer></script>
+  <!-- <script src="script_cart.js" defer></script> -->
 
   <style>
     /* ---------- MAIN ---------- */
@@ -390,6 +390,73 @@
         })
     }
 
+    // add-to-cart.js – ONLY adds to cart – super simple & works instantly
+    (() => {
+      if (window.addToCartReady) return;
+      window.addToCartReady = true;
+
+      // Get session (for guests) + user (if logged in)
+      let sessionId = localStorage.getItem('cartSession');
+      if (!sessionId) {
+        sessionId = crypto.randomUUID();
+        localStorage.setItem('cartSession', sessionId);
+      }
+
+      let userId = null;
+      try {
+        const session = localStorage.getItem('userSession') || localStorage.getItem('SESSION_KEY');
+        if (session) {
+          const data = JSON.parse(session);
+          userId = data?.user?.id || data?.id || null;
+        }
+      } catch (e) { }
+
+      // GLOBAL FUNCTION – this is the only thing your buttons need
+      window.addToCart = async (productId) => {
+        try {
+          const res = await fetch('/api/cart', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'add',
+              sessionId,
+              userId,
+              productId,
+              quantity: 1
+            })
+          });
+
+          const data = await res.json();
+
+          if (data.success) {
+            // Optional: show success
+            const btn = event?.target;
+            if (btn) {
+              btn.textContent = 'Added!';
+              btn.style.background = '#28a745';
+              setTimeout(() => {
+                btn.textContent = 'Add to Cart';
+                btn.style.background = '';
+              }, 1000);
+            }
+
+            // Update cart count in navbar
+            const link = document.getElementById('cart-link');
+            if (link) {
+              const count = (parseInt(link.textContent.match(/\d+/)?.[0] || 0) || 0) + 1;
+              link.textContent = `Cart (${count})`;
+            }
+          } else {
+            alert(data.error || 'Out of stock');
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Failed to add to cart');
+        }
+      };
+
+      console.log('Add to Cart ready!');
+    })();
   </script>
 </body>
 
