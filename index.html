@@ -407,7 +407,7 @@
       if (!cartLink) return;
       const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 0), 0);
       cartLink.textContent = `Cart (${totalItems})`;
-      cartLink.href = "index.html"; // or create cart.html later
+      cartLink.href = "cart.html";
     }
 
     document.addEventListener("DOMContentLoaded", updateCartCount);
