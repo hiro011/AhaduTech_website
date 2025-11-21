@@ -4,7 +4,7 @@ import { neon } from '@netlify/neon';
 export default async (req) => {
   const sql = neon();
 
-  // Helper: Hash password with PBKDF2 (Node.js native)
+  // ──── CRYPTO HELPERS (unchanged) ────
   const hashPassword = async (password) => {
     const enc = new TextEncoder();
     const keyMaterial = await crypto.subtle.importKey(
@@ -18,7 +18,6 @@ export default async (req) => {
     return btoa(String.fromCharCode(...new Uint8Array(derived))) + '|' + btoa(String.fromCharCode(...salt));
   };
 
-  // Helper: Verify password
   const verifyPassword = async (password, hash) => {
     const [hashed, saltStr] = hash.split('|');
     const enc = new TextEncoder();
@@ -34,9 +33,12 @@ export default async (req) => {
   };
 
   try {
-    const { action, name, email, password } = await req.json();
+    // ──── READ BODY ONLY ONCE ────
+    const body = await req.json();
 
-    // REGISTER
+    const { action } = body;
+
+    // ──── REGISTER ────
     if (action === 'register') {
       const {
         name,
@@ -46,8 +48,9 @@ export default async (req) => {
         security_answer_1,
         security_question_2,
         security_answer_2
-      } = await req.json();
+      } = body;
 
+      // Validation
       if (!name?.trim() || !email?.trim() || !password || password.length < 6) {
         return new Response(JSON.stringify({ error: 'Fill all fields. Password min 6 chars.' }), { status: 400 });
       }
@@ -58,45 +61,48 @@ export default async (req) => {
         return new Response(JSON.stringify({ error: 'Please choose two different questions' }), { status: 400 });
       }
 
-      // Check if email exists
-      const existing = await sql`SELECT id FROM users WHERE email = ${email.trim().toLowerCase()}`;
+      const cleanEmail = email.trim().toLowerCase();
+
+      // Check duplicate
+      const existing = await sql`SELECT id FROM users WHERE email = ${cleanEmail}`;
       if (existing.length > 0) {
         return new Response(JSON.stringify({ error: 'This email is already registered!' }), { status: 409 });
       }
 
       const password_hash = await hashPassword(password);
 
-      // INSERT with security questions
       const result = await sql`
-    INSERT INTO users (
-      name, email, password_hash,
-      security_question_1, security_answer_1,
-      security_question_2, security_answer_2
-    )
-    VALUES (
-      ${name.trim()},
-      ${email.trim().toLowerCase()},
-      ${password_hash},
-      ${security_question_1},
-      ${security_answer_1.toLowerCase().trim()},
-      ${security_question_2},
-      ${security_answer_2.toLowerCase().trim()}
-    )
-    RETURNING id, name, email
-  `;
+        INSERT INTO users (
+          name, email, password_hash,
+          security_question_1, security_answer_1,
+          security_question_2, security_answer_2
+        ) VALUES (
+          ${name.trim()},
+          ${cleanEmail},
+          ${password_hash},
+          ${security_question_1},
+          ${security_answer_1.toLowerCase().trim()},
+          ${security_question_2},
+          ${security_answer_2.toLowerCase().trim()}
+        )
+        RETURNING id, name, email
+      `;
 
       return new Response(JSON.stringify({ success: true, user: result[0] }));
     }
 
-    // LOGIN
+    // ──── LOGIN ────
     if (action === 'login') {
+      const { email, password } = body;
+
       if (!email?.trim() || !password) {
         return new Response(JSON.stringify({ error: 'Email and password required' }), { status: 400 });
       }
 
+      const cleanEmail = email.trim().toLowerCase();
       const users = await sql`
         SELECT id, name, email, password_hash
-        FROM users WHERE email = ${email.trim().toLowerCase()}
+        FROM users WHERE email = ${cleanEmail}
       `;
 
       if (users.length === 0) {
@@ -105,7 +111,6 @@ export default async (req) => {
 
       const user = users[0];
       const valid = await verifyPassword(password, user.password_hash);
-
       if (!valid) {
         return new Response(JSON.stringify({ error: 'Invalid email or password' }), { status: 401 });
       }
@@ -118,7 +123,7 @@ export default async (req) => {
 
   } catch (err) {
     console.error('Auth error:', err);
-    return new Response(JSON.stringify({ error: 'Server error: ' + err.message }), { status: 500 });
+    return new Response(JSON.stringify({ error: 'Server error' }), { status: 500 });
   }
 };
 

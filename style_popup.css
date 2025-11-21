@@ -260,7 +260,7 @@
 /* Padding for form content */
 #forgot-step-1,
 #forgot-step-2 {
-    padding: 0 28px 28px;
+    padding: 0 28px 5px;
     position: relative;
 }
 
