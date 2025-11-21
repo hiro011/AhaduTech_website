@@ -139,10 +139,8 @@
 /* ===================== FORGOT PASSWORD MODAL ===================== */
 #forgotPassModal {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 50%;
+    left: 50%;
     background: rgba(0, 0, 0, 0.65);
     backdrop-filter: blur(6px);
     display: flex;
@@ -405,6 +403,117 @@
     text-align: center;
     font-weight: 600;
     min-height: 24px;
+}
+
+/* Make register form scrollable inside popup */
+.scrollable-form {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: 90vh;
+    /* Never taller than screen */
+}
+
+.scrollable-form .form-header {
+    padding: 24px 28px 16px;
+    text-align: center;
+    border-bottom: 1px solid #e2e8f0;
+    background: white;
+    flex-shrink: 0;
+}
+
+.scrollable-form .form-scroll-container {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    /* Smooth scrolling on iOS */
+    padding: 20px 28px;
+    background: #f8fafc;
+}
+
+.scrollable-form .form-fields {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* Style inputs consistently */
+.scrollable-form input,
+.scrollable-form select {
+    width: 100%;
+    padding: 14px 16px;
+    margin: 10px 0;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 15px;
+    background: white;
+    transition: all 0.2s;
+}
+
+.scrollable-form input:focus,
+.scrollable-form select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+}
+
+.scrollable-form label {
+    display: block;
+    margin: 16px 0 6px;
+    font-weight: 600;
+    color: #374151;
+    font-size: 14px;
+}
+
+/* Security section styling */
+.security-section {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    margin: 20px 0;
+}
+
+/* Button stays at bottom */
+.btn-register {
+    width: 100%;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 20px 0 10px;
+}
+
+/* Smooth scrollbar (optional - looks premium) */
+.form-scroll-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.form-scroll-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.form-scroll-container::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.form-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Mobile fixes */
+@media (max-height: 700px),
+(max-width: 480px) {
+    .scrollable-form .form-header {
+        padding: 18px 20px 12px;
+    }
+
+    .scrollable-form .form-scroll-container {
+        padding: 16px 20px;
+    }
+
+    .scrollable-form .form-header h2 {
+        font-size: 20px;
+    }
 }
 
 /* Animation */

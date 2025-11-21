@@ -536,7 +536,7 @@
     window.deleteProduct = async (id) => {
       if (!confirm('Delete this product forever?')) return;
 
-      const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/admin/products/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Product deleted');
         loadProducts();

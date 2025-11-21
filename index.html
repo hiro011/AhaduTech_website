@@ -220,47 +220,64 @@
       </div>
     </div>
 
-    <!-- Register Form -->
-    <div id="register-form" class="auth-form" style="display:none;">
-      <h2 style="text-align:center; margin:0 0 25px;">Create Account</h2>
-      <input type="text" id="reg-name" placeholder="Full Name" required>
-      <input type="email" id="reg-email" placeholder="Email" required>
-      <input type="password" id="reg-password" placeholder="Password" required>
-      <input type="password" id="reg-confirm" placeholder="Confirm Password" required>
-      <div class="form-group">
-        <label>Security Question 1</label>
-        <select id="reg-q1" required>
-          <option value="">Choose a question...</option>
-          <option>What was the name of your first pet?</option>
-          <option>In what city were you born?</option>
-          <option>What is your mother's maiden name?</option>
-          <option>What was your childhood nickname?</option>
-          <option>What is the name of your favorite teacher?</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Answer 1</label>
-        <input type="text" id="reg-a1" required placeholder="Your answer">
+    <!-- Register Form - Now Scrollable -->
+    <div id="register-form" class="auth-form scrollable-form" style="display:none;">
+      <div class="form-header">
+        <h2>Create Account</h2>
+        <p style="margin: 8px 0 0; color:#64748b; font-size:14px;">
+          Join us — it's free and takes less than a minute!
+        </p>
       </div>
 
-      <div class="form-group">
-        <label>Security Question 2</label>
-        <select id="reg-q2" required>
-          <option value="">Choose another question...</option>
-          <option>What was the name of your first pet?</option>
-          <option>In what city were you born?</option>
-          <option>What is your mother's maiden name?</option>
-          <option>What was your childhood nickname?</option>
-          <option>What is the name of your favorite teacher?</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Answer 2</label>
-        <input type="text" id="reg-a2" required placeholder="Your answer">
-      </div>
-      <button class="btn-primary btn-register" onclick="register()">Register</button>
-      <div class="switch-link">
-        Already have an account? <a onclick="showLogin()">Login</a>
+      <div class="form-scroll-container">
+        <div class="form-fields">
+          <input type="text" id="reg-name" placeholder="Full Name" required>
+          <input type="email" id="reg-email" placeholder="Email Address" required>
+          <input type="password" id="reg-password" placeholder="Create Password" required>
+          <input type="password" id="reg-confirm" placeholder="Confirm Password" required>
+
+          <!-- Security Questions Group -->
+          <div class="security-section">
+            <h4 style="margin: 24px 0 16px; color:#1e293b; font-weight:600;">
+              Security Questions (for password recovery)
+            </h4>
+
+            <label>Question 1</label>
+            <select id="reg-q1" required>
+              <option value="">Choose a question...</option>
+              <option>What was the name of your first pet?</option>
+              <option>In what city were you born?</option>
+              <option>What is your mother's maiden name?</option>
+              <option>What was your childhood nickname?</option>
+              <option>What is the name of your favorite teacher?</option>
+            </select>
+
+            <label style="margin-top:16px;">Answer 1</label>
+            <input type="text" id="reg-a1" required placeholder="Your answer (case insensitive)">
+
+            <label style="margin-top:20px;">Question 2</label>
+            <select id="reg-q2" required>
+              <option value="">Choose another question...</option>
+              <option>What was the name of your first pet?</option>
+              <option>In what city were you born?</option>
+              <option>What is your mother's maiden name?</option>
+              <option>What was your childhood nickname?</option>
+              <option>What is the name of your favorite teacher?</option>
+            </select>
+
+            <label style="margin-top:16px;">Answer 2</label>
+            <input type="text" id="reg-a2" required placeholder="Your answer (case insensitive)">
+          </div>
+
+          <!-- Submit Button - Fixed at bottom -->
+          <button class="btn-primary btn-register" onclick="register()">
+            Create My Account
+          </button>
+
+          <div class="switch-link" style="margin-top: 20px; padding-bottom: 10px;">
+            Already have an account? <a onclick="showLogin()">Login here</a>
+          </div>
+        </div>
       </div>
     </div>
 
