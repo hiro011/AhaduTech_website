@@ -32,7 +32,7 @@
       margin-bottom: 1rem;
       line-height: 1.1;
       background: linear-gradient(90deg, #00d4ff, #ff6b6b);
-      -webkit-background-clip: text; 
+      -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
@@ -226,7 +226,6 @@
 
     <!-- Register Form - Now Scrollable -->
     <div id="register-form" class="auth-form scrollable-form" style="display:none;">
-      <!-- Fixed header -->
       <div class="form-header">
         <h2>Create Account</h2>
         <p style="margin:8px 0 0; color:#64748b; font-size:14px;">
@@ -281,14 +280,17 @@
         </button>
 
         <div style="text-align:center; margin:20px 0 10px;">
-          Already have an account? <a onclick="showLogin()" style="color:#3b82f6; font-weight:600;">Login here</a>
+          Already have an account? <a onclick="showLogin()"
+            style="color:#3b82f6; font-weight:600; cursor: pointer;">Login here</a>
         </div>
 
       </div>
     </div>
+
     <div id="auth-message"></div>
   </div>
 
+  <!-- Forgot Password Modal -->
   <div id="forgotPassModal" class="modal" style="display:none;">
     <div class="modal-content">
       <span class="close" onclick="closeForgotPassword()">×</span>
@@ -329,6 +331,10 @@
         <input type="password" id="fp-confirm" placeholder="Confirm password" required>
         <button onclick="resetPassword()">Update Password</button>
         <p id="fp-msg2"></p>
+      </div>
+
+      <div style="text-align:center; margin:20px 0 10px;">
+        <a onclick="showLogin()" style="color:#3b82f6; font-weight:600; cursor: pointer;">Back To Login</a>
       </div>
     </div>
   </div>

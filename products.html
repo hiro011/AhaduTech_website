@@ -191,7 +191,7 @@
       <div class="cp-msg" id="cpMsg"></div>
     </form>
   </div>
-  
+
   <!-- Login / Register Auth Popup -->
   <div id="auth-popup" class="popup-box" style="display:none;">
     <span class="close-btn" onclick="closePopup()">&times;</span>
@@ -266,15 +266,17 @@
         </button>
 
         <div style="text-align:center; margin:20px 0 10px;">
-          Already have an account? <a onclick="showLogin()" style="color:#3b82f6; font-weight:600; cursor: pointer;">Login here</a>
+          Already have an account? <a onclick="showLogin()"
+            style="color:#3b82f6; font-weight:600; cursor: pointer;">Login here</a>
         </div>
 
       </div>
     </div>
-    
+
     <div id="auth-message"></div>
   </div>
 
+  <!-- Forgot Password Modal -->
   <div id="forgotPassModal" class="modal" style="display:none;">
     <div class="modal-content">
       <span class="close" onclick="closeForgotPassword()">×</span>
@@ -315,6 +317,10 @@
         <input type="password" id="fp-confirm" placeholder="Confirm password" required>
         <button onclick="resetPassword()">Update Password</button>
         <p id="fp-msg2"></p>
+      </div>
+
+      <div style="text-align:center; margin:20px 0 10px;">
+        <a onclick="showLogin()" style="color:#3b82f6; font-weight:600; cursor: pointer;">Back To Login</a>
       </div>
     </div>
   </div>
@@ -382,7 +388,7 @@
           });
         })
     }
-  
+
   </script>
 </body>
 
