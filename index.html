@@ -208,7 +208,7 @@
 
     <!-- Login Form -->
     <div id="login-form" class="auth-form">
-      <h2 style="text-align:center; margin:0 0 25px;">Welcome Back</h2>
+      <h2 style="text-align:center; margin:0 0 25px; color: greenyellow;">Welcome Back</h2>
       <input type="email" id="login-email" placeholder="Email" required>
       <input type="password" id="login-password" placeholder="Password" required>
       <button class="btn-primary btn-login" onclick="login()">Login</button>
@@ -222,66 +222,64 @@
 
     <!-- Register Form - Now Scrollable -->
     <div id="register-form" class="auth-form scrollable-form" style="display:none;">
+      <!-- Fixed header -->
       <div class="form-header">
         <h2>Create Account</h2>
         <p style="margin:8px 0 0; color:#64748b; font-size:14px;">
-         111 Join us — it's free and takes less than a minute!
+          Join us — it's free and takes less than a minute!
         </p>
       </div>
 
+      <!-- SCROLLABLE AREA -->
       <div class="form-scroll-container">
-        <div class="form-fields">
 
-          <input type="text" id="reg-name" placeholder="Full Name" maxlength="30" required>
-          <input type="email" id="reg-email" placeholder="Email Address" maxlength="60" required>
-          <input type="password" id="reg-password" placeholder="Password (6-12 chars)" maxlength="12" required>
-          <input type="password" id="reg-confirm" placeholder="Confirm Password" maxlength="12" required>
+        <input type="text" id="reg-name" placeholder="Full Name" maxlength="30" required>
+        <input type="email" id="reg-email" placeholder="Email Address" maxlength="60" required>
+        <input type="password" id="reg-password" placeholder="Password (6-12 chars)" maxlength="12" required>
+        <input type="password" id="reg-confirm" placeholder="Confirm Password" maxlength="12" required>
 
-          <div class="security-section">
-            <h4 style="margin:0 0 16px; color:#1e293b; font-weight:600;">
-              Security Questions (for password recovery)
-            </h4>
+        <div style="background:white; padding:20px; border-radius:12px; margin:20px 0; border:1px solid #e2e8f0;">
+          <h4 style="margin:0 0 16px; color:#1e293b;">Security Questions</h4>
 
-            <label>Question 1</label>
-            <select id="reg-q1" required>
-              <option value="">Choose a question...</option>
-              <option>What was the name of your first pet?</option>
-              <option>In what city were you born?</option>
-              <option>What is your mother's maiden name?</option>
-              <option>What was your childhood nickname?</option>
-              <option>What is the name of your favorite teacher?</option>
-            </select>
+          <label>Question 1</label>
+          <select id="reg-q1" required>
+            <option value="">Choose a question...</option>
+            <option>What was the name of your first pet?</option>
+            <option>In what city were you born?</option>
+            <option>What is your mother's maiden name?</option>
+            <option>What was your childhood nickname?</option>
+            <option>What is the name of your favorite teacher?</option>
+          </select>
 
-            <label>Answer 1</label>
-            <input type="text" id="reg-a1" maxlength="50" required placeholder="Your answer">
+          <label style="margin-top:16px;">Answer 1</label>
+          <input type="text" id="reg-a1" maxlength="50" required placeholder="Your answer">
 
-            <label>Question 2</label>
-            <select id="reg-q2" required>
-              <option value="">Choose another question...</option>
-              <option>What was the name of your first pet?</option>
-              <option>In what city were you born?</option>
-              <option>What is your mother's maiden name?</option>
-              <option>What was your childhood nickname?</option>
-              <option>What is the name of your favorite teacher?</option>
-            </select>
+          <label style="margin-top:20px;">Question 2</label>
+          <select id="reg-q2" required>
+            <option value="">Choose another question...</option>
+            <option>What was the name of your first pet?</option>
+            <option>In what city were you born?</option>
+            <option>What is your mother's maiden name?</option>
+            <option>What was your childhood nickname?</option>
+            <option>What is the name of your favorite teacher?</option>
+          </select>
 
-            <label>Answer 2</label>
-            <input type="text" id="reg-a2" maxlength="50" required placeholder="Your answer">
-          </div>
-
-          <!-- Button and link MUST be inside scroll container -->
-          <button class="btn-primary btn-register" onclick="register()">
-            Create My Account
-          </button>
-
-          <div class="switch-link" style="text-align:center; margin:20px 0 10px;">
-            Already have an account? <a onclick="showLogin()">Login here</a>
-          </div>
-
+          <label style="margin-top:16px;">Answer 2</label>
+          <input type="text" id="reg-a2" maxlength="50" required placeholder="Your answer">
         </div>
-      </div>
-    </div>
 
+        <!-- Button and link inside the scroll container -->
+        <button class="btn-primary btn-register" onclick="register()"
+          style="padding:16px; font-size:16px; font-weight:600;">
+          Create My Account
+        </button>
+
+        <div style="text-align:center; margin:20px 0 10px;">
+          Already have an account? <a onclick="showLogin()" style="color:#3b82f6; font-weight:600;">Login here</a>
+        </div>
+
+      </div> 
+    </div>
     <div id="auth-message"></div>
   </div>
 
