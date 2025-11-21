@@ -390,27 +390,23 @@
         })
     }
 
-    // add-to-cart.js – FINAL VERSION THAT NEVER FAILS
+    // add-to-cart.js
     (() => {
       if (window.addToCartReady) return;
       window.addToCartReady = true;
 
-      // Session ID
       let sessionId = localStorage.getItem('cartSession');
       if (!sessionId) {
         sessionId = crypto.randomUUID();
         localStorage.setItem('cartSession', sessionId);
       }
 
-      // Get user ID safely (only if logged in)
       let userId = null;
       try {
-        const session = localStorage.getItem('userSession') || localStorage.getItem('SESSION_KEY');
-        if (session) {
-          const data = JSON.parse(session);
-          userId = data?.user?.id || data?.id || null;
-          // Force number or null – this fixes the 500 error!
-          userId = userId ? Number(userId) : null;
+        const s = localStorage.getItem('userSession') || localStorage.getItem('SESSION_KEY');
+        if (s) {
+          const d = JSON.parse(s);
+          userId = d?.user?.id || d?.id || null;
         }
       } catch (e) { }
 
@@ -422,7 +418,7 @@
             body: JSON.stringify({
               action: 'add',
               sessionId,
-              userId,           // ← now always number or null
+              userId: userId ? Number(userId) : null,
               productId: Number(productId),
               quantity: 1
             })
@@ -431,34 +427,33 @@
           const data = await res.json();
 
           if (data.success) {
-            const btn = event?.target?.closest('button') || event?.target;
-            if (btn) {
-              const original = btn.textContent;
-              btn.textContent = 'Added!';
-              btn.style.background = '#28a745';
-              setTimeout(() => {
-                btn.textContent = original;
-                btn.style.background = '';
-              }, 1000);
-            }
+            const btn = event.target.closest('button');
+            const orig = btn.textContent;
+            btn.textContent = 'Added!';
+            btn.style.background = '#28a745';
+            setTimeout(() => {
+              btn.textContent = orig;
+              btn.style.background = '';
+            }, 1000);
 
-            // Update cart count
+            // Update navbar count
             const link = document.getElementById('cart-link');
             if (link) {
               const current = parseInt(link.textContent.match(/\d+/)?.[0] || 0);
               link.textContent = `Cart (${current + 1})`;
             }
           } else {
-            alert(data.error || 'Failed to add');
+            alert(data.error || 'Failed');
           }
         } catch (err) {
-          console.error('Cart error:', err);
-          alert('Network error – try again');
+          console.error(err);
+          alert('Network error');
         }
       };
 
       console.log('Add to Cart ready!');
     })();
+
   </script>
 </body>
 
