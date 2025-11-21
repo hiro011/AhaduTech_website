@@ -16,10 +16,25 @@ export default async (req) => {
         const pid = Number(productId)
         const qty = Number(quantity)
 
-        // Check stock
+        // Check stock + current quantity in cart
         const productRows = await sql`SELECT stock FROM products WHERE id = ${pid}`
-        if (productRows.length === 0 || productRows[0].stock < qty) {
-            return new Response(JSON.stringify({ success: false, error: 'Out of stock' }), { status: 400 })
+        if (productRows.length === 0) {
+            return new Response(JSON.stringify({ success: false, error: 'Product not found' }), { status: 404 })
+        }
+
+        // Get how many this user already has in cart
+        const cartRows = await sql`
+            SELECT quantity FROM cart_items 
+            WHERE user_id = ${uid} AND product_id = ${pid}
+        `
+        const currentInCart = cartRows.length > 0 ? cartRows[0].quantity : 0
+
+        // If adding 1 more would exceed available stock
+        if (currentInCart + qty > productRows[0].stock) {
+            return new Response(JSON.stringify({
+                success: false,
+                error: 'Maximum available quantity reached!'
+            }), { status: 400 })
         }
 
         // Add to cart
