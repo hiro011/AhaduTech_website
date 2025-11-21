@@ -1,4 +1,3 @@
-
 // Unique session ID (keeps cart when not logged in)
 let sessionId = localStorage.getItem('cartSession') || crypto.randomUUID();
 if (!localStorage.getItem('cartSession')) {
