@@ -447,7 +447,7 @@
 
 /* Register form scrollable */
 #register-form.scrollable-form {
-    display: flex !important;;
+    display: flex;;
     flex-direction: column !important;
     height: 100% !important;
 }

@@ -108,7 +108,7 @@ function showRegister() {
   document.getElementById('popup-overlay').style.display = 'block';
   document.getElementById('auth-popup').style.display = 'block';
   document.getElementById('login-form').style.display = 'none';
-  document.getElementById('register-form').style.display = 'block';
+  document.getElementById('register-form').style.display = 'flex';
 }
 function showLogin() {
   document.getElementById('popup-overlay').style.display = 'block';
