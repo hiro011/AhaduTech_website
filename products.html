@@ -382,18 +382,9 @@
             const card = document.createElement('div');
             card.className = 'product-card';
 
-            let buttonHTML;
-            if (!currentUserId) {
-              buttonHTML = `<button class="add-to-cart" disabled style="background:#ccc;cursor:not-allowed;">
-              Login to Add
-            </button>`;
-            } else if (product.stock <= 0) {
-              buttonHTML = `<button class="add-to-cart sold-out" disabled>Sold Out</button>`;
-            } else {
-              buttonHTML = `<button class="add-to-cart" onclick="addToCart(${product.id})">
-              Add to Cart
-            </button>`;
-            }
+            const buttonHTML = product.stock > 0
+              ? `<button class="add-to-cart" onclick="addToCart(${product.id})">Add to Cart</button>`
+              : `<button class="add-to-cart sold-out" disabled>Sold Out</button>`;
 
             card.innerHTML = `
             <img src="../images/${product.image}" alt="${product.name}" class="product-img" onclick="openLightbox('../images/${product.image}')">
@@ -413,18 +404,22 @@
 
     // Add to Cart – Only for logged-in users
     async function addToCart(productId) {
-      if (!currentUserId) {
-        alert('Please log in to add items to cart');
-        window.location.href = 'login.html'; // redirect to login
+      // Check if user is logged in
+      const user = getCurrentUser();  // ← This uses your auth system
+      if (!user) {
+        alert('You must be logged in to add items to cart!');
+        showLogin(); // opens your login popup
         return;
       }
+
+      const userId = user.id;
 
       try {
         const res = await fetch('/api/cart', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            userId: currentUserId,
+            userId: userId,
             productId: Number(productId),
             quantity: 1
           })
@@ -442,17 +437,17 @@
             btn.style.background = '';
           }, 1500);
 
-          // Update cart count in navbar
+          // Update cart count
           updateCartCount();
         } else {
           alert(data.error || 'Failed to add to cart');
         }
       } catch (err) {
         console.error(err);
-        alert('Network error. Try again.');
+        alert('Network error. Please try again.');
       }
     }
-
+    
     // Update cart count in navbar
     async function updateCartCount() {
       if (!currentUserId) return;
