@@ -1,5 +1,5 @@
 /* Dark overlay – click anywhere here to close */
-#popup-overlay {
+/* #popup-overlay {
     display: none;
     position: fixed;
     top: 0;
@@ -10,6 +10,15 @@
     z-index: 9998;
     inset: 0;
     backdrop-filter: blur(6px);
+} */ 
+
+#popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(8px);
+  z-index: 9998;
+  display: none;
 }
 
 /* Change Password Popup */
@@ -426,48 +435,47 @@
     margin: 20px 0 10px;
 }
 
-/* ===================== FINAL WORKING SCROLLABLE REGISTER FORM ===================== */
 #auth-popup {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    max-width: 420px;
-    max-height: 90vh;
-    /* Critical */
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.3);
-    overflow: hidden;
-    /* This enables internal scrolling */
-    z-index: 9999;
-    display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 92%;
+  max-width: 440px;
+  height: 90vh;                /* ← FORCE fixed height */
+  max-height: 90vh;            /* ← also for very tall screens */
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 25px 80px rgba(0,0,0,0.35);
+  overflow: hidden;            /* ← this enables internal scroll */
+  z-index: 9999;
+  display: none;
+  flex-direction: column;      /* ← important */
 }
 
-/* Register form becomes scrollable */
+/* Register form = full height flex container */
 #register-form.scrollable-form {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
+  height: 100%;                /* ← takes full popup height */
 }
 
-/* Header stays at top */
+/* Header stays on top */
 #register-form .form-header {
-    padding: 28px 28px 16px;
-    text-align: center;
-    background: white;
-    border-bottom: 1px solid #e2e8f0;
-    flex-shrink: 0;
+  padding: 28px 28px 16px;
+  text-align: center;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  flex-shrink: 0;
 }
 
-/* This is the ONLY scrollable area */
+/* THIS IS THE ONLY SCROLLABLE PART */
 #register-form .form-scroll-container {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 24px 28px 32px;
-    background: #f8fafc;
+  flex: 1;                     /* ← takes remaining space */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 24px 28px 40px;     /* extra bottom so button isn't stuck */
+  background: #f9fafb;
 }
 
 /* Content inside scroll area */
@@ -476,23 +484,30 @@
     margin: 0 auto;
 }
 
-/* Nice inputs */
+/* Nice scrollbar (optional) */
+#register-form .form-scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+#register-form .form-scroll-container::-webkit-scrollbar-thumb {
+  background: #c0ccda;
+  border-radius: 3px;
+}
+
 #register-form input,
 #register-form select {
-    width: 100%;
-    padding: 14px 16px;
-    margin: 11px 0;
-    border: 1px solid #cbd5e1;
-    border-radius: 10px;
-    font-size: 15px;
-    background: white;
+  width: 100%;
+  padding: 14px 16px;
+  margin: 11px 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 15px;
 }
 
 #register-form input:focus,
 #register-form select:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59,130,246,0.15);
 }
 
 #register-form label {
