@@ -106,7 +106,6 @@
     min-height: 24px;
 }
 
-
 /* ===================== SECURITY QUESTIONS IN REGISTER FORM ===================== */
 .security-questions-group {
     margin: 18px 0;
@@ -147,23 +146,20 @@
 }
 
 /* ===================== FORGOT PASSWORD MODAL ===================== */
+/* FORGOT PASSWORD MODAL – FIXED & CENTERED */
 #forgotPassModal {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.65);
   backdrop-filter: blur(8px);
-  display: flex;
+  display: none;                   
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  /* opacity: 0; */
-  visibility: hidden;
-  transition: opacity 0.3s, visibility 0.3s;
 }
 
 #forgotPassModal.show {
-  opacity: 1;
-  visibility: visible;
+  display: flex;                    /* ← now it appears when .show is added */
 }
 
 #forgotPassModal .modal-content {
@@ -423,20 +419,22 @@
 }
 
 /* Popup Box */
-.popup-box {
-    padding: 40px 30px;
-    animation: popupFadeIn 0.3s ease-out;
-    font-family: system-ui, -apple-system, sans-serif;
-}
-
 #auth-popup {
+  padding: 0 !important;            /* ← KILLS the bad padding */
+  display: none;
+  flex-direction: column;
+  height: 90vh;
+  max-height: 90vh;
+  overflow: hidden;
+}
+/* #auth-popup {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 92%;
   max-width: 440px;
-  height: 90vh;                    /* FORCED height */
+  height: 90vh;                   
   max-height: 90vh;
   background: white;
   border-radius: 18px;
@@ -444,8 +442,8 @@
   overflow: hidden;
   z-index: 9999;
   display: none;
-  flex-direction: column;          /* critical */
-}
+  flex-direction: column;          
+} */
 
 /* Register form takes full height */
 #register-form.scrollable-form {

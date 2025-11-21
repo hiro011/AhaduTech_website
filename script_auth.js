@@ -151,7 +151,8 @@ document.getElementById('changePassForm').onsubmit = async (e) => {
   if (data.success) {
     msg.textContent = 'Password changed successfully!';
     msg.style.color = 'green';
-    setTimeout(closeChangePass, 1500);
+    // setTimeout(closePopup(), 600);
+    closePopup();
   } else {
     msg.textContent = data.error || 'Wrong current password';
     msg.style.color = 'red';
@@ -235,9 +236,9 @@ async function login() {
 
     // Close popup + clear fields
     // setTimeout(() => { // not working properly so removing it to check
-    closePopup();
     document.getElementById('login-email').value = '';
     document.getElementById('login-password').value = '';
+    closePopup();
     // }, 600);   // ← only one call, short delay = smooth
   } else {
     showMsg(data.error || 'Invalid email or password', 'red');
