@@ -421,13 +421,6 @@
 /* Popup Box */
 #auth-popup {
   padding: 0 !important;            /* ← KILLS the bad padding */
-  display: none;
-  flex-direction: column;
-  height: 90vh;
-  max-height: 90vh;
-  overflow: hidden;
-}
-/* #auth-popup {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -443,7 +436,7 @@
   z-index: 9999;
   display: none;
   flex-direction: column;          
-} */
+}
 
 /* Register form takes full height */
 #register-form.scrollable-form {
