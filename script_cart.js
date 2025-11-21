@@ -1,222 +1,135 @@
-// Unique session ID (keeps cart when not logged in)
-let sessionId = localStorage.getItem('cartSession') || crypto.randomUUID();
-if (!localStorage.getItem('cartSession')) {
-    localStorage.setItem('cartSession', sessionId);
-}
+// script_cart.js – FINAL VERSION THAT WORKS WITH YOUR CURRENT SETUP
+(() => {
+    // Prevent double loading + fix "currentUser already declared"
+    if (window.cartReady) return;
+    window.cartReady = true;
 
-// script_cart.js – TOP OF FILE
-if (window.cartLoaded) {
-    console.log('Cart script already loaded');
-} else {
-    window.cartLoaded = true;
-
-    // SAFE USER DETECTION
-    let currentUser = null;
-    try {
-        const sessionData = localStorage.getItem('userSession') || localStorage.getItem('SESSION_KEY');
-        if (sessionData) {
-            const parsed = JSON.parse(sessionData);
-            currentUser = parsed.user || parsed || null;
-        }
-    } catch (e) { }
-
-    // Listen for login/logout
-    window.addEventListener('userChanged', (e) => {
-        currentUser = e.detail || null;
-        loadCart();
-    });
-
-    // Your sessionId
-    let sessionId = localStorage.getItem('cartSession') || crypto.randomUUID();
-    if (!localStorage.getItem('cartSession')) {
+    // Session ID for guests
+    let sessionId = localStorage.getItem('cartSession');
+    if (!sessionId) {
+        sessionId = crypto.randomUUID();
         localStorage.setItem('cartSession', sessionId);
     }
 
-    // ... rest of your cart code (addToCart, loadCart, etc.)
-
-    // EXPOSE SAFE FUNCTION
-    window.addToCartSafe = function (productId, qty = 1) {
-        addToCart(productId, qty);
+    // Get logged-in user safely (no conflict with auth.js)
+    let currentUser = null;
+    const getUser = () => {
+        try {
+            const data = localStorage.getItem('userSession') || localStorage.getItem('SESSION_KEY');
+            if (data) {
+                const parsed = JSON.parse(data);
+                return parsed.user || parsed || null;
+            }
+        } catch (e) { }
+        return null;
     };
+    currentUser = getUser();
 
-    // Load cart when ready
-    document.addEventListener('DOMContentLoaded', () => {
+    // Listen for login/logout from other scripts
+    window.addEventListener('storage', () => {
+        currentUser = getUser();
         loadCart();
     });
-}
 
-// Get current user (from your auth system)
-let currentUser = null;
-try {
-    const sessionData = localStorage.getItem('userSession') || localStorage.getItem('SESSION_KEY');
-    if (sessionData) {
-        const parsed = JSON.parse(sessionData);
-        currentUser = parsed.user || parsed || null;
+    let cart = [];
+
+    // API CALL
+    const api = async (action, payload = {}) => {
+        const res = await fetch('/api/cart', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action,
+                sessionId,
+                userId: currentUser?.id || null,
+                ...payload
+            })
+        });
+        return res.json();
+    };
+
+    // GLOBAL FUNCTIONS – these fix "addToCart is not defined"
+    window.addToCart = async (id, qty = 1) => {
+        const data = await api('add', { productId: id, quantity: qty });
+        if (data.success) {
+            cart = data.cart;
+            renderCart();
+            updateCount();
+        } else {
+            alert(data.error || 'Failed');
+        }
+    };
+
+    window.removeFromCart = async (id) => {
+        const data = await api('remove', { productId: id });
+        if (data.success) { cart = data.cart; renderCart(); updateCount(); }
+    };
+
+    window.updateQuantity = async (id, qty) => {
+        const data = await api('update', { productId: id, quantity: qty });
+        if (data.success) { cart = data.cart; renderCart(); updateCount(); }
+        else { alert(data.error); loadCart(); }
+    };
+
+    window.loadCart = async () => {
+        const data = await api('get');
+        if (data.success) {
+            cart = data.cart || [];
+            renderCart();
+            updateCount();
+        }
+    };
+
+    function renderCart() {
+        const container = document.getElementById('cart-container');
+        const itemsEl = document.getElementById('total-items');
+        const priceEl = document.getElementById('total-price');
+        if (!container) return;
+
+        if (cart.length === 0) {
+            container.innerHTML = '<div class="empty-cart"><p>Your cart is empty. <a href="index.html">Shop now!</a></p></div>';
+            if (itemsEl) itemsEl.textContent = '0';
+            if (priceEl) priceEl.textContent = '0.00 Birr';
+            return;
+        }
+
+        let totalQty = 0, totalPrice = 0;
+        container.innerHTML = '<div class="cart-items">';
+
+        cart.forEach(item => {
+            totalQty += item.quantity;
+            totalPrice += item.price * item.quantity;
+
+            container.innerHTML += `
+        <div class="cart-card">
+          <img src="../images/${item.img}" class="cart-img" onclick="openLightbox('../images/${item.img}')">
+          <div class="cart-info">
+            <div class="cart-title">${item.name}</div>
+            <div class="cart-price">${item.price} Birr</div>
+            <div class="cart-quantity">
+              <button class="qty-btn minus" onclick="updateQuantity(${item.product_id}, ${item.quantity - 1})">-</button>
+              <span>${item.quantity}</span>
+              <button class="qty-btn plus" onclick="updateQuantity(${item.product_id}, ${item.quantity + 1})">+</button>
+            </div>
+            <button class="remove-btn" onclick="removeFromCart(${item.product_id})">Remove</button>
+          </div>
+        </div>`;
+        });
+        container.innerHTML += '</div>';
+        if (itemsEl) itemsEl.textContent = totalQty;
+        if (priceEl) priceEl.textContent = totalPrice.toFixed(2) + ' Birr';
     }
-} catch (e) {
-    console.warn('Failed to read user session');
-}
 
-// Listen for login/logout from auth.js
-window.addEventListener('userChanged', (e) => {
-    currentUser = e.detail || null;
-    loadCart(); // refresh cart when user logs in/out
-});
-
-const cartContainer = document.getElementById('cart-container');
-const totalItemsEl = document.getElementById('total-items');
-const totalPriceEl = document.getElementById('total-price');
-const cartLink = document.getElementById('cart-link');
-
-let cart = [];
-
-// Call API
-async function cartAPI(action, data = {}) {
-    const res = await fetch('/api/cart', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            action,
-            sessionId,
-            userId: currentUser?.id || null,
-            ...data
-        })
-    });
-    return await res.json();
-}
-
-// Load cart on page load
-async function loadCart() {
-    const data = await cartAPI('get');
-    if (data.success) {
-        cart = data.cart;
-        renderCart();
-        updateCartCount();
+    function updateCount() {
+        const count = cart.reduce((s, i) => s + i.quantity, 0);
+        const link = document.getElementById('cart-link');
+        if (link) link.textContent = `Cart (${count})`;
     }
-}
 
-// Add to cart
-async function addToCart(productId, qty = 1) {
-    const data = await cartAPI('add', { productId, quantity: qty });
-    if (data.success) {
-        cart = data.cart;
-        renderCart();
-        updateCartCount();
+    // Auto load when page is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadCart);
     } else {
-        alert(data.error);
+        loadCart();
     }
-}
-
-// Remove from cart
-async function removeFromCart(productId) {
-    const data = await cartAPI('remove', { productId });
-    if (data.success) {
-        cart = data.cart;
-        renderCart();
-        updateCartCount();
-    }
-}
-
-// Update quantity
-async function updateQuantity(productId, quantity) {
-    const data = await cartAPI('update', { productId, quantity });
-    if (data.success) {
-        cart = data.cart;
-        renderCart();
-        updateCartCount();
-    } else {
-        alert(data.error);
-        loadCart(); // refresh if error
-    }
-}
-
-// Render cart
-function renderCart() {
-    cartContainer.innerHTML = '';
-
-    if (cart.length === 0) {
-        cartContainer.innerHTML = `<div class="empty-cart"><p>Your cart is empty. <a href="index.html">Shop now!</a></p></div>`;
-        totalItemsEl.textContent = '0';
-        totalPriceEl.textContent = '$0.00';
-        return;
-    }
-
-    let totalItems = 0;
-    let totalPrice = 0;
-
-    const grid = document.createElement('div');
-    grid.className = 'cart-items';
-
-    cart.forEach(item => {
-        totalItems += item.quantity;
-        totalPrice += item.price * item.quantity;
-
-        const card = document.createElement('div');
-        card.className = 'cart-card';
-        card.innerHTML = `
-      <img src="../images/${item.img}" alt="${item.name}" class="cart-img" onclick="openLightbox('../images/${item.img}')">
-      <div class="cart-info">
-        <div class="cart-title">${item.name}</div>
-        <div class="cart-price">$${item.price.toFixed(2)}</div>
-        <div class="cart-quantity">Qty: 
-          <button class="qty-btn minus" data-id="${item.product_id}">-</button>
-          <span class="qty-number">${item.quantity}</span>
-          <button class="qty-btn plus" data-id="${item.product_id}">+</button>
-          ${item.quantity >= item.stock ? '<small style="color:red; margin-left:8px;">(Max stock)</small>' : ''}
-        </div>
-        <button class="remove-btn" onclick="removeFromCart(${item.product_id})">Remove</button>
-      </div>
-    `;
-        grid.appendChild(card);
-    });
-
-    cartContainer.appendChild(grid);
-    totalItemsEl.textContent = totalItems;
-    totalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
-
-    // + / - buttons
-    document.querySelectorAll('.qty-btn').forEach(btn => {
-        btn.onclick = () => {
-            const id = parseInt(btn.dataset.id);
-            const change = btn.classList.contains('plus') ? 1 : -1;
-            updateQuantity(id, cart.find(i => i.product_id === id).quantity + change);
-        };
-    });
-}
-
-// Update cart count in navbar
-function updateCartCount() {
-    const count = cart.reduce((sum, i) => sum + i.quantity, 0);
-    cartLink.textContent = `Cart (${count})`;
-}
-
-// Lightbox (keep your existing one)
-function openLightbox(src) {
-    const lightbox = document.getElementById('lightbox');
-    const lightboxImg = document.getElementById('lightbox-img');
-    lightboxImg.src = src;
-    lightbox.classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeLightbox() {
-    document.getElementById('lightbox').classList.remove('active');
-    document.getElementById('lightbox-img').src = '';
-    document.body.style.overflow = '';
-}
-
-// Start
-loadCart();
-
-// Make addToCart available globally but only after script loads
-window.addToCartSafe = function (productId, qty = 1) {
-    if (typeof addToCart === 'function') {
-        addToCart(productId, qty);
-    } else {
-        console.error('Cart not loaded yet');
-        alert('Cart is still loading. Please try again.');
-    }
-};
-
-// Optional: dispatch event when cart is ready
-window.dispatchEvent(new CustomEvent('cartReady'));
+})();

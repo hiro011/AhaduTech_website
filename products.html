@@ -370,9 +370,7 @@
             card.className = 'product-card';
 
             const buttonHTML = product.stock > 0
-              ? `<button class="add-to-cart" onclick="window.addToCartSafe?.(${product.id})">
-                    Add to Cart
-                  </button>`
+              ? `<button class="add-to-cart" onclick="addToCart(${product.id})">Add to Cart</button>`
               : `<button class="add-to-cart sold-out" disabled>Sold Out</button>`;
 
             card.innerHTML = `
