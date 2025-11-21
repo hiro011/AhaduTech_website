@@ -497,7 +497,7 @@
   border-radius: 16px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.3);
   overflow: hidden;        /* This enables scrolling inside */
-  z-index: 1000;
+  z-index: 9999;
   display: none;
 }
 
