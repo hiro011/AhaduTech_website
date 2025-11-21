@@ -419,6 +419,12 @@
 }
 
 /* Popup Box */
+.popup-box {
+    padding: 40px 30px;
+    animation: popupFadeIn 0.3s ease-out;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
 #auth-popup {
   position: fixed;
   top: 50%;
