@@ -355,119 +355,120 @@
   </footer>
 
   <!-- <script src="script.js"></script> -->
-
   <script>
-    // Load Products
     const productList = document.getElementById('product-list2');
 
-    loadProducts2();
+    // Check if user is logged in
+    function getUserId() {
+      try {
+        const session = localStorage.getItem('userSession');
+        if (!session) return null;
+        const data = JSON.parse(session);
+        return data?.user?.id || data?.id || null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    const currentUserId = getUserId();
+
+    // Load Products
     function loadProducts2() {
       fetch('/api/products')
         .then(r => r.json())
         .then(products => {
-          productList.innerHTML = ''; // clear old ones
+          productList.innerHTML = '';
           products.forEach(product => {
             const card = document.createElement('div');
             card.className = 'product-card';
 
-            const buttonHTML = product.stock > 0
-              ? `<button class="add-to-cart" onclick="addToCart(${product.id})">Add to Cart</button>`
-              : `<button class="add-to-cart sold-out" disabled>Sold Out</button>`;
+            let buttonHTML;
+            if (!currentUserId) {
+              buttonHTML = `<button class="add-to-cart" disabled style="background:#ccc;cursor:not-allowed;">
+              Login to Add
+            </button>`;
+            } else if (product.stock <= 0) {
+              buttonHTML = `<button class="add-to-cart sold-out" disabled>Sold Out</button>`;
+            } else {
+              buttonHTML = `<button class="add-to-cart" onclick="addToCart(${product.id})">
+              Add to Cart
+            </button>`;
+            }
 
             card.innerHTML = `
-          <img src="../images/${product.image}" alt="${product.name}" class="product-img" onclick="openLightbox('../images/${product.image}')">
-          <div class="product-info">
-            <div class="product-title"><a href="product_items.html?id=${product.id}">${product.name}</a></div>
-            <div class="product-price">${product.price} Birr</div>
-            <div class="product-stock">Available: ${product.stock} unit${product.stock !== 1 ? 's' : ''}</div>
-            <div class="product-phone">Phone: <a href="tel:${product.phone}">${product.phone.replace('+251', '')}</a></div>
-            ${buttonHTML}
-          </div>
-        `;
+            <img src="../images/${product.image}" alt="${product.name}" class="product-img" onclick="openLightbox('../images/${product.image}')">
+            <div class="product-info">
+              <div class="product-title"><a href="product_items.html?id=${product.id}">${product.name}</a></div>
+              <div class="product-price">${product.price} Birr</div>
+              <div class="product-stock">Available: ${product.stock} unit${product.stock !== 1 ? 's' : ''}</div>
+              <div class="product-phone">Phone: <a href="tel:${product.phone}">${product.phone.replace('+251', '')}</a></div>
+              ${buttonHTML}
+            </div>
+          `;
             productList.appendChild(card);
           });
         })
         .catch(err => console.error('Load products error:', err));
     }
 
-    // ——— ADD TO CART ———
-    (() => {
-      if (window.addToCartReady) return;
-      window.addToCartReady = true;
-
-      // Session ID (always exists)
-      let sessionId = localStorage.getItem('cartSession');
-      if (!sessionId) {
-        sessionId = crypto.randomUUID();
-        localStorage.setItem('cartSession', sessionId);
+    // Add to Cart – Only for logged-in users
+    async function addToCart(productId) {
+      if (!currentUserId) {
+        alert('Please log in to add items to cart');
+        window.location.href = 'login.html'; // redirect to login
+        return;
       }
 
-      // User ID (only if logged in)
-      let userId = null;
       try {
-        const s = localStorage.getItem('userSession');
-        if (s) {
-          const d = JSON.parse(s);
-          userId = d?.user?.id || d?.id || null;
-        }
-      } catch (e) { }
-
-      window.addToCart = async (productId) => {
-        try {
-          const payload = {
-            action: 'add',
-            sessionId: sessionId,
-            userId: userId ? Number(userId) : null,
+        const res = await fetch('/api/cart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: currentUserId,
             productId: Number(productId),
             quantity: 1
-          };
+          })
+        });
 
-          console.log('Sending to /api/cart:', payload); // ← check this in console
+        const data = await res.json();
 
-          const res = await fetch('/api/cart', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
+        if (data.success) {
+          const btn = event.target;
+          const original = btn.textContent;
+          btn.textContent = 'Added!';
+          btn.style.background = '#28a745';
+          setTimeout(() => {
+            btn.textContent = original;
+            btn.style.background = '';
+          }, 1500);
 
-          const text = await res.text();        // read raw text first
-          console.log('Raw response:', text);   // ← this will show the real error
-
-          let data;
-          try { data = JSON.parse(text); }
-          catch (e) {
-            console.error('Not JSON:', text);
-            alert('Server error – check console');
-            return;
-          }
-
-          if (data.success) {
-            const btn = event.target.closest('button');
-            const orig = btn.textContent;
-            btn.textContent = 'Added!';
-            btn.style.background = '#28a745';
-            setTimeout(() => {
-              btn.textContent = orig;
-              btn.style.background = '';
-            }, 1000);
-
-            // update cart count
-            const link = document.getElementById('cart-link');
-            if (link) {
-              const cur = parseInt(link.textContent.match(/\d+/)?.[0] || 0);
-              link.textContent = `Cart (${cur + 1})`;
-            }
-          } else {
-            alert(data.error || 'Failed to add');
-          }
-        } catch (err) {
-          console.error('addToCart error:', err);
-          alert('Network error');
+          // Update cart count in navbar
+          updateCartCount();
+        } else {
+          alert(data.error || 'Failed to add to cart');
         }
-      };
+      } catch (err) {
+        console.error(err);
+        alert('Network error. Try again.');
+      }
+    }
 
-      console.log('Add to Cart ready!');
-    })();
+    // Update cart count in navbar
+    async function updateCartCount() {
+      if (!currentUserId) return;
+      try {
+        const res = await fetch(`/api/cart/count?userId=${currentUserId}`);
+        const data = await res.json();
+        const link = document.getElementById('cart-link');
+        if (link && data.count !== undefined) {
+          link.textContent = `Cart (${data.count})`;
+        }
+      } catch (e) { }
+    }
+
+    // Run on load
+    loadProducts2();
+    if (currentUserId) updateCartCount();
   </script>
 </body>
 

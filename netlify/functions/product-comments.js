@@ -49,7 +49,7 @@ export default async (req) => {
       const result = await sql`
         DELETE FROM product_comments 
         WHERE id = ${comment_id} 
-          AND (user_id::text = ${userIdStr} OR ${userIdStr} IN ('8', '9'))
+          AND (user_id::text = ${userIdStr} OR ${userIdStr} IN ('12', '9'))
         RETURNING id
       `;
 
