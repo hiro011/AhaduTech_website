@@ -232,14 +232,11 @@ async function login() {
     document.getElementById('login-email').value = '';
     document.getElementById('login-password').value = '';
 
-    // THIS IS THE FIX – force close everything
-    document.getElementById('auth-popup').style.display = 'none';
-    document.getElementById('popup-overlay').classList.remove('active');
-    // If you're using .active class for overlay, otherwise use: .style.display = 'none'
-
     // Optional: tiny delay so user sees "Login successful!" message
     setTimeout(() => {
       document.getElementById('auth-message').textContent = '';
+      document.getElementById('auth-popup').style.display = 'none';
+      document.getElementById('popup-overlay').classList.remove('active');
     }, 1500);
   } else {
     showMsg(data.error || 'Invalid email or password', 'red');
