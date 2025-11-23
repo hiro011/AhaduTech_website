@@ -469,103 +469,108 @@
     <a href="https://t.me/NatnaelBizuneh" target="_blank" style="color:#00d4ff; text-decoration:none;">Contact us on
       Telegram @NatnaelBizuneh</a>
   </footer>
+  <script>
+    // Get logged-in user
+    function getCurrentUser() {
+      try {
+        const data = localStorage.getItem('ahaduUser');
+        if (!data) return null;
+        const parsed = JSON.parse(data);
+        if (Date.now() > parsed.expiresAt) {
+          localStorage.removeItem('ahaduUser');
+          return null;
+        }
+        return parsed.user;
+      } catch (e) {
+        return null;
+      }
+    }
 
-  <!-- <script>
-    const products = [
-      { id: 1, name: "Redmi Earpod", price: 2700, stock: 1, img: "images/redmi-earpod.jpg", description: "High-quality wireless earbuds with deep bass and long battery life.", phone: "+251941057332" },
-      { id: 2, name: "Hair Trimmer Golden", price: 1100, stock: 1, img: "images/hair-trimmer gold.jpg", description: "Professional golden hair trimmer with sharp blades.", phone: "+251941057332" },
-      { id: 3, name: "Hair Trimmer Black", price: 1100, stock: 1, img: "images/hair-trimmer black.jpg", description: "Sleek black hair trimmer for precise cutting.", phone: "+251941057332" },
-      { id: 4, name: "USB-C Charger", price: 750, stock: 45, img: "images/image.png", description: "Fast charging USB-C adapter with 65W power delivery.", phone: "+251941057332" },
-      { id: 5, name: "Wireless Mouse Adjustable DPI", price: 1200, stock: 1, img: "images/mouse-black.jpg", description: "Ergonomic wireless mouse with adjustable DPI settings.", phone: "+251941057332" },
-      { id: 6, name: "Slim Wireless Mouse White", price: 1200, stock: 0, img: "images/mouse-white.jpg", description: "Ultra-slim and lightweight wireless mouse in white.", phone: "+251941057332" },
-      { id: 7, name: "Hair Clipper", price: 2000, stock: 0, img: "images/Hair Clipper.jpg", description: "Professional cordless hair clipper with multiple guards.", phone: "+251941057332" },
-      { id: 8, name: "Lenovo Thinkplus LivePods", price: 2999, stock: 0, img: "images/Lenovo LivePods.jpg", description: "Premium TWS earbuds with active noise cancellation.", phone: "+251941057332" },
-      { id: 9, name: "USB Bluetooth 5.3/5.1/5.0 Adapter", price: 1000, stock: 0, img: "images/USB Bluetooth.jpg", description: "Add Bluetooth to any PC or laptop instantly.", phone: "+251941057332" },
-      { id: 10, name: "WiFi 6 USB 3.0 Adapter", price: 2500, stock: 0, img: "images/WiFi-adapter.jpg", description: "Upgrade your PC to ultra-fast WiFi 6 speeds.", phone: "+251941057332" },
-      { id: 11, name: "Air Pro 6 TWS Headset", price: 1500, stock: 0, img: "images/tws earpod.jpg", description: "Best-selling wireless earbuds with touch control and mic.", phone: "+251941057332" }
-    ];
-    // Load cart from localStorage
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const user = getCurrentUser();
     const cartContainer = document.getElementById('cart-container');
     const totalItemsEl = document.getElementById('total-items');
     const totalPriceEl = document.getElementById('total-price');
-    const cartLink = document.getElementById('cart-link');
 
-    // Helper: Find product by ID
-    function findProductById(id) {
-      return products.find(p => p.id === id);
+    // Redirect if not logged in
+    if (!user) {
+      document.body.innerHTML = `
+      <div style="text-align:center; margin-top:100px; color:#e74c3c; font-size:2rem;">
+        <h1>Please Login First</h1>
+        <p>You must be logged in to view your cart.</p>
+        <button onclick="showLogin()" style="padding:12px 24px; font-size:1rem; background:#007bff; color:white; border:none; border-radius:8px; cursor:pointer;">
+          Login Now
+        </button>
+      </div>
+    `;
     }
 
-    // Update navbar cart count
-    function updateCartCount() {
-      const count = cart.reduce((sum, item) => sum + item.quantity, 0);
-      cartLink.textContent = `Cart (${count})`;
-    }
+    // FETCH CART FROM DATABASE
+    async function loadCart() {
+      try {
+        const res = await fetch(`/api/cart-items?userId=${user.id}`);
+        if (!res.ok) throw new Error('Failed to load cart');
+        const cartItems = await res.json();
 
-    // Save cart to localStorage
-    function saveCart() {
-      localStorage.setItem('cart', JSON.stringify(cart));
-      updateCartCount();
-      renderCart();
-    }
-
-    // Add or update item in cart
-    function addToCart(productId, quantityChange = 1) {
-      const product = findProductById(productId);
-      if (!product) return;
-
-      const existingItem = cart.find(item => item.id === productId);
-
-      if (existingItem) {
-        const newQty = existingItem.quantity + quantityChange;
-        if (newQty > product.stock) {
-          alert(`Sorry! Only ${product.stock} unit(s) available for "${product.name}".`);
-          return;
-        }
-        if (newQty <= 0) {
-          removeFromCart(productId);
-          return;
-        }
-        existingItem.quantity = newQty;
-      } else if (quantityChange > 0) {
-        if (quantityChange > product.stock) {
-          alert(`Sorry! Only ${product.stock} unit(s) available for "${product.name}".`);
-          return;
-        }
-        cart.push({
-          id: product.id,
-          name: product.name,
-          price: product.price,
-          img: product.img,
-          quantity: quantityChange
-        });
+        renderCart(cartItems);
+        updateCartCount();
+      } catch (err) {
+        cartContainer.innerHTML = `<p style="color:red; text-align:center;">Failed to load cart. Please try again.</p>`;
       }
-      saveCart();
     }
 
-    // Remove item completely
-    function removeFromCart(productId) {
-      cart = cart.filter(item => item.id !== productId);
-      saveCart();
+    // UPDATE QUANTITY
+    async function updateQuantity(productId, newQty) {
+      if (newQty < 1) {
+        removeFromCart(productId);
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/cart-update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: user.id, productId, quantity: newQty })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          loadCart(); // Refresh cart
+        } else {
+          alert(data.error || 'Failed to update');
+          loadCart();
+        }
+      } catch (err) {
+        alert('Network error');
+        loadCart();
+      }
     }
 
-    // Change quantity (used by + and - buttons)
-    function changeQuantity(productId, change) {
-      addToCart(productId, change);
+    // REMOVE ITEM
+    async function removeFromCart(productId) {
+      if (!confirm('Remove this item from cart?')) return;
+
+      try {
+        await fetch('/api/cart-remove', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: user.id, productId })
+        });
+        loadCart();
+      } catch (err) {
+        alert('Failed to remove');
+      }
     }
 
-    // Render cart
-    function renderCart() {
-      cartContainer.innerHTML = '';
-
-      if (cart.length === 0) {
+    // RENDER CART
+    function renderCart(items) {
+      if (items.length === 0) {
         cartContainer.innerHTML = `
         <div class="empty-cart">
-          <p>Your cart is empty. <a href="index.html" style="color:#00d4ff;">Shop now!</a></p>
+          <p>Your cart is empty. <a href="products.html" style="color:#00d4ff;">Shop now!</a></p>
         </div>
       `;
         totalItemsEl.textContent = '0';
-        totalPriceEl.textContent = '$0.00';
+        totalPriceEl.textContent = '0 Birr';
         return;
       }
 
@@ -575,73 +580,83 @@
       const grid = document.createElement('div');
       grid.className = 'cart-items';
 
-      cart.forEach(item => {
-        const product = findProductById(item.id);
-        const availableStock = product ? product.stock : 0;
-
+      items.forEach(item => {
         totalItems += item.quantity;
         totalPrice += item.price * item.quantity;
 
         const card = document.createElement('div');
         card.className = 'cart-card';
         card.innerHTML = `
-        <img src="../images/${item.img}" alt="${item.name}" class="cart-img" onclick="openLightbox('../images/${item.img}')">
+        <img src="../images/${item.image}" alt="${item.name}" class="cart-img" onclick="openLightbox('../images/${item.image}')">
         <div class="cart-info">
           <div class="cart-title">${item.name}</div>
-          <div class="cart-price">$${item.price.toFixed(2)}</div>
-          <div class="cart-quantity">Qty: 
+          <div class="cart-price">${item.price} Birr</div>
+          <div class="cart-quantity">
+            Qty: 
             <button class="qty-btn minus" data-id="${item.id}">-</button>
             <span class="qty-number">${item.quantity}</span>
             <button class="qty-btn plus" data-id="${item.id}">+</button>
-            ${item.quantity >= availableStock ? '<small style="color:red; margin-left:8px;">(Max stock reached)</small>' : ''}
+            ${item.quantity >= item.stock ? '<small style="color:red; margin-left:8px;">(Max stock)</small>' : ''}
           </div>
-          <button class="remove-btn" onclick="removeFromCart(${item.id})">
-            Remove
-          </button>
+          <button class="remove-btn" onclick="removeFromCart(${item.id})">Remove</button>
         </div>
       `;
         grid.appendChild(card);
       });
 
+      cartContainer.innerHTML = '';
       cartContainer.appendChild(grid);
 
       totalItemsEl.textContent = totalItems;
-      totalPriceEl.textContent = `$${totalPrice.toFixed(2)}`;
+      totalPriceEl.textContent = `${totalPrice} Birr`;
 
-      // Attach event listeners to + and - buttons (using event delegation)
+      // Attach + / - buttons
       document.querySelectorAll('.qty-btn').forEach(btn => {
-        btn.addEventListener('click', function () {
-          const id = parseInt(this.dataset.id);
+        btn.onclick = function () {
+          const id = this.dataset.id;
+          const current = parseInt(this.parentNode.querySelector('.qty-number').textContent);
           const change = this.classList.contains('plus') ? 1 : -1;
-          changeQuantity(id, change);
-        });
+          updateQuantity(id, current + change);
+        };
       });
     }
 
-    /* ---------- Lightbox functions ---------- */
-    const lightbox = document.getElementById('lightbox');
-    const lightboxImg = document.getElementById('lightbox-img');
+    // Update navbar count
+    async function updateCartCount() {
+      if (!user) return;
+      const link = document.getElementById('cart-link');
+      if (!link) return;
+      try {
+        const res = await fetch(`/api/cart-count?userId=${user.id}`);
+        const data = await res.json();
+        link.textContent = `Cart (${data.count || 0})`;
+      } catch (e) {
+        link.textContent = 'Cart (?)';
+      }
+    }
 
+    // Lightbox (keep your existing one)
     function openLightbox(src) {
-      lightboxImg.src = src;
+      const lightbox = document.getElementById('lightbox');
+      document.getElementById('lightbox-img').src = src;
       lightbox.classList.add('active');
       document.body.style.overflow = 'hidden';
     }
-
     function closeLightbox() {
+      const lightbox = document.getElementById('lightbox');
       lightbox.classList.remove('active');
-      lightboxImg.src = '';
+      document.getElementById('lightbox-img').src = '';
       document.body.style.overflow = '';
     }
-
-    lightbox.addEventListener('click', e => {
-      if (e.target === lightbox) closeLightbox();
+    document.getElementById('lightbox')?.addEventListener('click', e => {
+      if (e.target.id === 'lightbox') closeLightbox();
     });
 
-    // Initial render
-    renderCart();
-    updateCartCount();
-  </script> -->
+    // LOAD CART ON PAGE OPEN
+    if (user) {
+      loadCart();
+    }
+  </script>
 
 </body>
 
