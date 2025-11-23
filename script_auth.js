@@ -233,6 +233,7 @@ async function login() {
     setCurrentUser(data.user);
     showMsg('Login successful!', 'green');
     if (typeof updateCartCount === 'function') updateCartCount();
+    if (typeof loadCart === 'function') loadCart();
 
     // Clear fields
     document.getElementById('login-email').value = '';
