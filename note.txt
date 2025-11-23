@@ -1,0 +1,4 @@
+
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+npm int y
+npm install @netlify/neon
