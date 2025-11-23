@@ -410,8 +410,8 @@
   </div>
 
   <!-- Main Content -->
-  <div class="container" id="main-cart-container">
-    <div class="dashboard-header">
+  <div class="container">
+    <div class="dashboard-header" id="cart-header">
       <h1>Your Cart</h1>
       <div class="summary">
         <div class="summary-item">
@@ -473,21 +473,23 @@
 
     // Redirect if not logged in
     if (!user) {
+      document.getElementById("cart-header").style.display = 'none';
       document.getElementById("cart-container").innerHTML = `
-      <div style="text-align:center; margin-top:100px; color:#e74c3c; font-size:2rem;">
-        <h1>Please Login First</h1>
-        <p>You must be logged in to view your cart.</p>
-        <button onclick="showLogin()"
-          style="padding:12px 24px; font-size:1rem; background:#007bff; color:white; border:none; border-radius:8px; cursor:pointer;">
-          Login Now
-        </button>
-      </div>
+        <div style="text-align:center; margin-top:100px; color:#e74c3c; font-size:2rem;">
+          <h1>Please Login First</h1>
+          <p>You must be logged in to view your cart.</p>
+          <button onclick="showLogin()"
+            style="padding:12px 24px; font-size:1rem; background:#007bff; color:white; border:none; border-radius:8px; cursor:pointer;">
+            Login Now
+          </button>
+        </div>
       `;
     }
 
     // FETCH CART FROM DATABASE
     async function loadCart() {
       const user1 = getCurrentUser();
+      document.getElementById("cart-header").style.display = 'block';
 
       try {
         const res = await fetch(`/api/cart-items?userId=${user1.id}`);
