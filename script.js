@@ -22,17 +22,4 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.target === lightbox || e.target.tagName === 'SPAN') closeLightbox();
     });
   }
-
-  // Add to cart function (global)
-  window.addToCart = function (id) {
-    const product = products.find(p => p.id === id);
-    if (!product || product.stock <= 0) return;
-
-    const existing = cart.find(i => i.id === id);
-    if (existing) existing.quantity += 1;
-    else cart.push({ ...product, quantity: 1 });
-
-    saveCart();
-    showToast(`${product.name} added to cart!`);
-  };
 });
