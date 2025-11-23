@@ -607,11 +607,13 @@
 
     // Update navbar count
     async function updateCartCount() {
-      if (!user) return;
+      const user1 = getCurrentUser();
+
+      if (!user1) return;
       const link = document.getElementById('cart-link');
       if (!link) return;
       try {
-        const res = await fetch(`/api/cart-count?userId=${user.id}`);
+        const res = await fetch(`/api/cart-count?userId=${user1.id}`);
         const data = await res.json();
         link.textContent = `Cart (${data.count || 0})`;
       } catch (e) {
