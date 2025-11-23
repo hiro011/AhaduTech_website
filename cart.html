@@ -5,7 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard - AhaduTech</title>
-  <meta name="description" content="AhaduTech — Ethiopia’s fast & secure online store for electronics, social media boost services and other services. Shop now!">
+  <meta name="description"
+    content="AhaduTech — Ethiopia’s fast & secure online store for electronics, social media boost services and other services. Shop now!">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="icon" type="image" href="images/image.png">
   <link rel="stylesheet" href="style.css">
@@ -214,9 +215,7 @@
         text-align: center;
       }
     }
-  </style>
 
-  <style>
     .qty-btn {
       width: 25px;
       height: 25px;
@@ -243,7 +242,6 @@
 </head>
 
 <body>
-
   <!-- Navbar -->
   <nav class="navbar">
     <div class="nav-container">
@@ -494,22 +492,22 @@
     }
 
     // UPDATE QUANTITY
-    async function updateQuantity(productId, newQty) {
-      if (newQty < 1) {
-        removeFromCart(productId);
-        return;
-      }
-
+    async function updateQuantity(productId, change) {
       try {
-        const res = await fetch('/api/cart-update', {
+        const res = await fetch('/api/cart-qty', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: user.id, productId, quantity: newQty })
+          body: JSON.stringify({
+            userId: user.id,
+            productId: productId,
+            change: change  // +1 or -1
+          })
         });
+
         const data = await res.json();
 
         if (data.success) {
-          loadCart(); // Refresh cart
+          loadCart();  // Refresh cart
         } else {
           alert(data.error || 'Failed to update');
           loadCart();
@@ -519,7 +517,7 @@
         loadCart();
       }
     }
-
+    
     // REMOVE ITEM
     async function removeFromCart(productId) {
       if (!confirm('Remove this item from cart?')) return;
@@ -591,7 +589,7 @@
           const id = this.dataset.id;
           const current = parseInt(this.parentNode.querySelector('.qty-number').textContent);
           const change = this.classList.contains('plus') ? 1 : -1;
-          updateQuantity(id, current + change);
+          updateQuantity(id, change);
         };
       });
     }
