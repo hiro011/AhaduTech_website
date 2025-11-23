@@ -487,8 +487,10 @@
 
     // FETCH CART FROM DATABASE
     async function loadCart() {
+      const user1 = getCurrentUser();
+
       try {
-        const res = await fetch(`/api/cart-items?userId=${user.id}`);
+        const res = await fetch(`/api/cart-items?userId=${user1.id}`);
         if (!res.ok) throw new Error('Failed to load cart');
         const cartItems = await res.json();
 
