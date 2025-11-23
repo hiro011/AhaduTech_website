@@ -558,12 +558,17 @@
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const productId = parseInt(urlParams.get('id')) || 1;
+        const productId = parseInt(urlParams.get('id')) || null;
+
+        if (!productId) {
+            document.body.innerHTML = '<h1 style="text-align:center; margin-top:100px; color:red;">Invalid Product ID</h1>';
+            throw new Error('No product ID');
+        }
 
         // Get current logged-in user
         function getCurrentUser() {
             try {
-                const data = localStorage.getItem('ahaduUser');  // ← This is your key!
+                const data = localStorage.getItem('ahaduUser');
                 if (!data) return null;
                 const parsed = JSON.parse(data);
                 if (Date.now() > parsed.expiresAt) {
@@ -583,11 +588,10 @@
 
             if (!user) {
                 alert('You must be logged in to add items to cart!');
-                showLogin();
+                showLogin && showLogin();
                 return;
             }
 
-            // Disable button immediately to prevent double-click
             btn.disabled = true;
             btn.textContent = 'Adding...';
 
@@ -607,30 +611,20 @@
                 if (data.success) {
                     btn.textContent = 'Added!';
                     btn.style.background = '#28a745';
-
                     setTimeout(() => {
                         btn.textContent = 'Add to Cart';
                         btn.style.background = '';
                         btn.disabled = false;
                     }, 1500);
-
                     updateCartCount();
-                }
-                else if (data.error && data.error.includes('stock')) {
-                    // This means backend said "not enough stock"
-                    alert('Maximum available quantity reached for this item!');
-                    btn.textContent = 'Max Reached';
-                    btn.style.background = '#dc3545';
-                    btn.disabled = true;
-                }
-                else {
-                    alert(data.error || 'Failed to add to cart');
+                } else {
+                    alert(data.error || 'Failed to add');
                     btn.textContent = 'Add to Cart';
                     btn.disabled = false;
                 }
             } catch (err) {
-                console.error(err);
-                alert('Network error. Try again.');
+                console.error('Add to cart error:', err);
+                alert('Network error');
                 btn.textContent = 'Add to Cart';
                 btn.disabled = false;
             }
@@ -648,17 +642,46 @@
             }
 
             try {
-                const res = await fetch(`/api/cart-count?userId=${user.id}`)
-                if (!res.ok) throw new Error('Failed');
+                const res = await fetch(`/api/cart-count?userId=${user.id}`);
                 const data = await res.json();
                 link.textContent = `Cart (${data.count || 0})`;
             } catch (e) {
                 link.textContent = 'Cart (?)';
-                console.error('Cart count failed');
             }
         }
 
-        updateCartCount();
+        // Fetch single product from DB
+        async function loadProductDetail() {
+            try {
+                const res = await fetch(`/api/products/${productId}`);
+                if (!res.ok) throw new Error('Product not found');
+                const product = await res.json();
+
+                document.title = `${product.name} - AhaduTech`;
+                document.getElementById('product-name').textContent = product.name;
+                document.getElementById('product-price').textContent = `${product.price} Birr`;
+                document.getElementById('product-stock').textContent = `Available: ${product.stock} unit${product.stock !== 1 ? 's' : ''}`;
+                document.getElementById('product-phone').innerHTML = `Phone: <a href="tel:${product.phone}">${product.phone}</a>`;
+                document.getElementById('product-img').src = `../images/${product.image}`;
+                document.getElementById('product-desc').textContent = product.description || 'No description.';
+
+                const btn = document.getElementById('add-to-cart');
+                if (product.stock <= 0) {
+                    btn.textContent = "Sold Out";
+                    btn.classList.add('sold-out');
+                    btn.disabled = true;
+                } else {
+                    btn.textContent = "Add to Cart";
+                    btn.classList.remove('sold-out');
+                    btn.disabled = false;
+                    btn.onclick = (e) => addToCart(product.id, e);  // NOW WORKS 100%
+                }
+
+            } catch (err) {
+                console.error(err);
+                document.body.innerHTML = `<h1 style="color:red; text-align:center;">Product Not Found</h1>`;
+            }
+        }
 
         let currentUser2 = getCurrentUser();
 
@@ -836,52 +859,11 @@
             }
         });
 
-        // Fetch single product from DB
-        async function loadProductDetail() {
-            try {
-                const res = await fetch(`/api/products/${productId}`);
-                if (!res.ok) throw new Error('Product not found');
-
-                const product = await res.json();
-
-                // Update page
-                document.title = `${product.name} - AhaduTech`;
-                document.getElementById('product-name').textContent = product.name;
-                document.getElementById('product-price').textContent = `${product.price} Birr`;
-                document.getElementById('product-stock').textContent =
-                    `Available: ${product.stock} unit${product.stock !== 1 ? 's' : ''}`;
-                document.getElementById('product-phone').innerHTML =
-                    `Phone: <a href="tel:${product.phone}">${product.phone}</a>`;
-                document.getElementById('product-img').src = `../images/${product.image}`;
-                document.getElementById('product-desc').textContent = product.description || 'No description available.';
-
-                // Add to cart button
-                const btn = document.getElementById('add-to-cart');
-
-                if (product.stock <= 0) {
-                    btn.textContent = "Sold Out";
-                    btn.classList.add('sold-out');
-                    btn.disabled = true;
-                } else {
-                    btn.textContent = "Add to Cart";
-                    btn.classList.remove('sold-out');
-                    btn.disabled = false;
-                }
-
-                btn.onclick = (e) => addToCart(product.id, e);
-            } catch (err) {
-                document.body.innerHTML = `
-                    <div style="text-align:center; margin-top:100px; color:#e74c3c; font-size:1.5rem;">
-                        <h1>Product Not Found</h1>
-                        <p>${err.message}</p>
-                        <a href="index.html" style="color:#007bff;">← Back to Shop</a>
-                    </div>
-                `;
-            }
-        }
-
-        // Load on page ready
-        document.addEventListener('DOMContentLoaded', loadProductDetail);
+        // Run on load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProductDetail();
+            updateCartCount();  // Show correct count on page load
+        });
 
         // Always show review form
         document.addEventListener('DOMContentLoaded', () => {
