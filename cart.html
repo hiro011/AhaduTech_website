@@ -434,7 +434,7 @@
   </div>
 
   <!-- Main Content -->
-  <div class="container">
+  <div class="container" id="main-container">
     <div class="dashboard-header">
       <h1>Your Cart</h1>
       <div class="summary">
@@ -493,7 +493,7 @@
 
     // Redirect if not logged in
     if (!user) {
-      document.body.innerHTML = `
+      document.getElementById("main-container").innerHTML = `
       <div style="text-align:center; margin-top:100px; color:#e74c3c; font-size:2rem;">
         <h1>Please Login First</h1>
         <p>You must be logged in to view your cart.</p>
