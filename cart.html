@@ -442,7 +442,7 @@
     <a href="https://t.me/NatnaelBizuneh" target="_blank" style="color:#00d4ff; text-decoration:none;">Contact us on
       Telegram @NatnaelBizuneh</a>
   </footer>
-  
+
   <script>
     // Get logged-in user
     function getCurrentUser() {
@@ -466,10 +466,10 @@
     const totalPriceEl = document.getElementById('total-price');
 
     // GLOBAL: Listen for login/logout and instantly update cart & count
-    document.addEventListener('ahaduLoginEvent', () => {
-      if (typeof loadCart === 'function') loadCart();
-      if (typeof updateCartCount === 'function') updateCartCount();
-    });
+  //  document.addEventListener('ahaduLoginEvent', () => {
+ //     if (typeof loadCart === 'function') loadCart();
+  //    if (typeof updateCartCount === 'function') updateCartCount();
+  //  });
 
     // Redirect if not logged in
     if (!user) {
@@ -616,23 +616,6 @@
         link.textContent = 'Cart (?)';
       }
     }
-
-    // Lightbox (keep your existing one)
-    function openLightbox(src) {
-      const lightbox = document.getElementById('lightbox');
-      document.getElementById('lightbox-img').src = src;
-      lightbox.classList.add('active');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeLightbox() {
-      const lightbox = document.getElementById('lightbox');
-      lightbox.classList.remove('active');
-      document.getElementById('lightbox-img').src = '';
-      document.body.style.overflow = '';
-    }
-    document.getElementById('lightbox')?.addEventListener('click', e => {
-      if (e.target.id === 'lightbox') closeLightbox();
-    });
 
     // LOAD CART ON PAGE OPEN
     if (user) {
