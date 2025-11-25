@@ -301,18 +301,42 @@
       height: 100%;
       background-color: rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(5px);
-      align-items: center;
+      overflow-y: auto;
+      padding: 20px 0;
+      align-items: flex-start;
       justify-content: center;
     }
 
+    /* Limit max height and enable inner scrolling */
     .modal-content {
       background: white;
       padding: 0;
       border-radius: 12px;
       width: 90%;
       max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      margin: 5vh auto;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-      animation: modalpop 0.3s ease-out;
+      position: relative;
+    }
+
+    .modal-content::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .modal-content::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+
+    .modal-content::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 10px;
+    }
+
+    .modal-content::-webkit-scrollbar-thumb:hover {
+      background: #555;
     }
 
     @keyframes modalpop {
@@ -779,28 +803,41 @@
       const newImage = document.getElementById('editImage').value.trim();
 
       const updatedData = {
-        name: document.getElementById('editName').value,
+        name: document.getElementById('editName').value.trim(),
         price: parseFloat(document.getElementById('editPrice').value),
-        stock: parseInt(document.getElementById('editStock').value),
-        description: document.getElementById('editDescription').value,
+        stock: parseInt(document.getElementById('editStock').value, 10),
+        description: document.getElementById('editDescription').value.trim(),
       };
       if (newImage) updatedData.image = newImage;
 
-      const res = await fetch(`/api/admin/products/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`  // your secret
-        },
-        body: JSON.stringify(updatedData)
-      });
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        showToast('Admin session expired. Please login again.', 'error');
+        return;
+      }
 
-      if (res.ok) {
-        showToast('Product updated successfully!', 'success');
-        editModal.style.display = 'none';
-        loadProducts();
-      } else {
-        showToast('Update failed', 'error');
+      try {
+        const res = await fetch(`/api/admin/products/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`        // ← THIS LINE MUST BE EXACT
+          },
+          body: JSON.stringify(updatedData)
+        });
+
+        if (res.ok) {
+          showToast('Product updated successfully!', 'success');
+          editModal.style.display = 'none';
+          loadProducts();
+        } else if (res.status === 401) {
+          showToast('Unauthorized – please login again', 'error');
+        } else {
+          showToast('Update failed', 'error');
+        }
+      } catch (err) {
+        showToast('Network error', 'error');
+        console.error(err);
       }
     };
 
