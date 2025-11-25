@@ -401,53 +401,60 @@
               : `<button class="add-to-cart sold-out" disabled>Sold Out</button>`;
 
             card.innerHTML = `
-            <img src="../images/${product.image}" alt="${product.name}" class="product-img" onclick="openLightbox('../images/${product.image}')">
-            <div class="product-info">
-              <div class="product-title"><a href="product_items.html?id=${product.id}">${product.name}</a></div>
-              <div class="product-price">${product.price} Birr</div>
-              <div class="rating" id="product-rating">
-                ${updateAverageRating(product.id)}
+              <img src="../images/${product.image}" alt="${product.name}" class="product-img" onclick="openLightbox('../images/${product.image}')">
+              <div class="product-info">
+                <div class="product-title"><a href="product_items.html?id=${product.id}">${product.name}</a></div>
+                <div class="product-price">${product.price} Birr</div>
+                <div class="rating" id="rating-${product.id}">
+                  <div class="stars">Loading reviews...</div>
+                </div>
+                <div class="product-stock">Available: ${product.stock} unit${product.stock !== 1 ? 's' : ''}</div>
+                <div class="product-phone">Phone: <a href="tel:${product.phone}">${product.phone.replace('+251', '')}</a></div>
+                ${buttonHTML}
               </div>
-
-              <div class="product-stock">Available: ${product.stock} unit${product.stock !== 1 ? 's' : ''}</div>
-              <div class="product-phone">Phone: <a href="tel:${product.phone}">${product.phone.replace('+251', '')}</a></div>
-              ${buttonHTML}
-            </div>
-          `;
+            `;
             productList.appendChild(card);
+
+            loadProductRating(product.id);
           });
         })
         .catch(err => console.error('Load products error:', err));
     }
 
-    // Update average rating display
-    async function updateAverageRating(productId) {
+    // FIXED: Load rating for a single product
+    async function loadProductRating(productId) {
+      const ratingEl = document.getElementById(`rating-${productId}`);
+      if (!ratingEl) return;
+
       try {
-        const productRating = document.getElementById('product-rating');
         const res = await fetch(`/api/product-comments?id=${productId}`);
         const comments = await res.json();
 
         if (comments.length === 0) {
-          productRating.innerHTML = `
-            <div class="stars" id="avg-stars">☆☆☆☆☆
-            <span class="rating-text" id="avg-rating-text">No reviews</span></div>
-          `;
+          ratingEl.innerHTML = `
+        <div class="stars">No reviews yet</div>
+        <small style="color:#888;">Be the first to review!</small>
+      `;
           return;
         }
 
         const avg = comments.reduce((sum, c) => sum + c.rating, 0) / comments.length;
         const filled = '★'.repeat(Math.round(avg));
         const empty = '☆'.repeat(5 - Math.round(avg));
-        productRating.innerHTML = `
-            <div class="stars" id="avg-stars">${filled + empty}
-            <span class="rating-text" id="avg-rating-text"><strong>${avg.toFixed(1)}</strong> (${comments.length} reviews)</span></div>
-          `;
+
+        ratingEl.innerHTML = `
+          <div class="stars">${filled}${empty}</div>
+          <div class="rating-text">
+            <strong>${avg.toFixed(1)}</strong> 
+            <small>(${comments.length} review${comments.length > 1 ? 's' : ''})</small>
+          </div>
+        `;
       } catch (err) {
-        console.error(err);
-        document.getElementById('product-rating').innerHTML = '<p style="color:red; text-align:center;">Failed to load reviews</p>';
+        console.error('Failed to load reviews:', err);
+        ratingEl.innerHTML = '<small style="color:red;">Failed to load reviews</small>';
       }
     }
-
+    
     // Add to Cart
     async function addToCart(productId, clickEvent) {
       const btn = clickEvent.target;
