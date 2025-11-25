@@ -572,20 +572,20 @@
         const card = document.createElement('div');
         card.className = 'cart-card';
         card.innerHTML = `
-        <img src="../images/${item.image}" alt="${item.name}" class="cart-img"
+          <img src="../images/${item.image}" alt="${item.name}" class="cart-img"
           onclick="openLightbox('../images/${item.image}')">
-        <div class="cart-info">
-          <div class="cart-title">${item.name}</div>
-          <div class="cart-price">${item.price} Birr</div>
-          <div class="cart-quantity">
-            Qty:
-            <button class="qty-btn minus" data-id="${item.id}">-</button>
-            <span class="qty-number">${item.quantity}</span>
-            <button class="qty-btn plus" data-id="${item.id}">+</button>
-            ${item.quantity >= item.stock ? '<small style="color:red; margin-left:8px;">(Max stock)</small>' : ''}
+          <div class="cart-info">
+            <div class="cart-title">${item.name}</div>
+            <div class="cart-price">${item.price} Birr</div>
+            <div class="cart-quantity">
+              Qty:
+              <button class="qty-btn minus" data-id="${item.id}">-</button>
+              <span class="qty-number">${item.quantity > item.stock ? item.stock : item.quantity}</span>
+              <button class="qty-btn plus" data-id="${item.id}">+</button>
+              ${item.quantity >= item.stock ? '<small style="color:red; margin-left:8px;">(Max stock)</small>' : ''}
+            </div>
+            <button class="remove-btn" onclick="removeFromCart(${item.id})">Remove</button>
           </div>
-          <button class="remove-btn" onclick="removeFromCart(${item.id})">Remove</button>
-        </div>
         `;
         grid.appendChild(card);
       });
