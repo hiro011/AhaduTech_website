@@ -434,7 +434,11 @@
 
         if (comments.length === 0) {
           ratingEl.innerHTML = `
-            <div class="stars">No reviews</div>
+            <div class="stars">★★★★★</div>
+            <div class="rating-text">
+              <strong>0</strong> 
+              <small>(No reviews)</small>
+            </div>
           `;
           return;
         }
