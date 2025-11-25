@@ -405,9 +405,8 @@
             <div class="product-info">
               <div class="product-title"><a href="product_items.html?id=${product.id}">${product.name}</a></div>
               <div class="product-price">${product.price} Birr</div>
-              <div class="rating">
-                  <div class="stars" id="avg-stars">☆☆☆☆☆
-                  <span class="rating-text" id="avg-rating-text">No reviews</span></div>
+              <div class="rating" id="product-rating">
+                ${updateAverageRating(product.id)}
               </div>
 
               <div class="product-stock">Available: ${product.stock} unit${product.stock !== 1 ? 's' : ''}</div>
@@ -504,29 +503,35 @@
     }
 
     // Update average rating display
-    async function updateAverageRating() {
+    async function updateAverageRating(productId) {
 
       try {
-        const avgEl = document.getElementById('avg-rating-text');
-        const starsEl = document.getElementById('avg-stars');
+        // const avgEl = document.getElementById('avg-rating-text');
+        // const starsEl = document.getElementById('avg-stars');
+
+        const productRating = document.getElementById('product-rating');
         const res = await fetch(`/api/product-comments?id=${productId}`);
         const comments = await res.json();
-        if (!avgEl || !starsEl) return;
+        // if (!avgEl || !starsEl) return;
 
         if (comments.length === 0) {
-          starsEl.textContent = '☆☆☆☆☆';
-          avgEl.textContent = 'No reviews';
+          productRating.innerHTML = `
+            <div class="stars" id="avg-stars">☆☆☆☆☆
+            <span class="rating-text" id="avg-rating-text">No reviews</span></div>
+          `;
           return;
         }
 
         const avg = comments.reduce((sum, c) => sum + c.rating, 0) / comments.length;
         const filled = '★'.repeat(Math.round(avg));
         const empty = '☆'.repeat(5 - Math.round(avg));
-        starsEl.textContent = filled + empty;
-        avgEl.innerHTML = `<strong>${avg.toFixed(1)}</strong> (${comments.length} reviews)`;
+        productRating.innerHTML = `
+            <div class="stars" id="avg-stars">${filled + empty}
+            <span class="rating-text" id="avg-rating-text"><strong>${avg.toFixed(1)}</strong> (${comments.length} reviews)</span></div>
+          `;
       } catch (err) {
         console.error(err);
-        document.getElementById('avg-stars').innerHTML = '<p style="color:red; text-align:center;">Failed to load reviews</p>';
+        document.getElementById('product-rating').innerHTML = '<p style="color:red; text-align:center;">Failed to load reviews</p>';
       }
     }
 
@@ -534,7 +539,6 @@
     document.addEventListener('DOMContentLoaded', () => {
       loadProducts2();
       updateCartCount();
-      updateAverageRating();
     });
 
     // ====================== AUTO DETECT PAGE & RUN ======================
