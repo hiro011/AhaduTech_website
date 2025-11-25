@@ -421,7 +421,7 @@
         .catch(err => console.error('Load products error:', err));
     }
 
-    // FIXED: Load rating for a single product
+    // Load rating for a single product
     async function loadProductRating(productId) {
       const ratingEl = document.getElementById(`rating-${productId}`);
       if (!ratingEl) return;
@@ -432,9 +432,8 @@
 
         if (comments.length === 0) {
           ratingEl.innerHTML = `
-        <div class="stars">No reviews yet</div>
-        <small style="color:#888;">Be the first to review!</small>
-      `;
+            <div class="stars">No reviews</div>
+          `;
           return;
         }
 
@@ -454,7 +453,7 @@
         ratingEl.innerHTML = '<small style="color:red;">Failed to load reviews</small>';
       }
     }
-    
+
     // Add to Cart
     async function addToCart(productId, clickEvent) {
       const btn = clickEvent.target;
