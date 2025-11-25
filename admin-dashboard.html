@@ -5,7 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Dashboard | AhaduTech</title>
-  <meta name="description" content="AhaduTech — Ethiopia’s fast & secure online store for electronics, social media boost services and other services. Shop now!">
+  <meta name="description"
+    content="AhaduTech — Ethiopia’s fast & secure online store for electronics, social media boost services and other services. Shop now!">
   <link rel="icon" href="../images/image.png" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
   <style>
@@ -288,6 +289,123 @@
       opacity: 0.7;
     }
   </style>
+
+  <style>
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 0;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      animation: modalpop 0.3s ease-out;
+    }
+
+    @keyframes modalpop {
+      from {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .modal-header {
+      padding: 20px;
+      background: #1f2937;
+      color: white;
+      border-radius: 12px 12px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    .close {
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      color: #aaa;
+    }
+
+    .close:hover {
+      color: white;
+    }
+
+    #editProductForm {
+      padding: 25px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    .btn-cancel {
+      background: #6b7280;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    .btn-save {
+      background: #10b981;
+      color: white;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .btn-save:hover {
+      background: #059669;
+    }
+
+    .btn-cancel:hover {
+      background: #4b5563;
+    }
+  </style>
+
 </head>
 
 <body>
@@ -302,7 +420,7 @@
     </div>
   </header>
 
-  <div class="container"> 
+  <div class="container">
     <!-- Stats -->
     <div class="stats-grid" id="stats">
       <div class="stat-card">
@@ -386,6 +504,54 @@
 
   <!-- Toast -->
   <div id="toast" class="toast"></div>
+
+  <!-- Edit Product Modal -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Edit Product</h2>
+        <span class="close">&times;</span>
+      </div>
+      <form id="editProductForm">
+        <input type="hidden" id="editProductId" />
+
+        <div class="form-group">
+          <label>Name</label>
+          <input type="text" id="editName" required />
+        </div>
+
+        <div class="form-group">
+          <label>Price (Birr)</label>
+          <input type="number" id="editPrice" min="1" step="0.01" required />
+        </div>
+
+        <div class="form-group">
+          <label>Stock</label>
+          <input type="number" id="editStock" min="0" required />
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="editDescription" rows="4" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Current Image</label>
+          <div style="margin-bottom:10px;">
+            <img id="currentImagePreview" src="" width="100" style="border-radius:8px; border:2px solid #ddd;" />
+          </div>
+          <label>Change Image (optional)</label>
+          <input type="text" id="editImage" placeholder="e.g. product1.jpg" />
+          <small>Leave empty to keep current image</small>
+        </div>
+
+        <div style="text-align:right; margin-top:20px;">
+          <button type="button" class="btn-cancel" id="cancelEdit">Cancel</button>
+          <button type="submit" class="btn-save">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script>
     // === SECURITY: Check Admin Session ===
@@ -572,6 +738,72 @@
         row.style.display = text.includes(term) ? '' : 'none';
       });
     });
+
+    // === EDIT PRODUCT MODAL ===
+    const editModal = document.getElementById('editModal');
+    const closeModal = document.querySelector('#editModal .close');
+    const cancelEdit = document.getElementById('cancelEdit');
+
+    // Open modal
+    window.editProduct = async (id) => {
+      try {
+        const res = await fetch(`/api/products/${id}`);  // ← Public endpoint (safe)
+        const product = await res.json();
+
+        document.getElementById('editProductId').value = product.id;
+        document.getElementById('editName').value = product.name;
+        document.getElementById('editPrice').value = product.price;
+        document.getElementById('editStock').value = product.stock;
+        document.getElementById('editDescription').value = product.description;
+        document.getElementById('editImage').value = '';
+        document.getElementById('currentImagePreview').src = `../images/${product.image}`;
+
+        editModal.style.display = 'flex';
+      } catch (err) {
+        showToast('Failed to load product', 'error');
+      }
+    };
+
+    // Close modal
+    closeModal.onclick = () => editModal.style.display = 'none';
+    cancelEdit.onclick = () => editModal.style.display = 'none';
+    window.onclick = (e) => {
+      if (e.target === editModal) editModal.style.display = 'none';
+    };
+
+    // Submit edit form
+    document.getElementById('editProductForm').onsubmit = async (e) => {
+      e.preventDefault();
+
+      const id = document.getElementById('editProductId').value;
+      const newImage = document.getElementById('editImage').value.trim();
+
+      const updatedData = {
+        name: document.getElementById('editName').value,
+        price: parseFloat(document.getElementById('editPrice').value),
+        stock: parseInt(document.getElementById('editStock').value),
+        description: document.getElementById('editDescription').value,
+      };
+      if (newImage) updatedData.image = newImage;
+
+      const res = await fetch(`/api/admin/products/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`  // your secret
+        },
+        body: JSON.stringify(updatedData)
+      });
+
+      if (res.ok) {
+        showToast('Product updated successfully!', 'success');
+        editModal.style.display = 'none';
+        loadProducts();
+      } else {
+        showToast('Update failed', 'error');
+      }
+    };
+
   </script>
 </body>
 

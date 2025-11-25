@@ -9,4 +9,4 @@ export default async (req, { params }) => {
   return new Response(JSON.stringify(result[0]), { status: 200 });
 };
 
-export const config = { path: '/api/products/:id' };  // ← This is now SAFE
+export const config = { path: '/api/products/:id' }; 
