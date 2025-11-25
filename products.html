@@ -420,6 +420,34 @@
         .catch(err => console.error('Load products error:', err));
     }
 
+    // Update average rating display
+    async function updateAverageRating(productId) {
+      try {
+        const productRating = document.getElementById('product-rating');
+        const res = await fetch(`/api/product-comments?id=${productId}`);
+        const comments = await res.json();
+
+        if (comments.length === 0) {
+          productRating.innerHTML = `
+            <div class="stars" id="avg-stars">☆☆☆☆☆
+            <span class="rating-text" id="avg-rating-text">No reviews</span></div>
+          `;
+          return;
+        }
+
+        const avg = comments.reduce((sum, c) => sum + c.rating, 0) / comments.length;
+        const filled = '★'.repeat(Math.round(avg));
+        const empty = '☆'.repeat(5 - Math.round(avg));
+        productRating.innerHTML = `
+            <div class="stars" id="avg-stars">${filled + empty}
+            <span class="rating-text" id="avg-rating-text"><strong>${avg.toFixed(1)}</strong> (${comments.length} reviews)</span></div>
+          `;
+      } catch (err) {
+        console.error(err);
+        document.getElementById('product-rating').innerHTML = '<p style="color:red; text-align:center;">Failed to load reviews</p>';
+      }
+    }
+
     // Add to Cart
     async function addToCart(productId, clickEvent) {
       const btn = clickEvent.target;
@@ -499,39 +527,6 @@
       } catch (e) {
         link.textContent = 'Cart (?)';
         console.error('Cart count failed');
-      }
-    }
-
-    // Update average rating display
-    async function updateAverageRating(productId) {
-
-      try {
-        // const avgEl = document.getElementById('avg-rating-text');
-        // const starsEl = document.getElementById('avg-stars');
-
-        const productRating = document.getElementById('product-rating');
-        const res = await fetch(`/api/product-comments?id=${productId}`);
-        const comments = await res.json();
-        // if (!avgEl || !starsEl) return;
-
-        if (comments.length === 0) {
-          productRating.innerHTML = `
-            <div class="stars" id="avg-stars">☆☆☆☆☆
-            <span class="rating-text" id="avg-rating-text">No reviews</span></div>
-          `;
-          return;
-        }
-
-        const avg = comments.reduce((sum, c) => sum + c.rating, 0) / comments.length;
-        const filled = '★'.repeat(Math.round(avg));
-        const empty = '☆'.repeat(5 - Math.round(avg));
-        productRating.innerHTML = `
-            <div class="stars" id="avg-stars">${filled + empty}
-            <span class="rating-text" id="avg-rating-text"><strong>${avg.toFixed(1)}</strong> (${comments.length} reviews)</span></div>
-          `;
-      } catch (err) {
-        console.error(err);
-        document.getElementById('product-rating').innerHTML = '<p style="color:red; text-align:center;">Failed to load reviews</p>';
       }
     }
 
