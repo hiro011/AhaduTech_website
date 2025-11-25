@@ -5,7 +5,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AhaduTech</title>
-  <meta name="description" content="AhaduTech — Ethiopia’s fast & secure online store for electronics, social media boost services and other services. Shop now!">
+  <meta name="description"
+    content="AhaduTech — Ethiopia’s fast & secure online store for electronics, social media boost services and other services. Shop now!">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="icon" type="image" href="images/image.png">
   <link rel="stylesheet" href="style.css">
@@ -153,6 +154,24 @@
       color: #fff;
       cursor: pointer;
       user-select: none;
+    }
+  </style>
+  <style>
+    .rating {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .stars {
+      color: #f39c12;
+      font-size: 1.6rem;
+    }
+
+    .rating-text {
+      font-size: 1.1rem;
+      color: #555;
     }
   </style>
 </head>
@@ -340,10 +359,6 @@
     <div class="products" id="product-list">
       <!-- Products injected via JS -->
     </div>
-
-    <div class="products" id="product-list2">
-      <!-- Products injected via JS -->
-    </div>
   </div>
 
 
@@ -355,7 +370,7 @@
 
   <!-- <script src="script.js"></script> -->
   <script>
-    const productList = document.getElementById('product-list2');
+    const productList = document.getElementById('product-list');
 
     function getCurrentUser() {
       try {
@@ -391,6 +406,11 @@
             <div class="product-info">
               <div class="product-title"><a href="product_items.html?id=${product.id}">${product.name}</a></div>
               <div class="product-price">${product.price} Birr</div>
+              <div class="rating">
+                  <div class="stars" id="avg-stars">★★★★★
+                  <span class="rating-text" id="avg-rating-text">No reviews</span></div>
+              </div>
+
               <div class="product-stock">Available: ${product.stock} unit${product.stock !== 1 ? 's' : ''}</div>
               <div class="product-phone">Phone: <a href="tel:${product.phone}">${product.phone.replace('+251', '')}</a></div>
               ${buttonHTML}
@@ -484,12 +504,40 @@
       }
     }
 
+    // Update average rating display
+    async function updateAverageRating() {
+      const avgEl = document.getElementById('avg-rating-text');
+      const starsEl = document.getElementById('avg-stars');
+
+      try {
+        const res = await fetch(`/api/product-comments?id=${productId}`);
+        const comments = await res.json();
+        if (!avgEl || !starsEl) return;
+
+        if (comments.length === 0) {
+          starsEl.textContent = '☆☆☆☆☆';
+          avgEl.textContent = 'No reviews';
+          return;
+        }
+
+        const avg = comments.reduce((sum, c) => sum + c.rating, 0) / comments.length;
+        const filled = '★'.repeat(Math.round(avg));
+        const empty = '☆'.repeat(5 - Math.round(avg));
+        starsEl.textContent = filled + empty;
+        avgEl.innerHTML = `<strong>${avg.toFixed(1)}</strong> (${comments.length} reviews)`;
+      } catch (err) {
+        console.error(err);
+        avgEl.innerHTML = '<p style="color:red; text-align:center;">Failed to load reviews</p>';
+      }
+    }
+
     // Run on load
     document.addEventListener('DOMContentLoaded', () => {
       loadProducts2();
       updateCartCount();
+      updateAverageRating();
     });
-    
+
     // ====================== AUTO DETECT PAGE & RUN ======================
     document.addEventListener('DOMContentLoaded', () => {
       const lightbox = document.getElementById('lightbox');

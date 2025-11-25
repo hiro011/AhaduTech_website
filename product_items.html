@@ -758,17 +758,17 @@
                         : '';
 
                     div.innerHTML = `
-                ${deleteBtn}
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <strong style="color:#1e293b; font-size:1.15rem;">${c.name || 'Anonymous'}</strong>
-                    <div style="color:#f59e0b; font-size:1.5rem;">${'★'.repeat(c.rating)}${'☆'.repeat(5 - c.rating)}</div>
-                </div>
-                <div style="color:#64748b; font-size:0.95rem; margin-bottom:12px;">
-                    ${formatDate(c.date)}
-                    ${isOwner ? ' <span style="color:#dc3545; font-weight:600;">(You)</span>' : ''}
-                </div>
-                <p style="margin:0; line-height:1.7; color:#334155;">${c.comment.replace(/\n/g, '<br>')}</p>
-            `;
+                        ${deleteBtn}
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                            <strong style="color:#1e293b; font-size:1.15rem;">${c.name || 'Anonymous'}</strong>
+                            <div style="color:#f59e0b; font-size:1.5rem;">${'★'.repeat(c.rating)}${'☆'.repeat(5 - c.rating)}</div>
+                        </div>
+                        <div style="color:#64748b; font-size:0.95rem; margin-bottom:12px;">
+                            ${formatDate(c.date)}
+                            ${isOwner ? ' <span style="color:#dc3545; font-weight:600;">(You)</span>' : ''}
+                        </div>
+                        <p style="margin:0; line-height:1.7; color:#334155;">${c.comment.replace(/\n/g, '<br>')}</p>
+                    `;
 
                     commentsList.appendChild(div);
                 });
